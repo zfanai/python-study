@@ -1,0 +1,6 @@
+[2015-07-09 13:12:51.752000]trace:['main:tp0,__name__,pid:', '__main__', 5292]
+[2015-07-09 13:12:51.908000]trace:['func2.pool:', <multiprocessing.pool.Pool object at 0x02558810>]
+[2015-07-09 13:12:51.908000]trace:['func2.result:', <multiprocessing.pool.ApplyResult object at 0x025E0C50>]
+[2015-07-09 13:12:51.939000]trace:['func2.tmp1:', 100]
+[2015-07-09 13:12:51.955000]trace:['func2.tmp2:', [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]]
+[2015-07-09 13:12:51.970000]trace:['main:tp9,__name__,pid:', '__main__', 5292]

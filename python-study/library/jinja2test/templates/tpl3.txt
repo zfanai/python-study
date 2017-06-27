@@ -1,0 +1,25 @@
+{% set args={} %}
+
+{% set args={"viewother":1} %}
+
+
+{% if args.viewother is defined %}
+args.viewother is defined
+{% endif %}
+
+{# end_date没有定义，但是它却是非空的。 #}
+{% if end_date is not none %}
+end_date is not none
+{% endif %}
+
+{% if end_date is defined %}
+end_date is defined
+{% endif %}
+
+{%set a=range(0,10)%}
+{%set b=a|length %}
+size of a:{{b}}
+{% for i in range(0,10) %}
+{{i}}
+{% endfor %}
+

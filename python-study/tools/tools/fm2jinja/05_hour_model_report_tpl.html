@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">   
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+
+{% set charset='utf8' %}
+{% set orient='heng' %}
+{% include 'report/pdf_common_head_tpl.html' %}
+
+<body id="{{pdf_report_id}}">
+
+{% include 'report/pdf_report_header_tpl.html' %}
+
+<div class="mt_page_body">
+
+<!--
+填写用户信息的表头
+-->
+
+{% include 'report/pdf_report_userinfo_tpl.html' %}
+
+<p class="content_title">分时模式图</p>
+<div class="mt_report_chart_warp">
+	<img src="{{chart_base_url}}/{{hour_model_chart_id}}" height="200px" width="100%"/>
+</div>
+
+<p class="content_title">分时统计</p>
+<div class="mt_report_statistics_tbl">
+<table cellspacing="0">
+    <tr>
+    <td colspan="2" class="b_border r_border">统计</td>
+    
+    {#
+    <#list 0..23 as x>
+    <td class="b_border r_border">${x?string("00")}:00</td>
+    </#list>
+    #}
+    {% for x in range(0, 24) %}
+    <td class="b_border r_border">{{"%02d"|format(x)}}:00</td>
+    {% endfor %}
+    
+    <td class="b_border">平均/总计</td>
+    </tr>
+    
+    {#<#list 0..16 as row>#}
+    {% for row in range(0, 17) %}
+    
+    <tr>
+    	
+    	{#
+    	<#if row==0><#assign item="正常%">
+        <#elseif row==1><#assign item="偏低%">
+        <#elseif row==2><#assign item="偏高%">
+        <#elseif row==3><#assign item="平均值">
+        <#elseif row==4><#assign item="标准差">
+        <#elseif row==5><#assign item="均值标准差">
+        <#elseif row==6><#assign item="最大值">  
+        <#elseif row==7><#assign item="最小值">
+        <#elseif row==8><#assign item="中位数">
+        <#elseif row==9><#assign item="第一分位">
+        <#elseif row==10><#assign item="第三分位">
+        <#elseif row==11><#assign item="偏高比">
+        <#elseif row==12><#assign item="偏低比">
+        <#elseif row==13><#assign item="次数">
+        <#elseif row==14><#assign item="平均值">
+        <#elseif row==15><#assign item="MAD">
+        <#elseif row==16><#assign item="ROG&ge;2%">       
+        </#if>
+        #}
+        {% if row==0 %}{% set item="正常%" %}
+        {% elseif row==1 %}{% set item="偏低%" %}
+        {% elseif row==2 %}{% set item="偏高%" %}
+        {% elseif row==3 %}{% set item="平均值" %}
+        {% elseif row==4 %}{% set item="标准差" %}
+        {% elseif row==5 %}{% set item="均值标准差" %}
+        {% elseif row==6 %}{% set item="最大值" %}
+        {% elseif row==7 %}{% set item="最小值" %}
+        {% elseif row==8 %}{% set item="中位数" %}
+        {% elseif row==9 %}{% set item="第一分位" %}
+        {% elseif row==10 %}{% set item="第三分位" %}
+        {% elseif row==11 %}{% set item="偏高比" %}
+        {% elseif row==12 %}{% set item="偏低比" %}
+        {% elseif row==13 %}{% set item="次数" %}
+        {% elseif row==14 %}{% set item="平均值" %}
+        {% elseif row==15 %}{% set item="MAD" %}
+        {% elseif row==16 %}{% set item="ROG&ge;2%" %}       
+        {% endif %}
+        
+        {#
+        <#if row==16>
+        	<#assign b_border="">
+        <#else>
+        	<#assign b_border="b_border">
+        </#if>
+        #}
+		{% row==16 %}{% set b_border="" %}
+		{% else %}{% set b_border="b_border" %}{% endif %}
+        
+        {#
+        <#if row==11>
+        	<td rowspan="2" class="{{b_border}} r_border">每天平均</td>
+          	<td class="{{b_border}} r_border">{{item}}</td>
+        <#elseif row==12>
+        	<td class="{{b_border}} r_border">{{item}}</td>
+        <#elseif row==13>
+        	<td rowspan="2" class="{{b_border}} r_border">指尖血</td>
+          	<td class="{{b_border}} r_border">{{item}}</td>        	
+        <#elseif row==14>
+          	<td class="{{b_border}} r_border">{{item}}</td>  
+        <#else>
+        	<td colspan="2" class="{{b_border}} r_border">{{item}}</td>        
+        </#if>
+        #}
+        {% if row==11 %}
+        	<td rowspan="2" class="{{b_border}} r_border">每天平均</td>
+          	<td class="{{b_border}} r_border">{{item}}</td>
+        {% elseif row==12 %}
+        	<td class="{{b_border}} r_border">{{item}}</td>
+        {% elseif row==13 %}
+        	<td rowspan="2" class="{{b_border}} r_border">指尖血</td>
+          	<td class="{{b_border}} r_border">{{item}}</td>        	
+        {% elseif row==14 %}
+          	<td class="{{b_border}} r_border">{{item}}</td>  
+        {% else %}
+        	<td colspan="2" class="{{b_border}} r_border">{{item}}</td>        
+        {% endif %}
+        
+        {#
+        <#assign keys=["tp", "lp", "up", "avg", "sd", "se", "max", 
+        			   "min", "median", "q1", "q3","day_up", "day_lp",
+                       "bg_num", "bg_avg", "mad", "rog2"]>
+        <#list 0..24 as col>
+        	
+            <#if col==24>
+                <#assign r_border="">
+            <#else>
+                <#assign r_border="r_border">
+            </#if>
+        
+        	<td class="{{b_border}} {{r_border}}">{{hour_model[col][keys[row]]}}</td>
+        </#list>
+        #}
+        {% set keys=["tp", "lp", "up", "avg", "sd", "se", "max", 
+        			   "min", "median", "q1", "q3","day_up", "day_lp",
+                       "bg_num", "bg_avg", "mad", "rog2"] %}
+        {% for col in range(0, 25) %}
+        	{% if col==24 %}{% set r_border="" %}
+        	{% else %}{% set r_border="r_border" %}{% endif %}
+        	
+        	<td class="{{b_border}} {{r_border}}">{{hour_model[col][keys[row]]}}</td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+</div>
+
+</div>
+</body>
+</html>

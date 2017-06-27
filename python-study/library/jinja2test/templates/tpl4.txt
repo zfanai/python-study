@@ -1,0 +1,25 @@
+{%set a=range(0,10)%}
+{%set b=a|length %}
+{{ a|length }}
+
+{#
+{% for x in range(0, 24) %}
+<td class="b_border r_border">{{"%02d"|format(x)}}:00</td>
+{% endfor %}
+#}
+
+{% set obj={'a':1, 'b':2} %}
+{# Python的内建函数可以调用。 #}
+{% set k=obj.keys() %}
+{% for i in k %}
+{{i}}
+{% endfor %}
+
+{% if 'a' in k %}
+'a' in k 
+{% endif %}
+
+{% for y in range(0,30) %}
+{% set r=(y/5)|int %}
+{{ (y/5)|int }}
+{% endfor %}

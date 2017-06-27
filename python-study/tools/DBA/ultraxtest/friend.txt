@@ -1,0 +1,5 @@
+('pre_common_friendlink',)
+('pre_home_friend',)
+('pre_home_friend_request',)
+('pre_home_friendlog',)
+('pre_ucenter_friends',)

@@ -1,0 +1,1 @@
+call flaskpython mysqlexec.py myzfsql85 flaskdb flaskdb.sql

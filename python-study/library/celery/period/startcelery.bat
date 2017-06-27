@@ -1,0 +1,1 @@
+celery  worker -A app -l info -P threads

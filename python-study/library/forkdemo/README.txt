@@ -1,0 +1,1 @@
+1.python 的win版本的os模块没有fork属性

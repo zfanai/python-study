@@ -1,0 +1,2305 @@
+
+C:\Users\zhoufan\Projects\Python\CodeRepository\GadgetTest\Tools\findreplace>python findreplace.py C:\Users\zhoufan\Projects\Python\TrumCloud\app\middle 
+trace: ['target_dir:', 'C:\\Users\\zhoufan\\Projects\\Python\\TrumCloud\\app\\middle']
+#!usr/bin/env python
+#coding:utf-8
+
+"""
+修改计划：
+1.转移这个文件里面的代码，把各个表的读取操作放到各自的dao里面去。
+"""
+import math
+import os
+import json
+#import random
+import datetime
+import time
+import string
+import itertools
+import pytz
+
+
+from operator import itemgetter
+
+from sqlalchemy import func, distinct, asc, and_, desc
+
+from app.tcld import db
+from app.model.models import *
+from app.history.HistoryAnalyzer import * 
+from app.middle.miscUtil import misc
+
+from app.medtrum import *
+from app.middle import debug
+from app.dao.dao2 import dao2
+from app.middle import gea
+from app.middle import inject
+from app.middle import glucoseutil
+from app.middle import sgUtil
+from app.middle import calibUtil
+from app.middle import bolusUtil
+from app.middle import journalutil
+from app.tcld_cfg import tcld_cfg
+
+# -- 计算画图和生成报告的JSON数据 -----------------------------------------
+
+# 内部函数，求指尖血糖的平均值
+def getBloodGlucoseAvg(blood_glucose):
+    day_num = len(blood_glucose)
+    glucose_sum = 0
+    count = 0
+    for i in range(0, day_num):
+        size = len(blood_glucose[i])
+        for j in range(0, size):
+            if blood_glucose[i][j][1] is not None:
+                glucose_sum += blood_glucose[i][j][1]
+                count += 1
+    if count>0:
+        return glucose_sum / count;
+    else:
+        return 0
+            
+################################################################################
+## 得到早中晚三餐的餐前餐后的传感器血糖值的叠加
+##    [mealtime,targetbg,hypo,blood_glucose,blood_glucose_avg,
+##     sensor_glucose,sensor_glucose_avg]
+################################################################################
+# 一个是绘图用的，一个是统计用的。
+def getSGPeriodModel(uid, datelist):
+    
+    daymealoverlay = []
+    dl=[]  #日期列表
+    day_num = len(datelist)
+    for d in range(0, day_num):
+        tmpst = datetime.datetime.strptime(datelist[d],'%Y-%m-%d')
+        dl.append(tmpst)    
+    
+    # pdl是period descript list的缩写，包含每个阶段信息的数据，例如，餐前时间，餐后时间。
+    # 餐前，餐后目标血糖。
+    pdl= dao2.setting_dao.getMealtimeandGlucose(uid)    
+    #debug.app_trace(['pdl:', pdl])
+    
+    #
+    ts=[]
+    period_dist10_interval_list = []
+    for p in pdl:
+        #mealoverlay = []
+        # 进餐时间的定义
+        mealtime=p[0]
+        mealStartTime=p[1]  # 整个用餐区段的覆盖时间，现在可能用不上了。因为现在就是计算餐后4小时的数据。
+        mealEndTime=p[2]    # 整个用餐区段的覆盖时间段的结束时间。
+        targetbg=p[3]     # 起始就是餐前餐后目标血糖，这里的bg可能用得不是很准确。
+        hypo=p[4]     # 低血糖限值。        
+            
+        daymealoverlay.append([mealtime, targetbg, hypo])        
+        
+        
+    #
+    # 查询数据， 画图用以及统计箱状图和分布图。 
+    # 把时间的区段划分得详细一点，全部查出来。
+    ts=[]
+    # 下面是全天时间加睡眠时间，加3个餐前，餐后时间，一个8个时间段。
+    timepl=[[pdl[3][0][0], pdl[3][0][1]],     # 睡眠
+        [pdl[0][0][0], pdl[0][0][1]], [pdl[0][0][2], pdl[0][0][3]],
+        [pdl[1][0][0], pdl[1][0][1]], [pdl[1][0][2], pdl[1][0][3]],
+        [pdl[2][0][0], pdl[2][0][1]], [pdl[2][0][2], pdl[2][0][3]],
+        [0,24*60], 
+        
+        [pdl[0][0][1], pdl[0][0][2]], [pdl[0][0][2], pdl[0][0][4]+4*60],  #早餐， 用餐时间以及，餐后最大时间
+        [pdl[1][0][1], pdl[1][0][2]], [pdl[1][0][2], pdl[1][0][4]+4*60],  #午餐， 用餐时间以及，餐后最大时间
+        [pdl[2][0][1], pdl[2][0][2]], [pdl[2][0][2], pdl[2][0][4]+4*60],  #晚餐， 用餐时间以及，餐后最大时间
+        ]
+    #debug.app_trace(['app middle chartdata timepl:', timepl])
+    #
+    for p in timepl:
+        for d in dl:
+            tmpst=d+datetime.timedelta(minutes=p[0])
+            tmpet=d+datetime.timedelta(minutes=p[1])
+            ts.append([tmpst, tmpet])
+            
+    # 而下面的ts包含三餐的范围时间和睡眠的覆盖时间。
+    #rv=dao2.sgdao.getSGByTimeSection(uid, ts, True)
+    rv=sgUtil.getSGByTimeSectionNew(uid, ts, True, preproc='CR')
+    #rv=dao2.bgdao.getBGByTimeSection(uid, ts)
+    
+    # 
+    dn=len(dl)     # 天数。
+    pn=len(pdl)    # 早餐，午餐，晚餐， 睡眠。 4个
+    plSize=len(timepl)  # 查询SG时， 时间区间的个数。
+    #debug.app_trace(['app middle chartdata len(rv):', len(rv), plSize, dn])
+    t1=time.time()
+    for i in range(0, pn):
+        sensor_glucose=[]
+        blood_glucose=[]
+        for j in range(0, dn):
+            tmpsg=[]
+            if 0==i:  # 早餐，午餐，晚餐
+                tmpsg=[rv[1*dn+j], rv[8*dn+j], rv[9*dn+j]]
+            elif 1==i:
+                tmpsg=[rv[3*dn+j],rv[10*dn+j], rv[11*dn+j]]
+            elif 2==i:
+                tmpsg=[rv[5*dn+j],rv[12*dn+j], rv[13*dn+j]]
+            elif 3==i:  # 睡眠
+                tmpsg=[rv[0*dn+j]]
+            #
+            #sensor_glucose.append(rv[i*dn+j])  # 以天的形式组织。这个阶段的多天的数据
+            sensor_glucose.append(tmpsg)
+            blood_glucose.append([])
+        # 
+        #blood_glucose_avg = getBloodGlucoseAvg(blood_glucose);
+        #mealStartTime=pdl[i][1]
+        #mealEndTime=pdl[i][2]
+        #sensor_glucose_avg = glucoseutil.calSGCurveAvg(sensor_glucose, [mealStartTime, mealEndTime])
+        blood_glucose_avg=[]  # 暂时留空。
+        sensor_glucose_avg=[] # 暂时留空。
+        daymealoverlay[i]+=[blood_glucose, blood_glucose_avg, sensor_glucose, sensor_glucose_avg]
+    t2=time.time()
+    debug.app_trace(['getSGPeriodModel exec 1:', t2-t1])
+    #
+    period_box_stat_list=[]
+    period_dist3_stat_list=[]
+    period_dist10_stat_list=[]
+    
+    
+    #### pie data for sensor overlay
+    sg_high,sg_low=dao2.setting_dao.getGlucoseTarget(uid)
+    # 
+    
+    targetList = [pdl[3][3],   # 睡眠
+                  pdl[0][3][0:2],pdl[0][3][2:4],  #早餐，餐前，餐后
+                  pdl[1][3][0:2],pdl[1][3][2:4],  #午餐，餐前，餐后
+                  pdl[2][3][0:2],pdl[2][3][2:4],  #晚餐，餐前，餐后
+                  [sg_low, sg_high]    #全天
+                  ]  
+    # 保存rv的值，方便调试。
+    #dt=datetime.datetime.now()
+    #fileName=tcld_cfg['JSON_DIR']+'/%d-%s-pm-%s.json'%(uid, dt.strftime('%Y%m%d%H%M%S'), misc.randomStr(4))
+    #strRv=json.dumps(rv, ensure_ascii=False)
+    #fileObj=open(fileName, 'w')
+    #fileObj.write(strRv)
+    #fileObj.close()
+    # 8个阶段。
+    t1=time.time()
+    period_sg_merge=[]
+    for i in range(0, 8):
+        sg=[]
+        for j in range(0, dn):
+            sg += rv[i*dn+j]
+        period_sg_merge.append(sg)
+    #debug.saveJson(uid, period_sg_merge)
+    #
+    for i in range(0, 8):
+        #sg=[]
+        #for j in range(0, dn):
+        #    sg += rv[i*dn+j]
+        sg=period_sg_merge[i]
+        # 
+        tmprank = glucoseutil.getSGRank(uid, targetList[i])
+        period_box_stat=glucoseutil.calSGBoxStat(sg)
+        period_box_stat_list.append(period_box_stat)
+        period_dist3_stat = glucoseutil.calSGDistPercent(sg, targetList[i])
+        period_dist3_stat_list.append(period_dist3_stat)
+        period_dist10_stat = glucoseutil.calSGDistPercentByInterval(sg, tmprank)
+        period_dist10_stat_list.append(period_dist10_stat)
+        #debug.app_trace(['tmprank:', tmprank, targetList[i]])
+        period_dist10_interval=misc.rankToIntervalList(tmprank)
+        period_dist10_interval_list.append(period_dist10_interval)        
+    t2=time.time()
+    debug.app_trace(['getSGPeriodModel exec 2:', t2-t1])
+    
+    #
+    return daymealoverlay, period_box_stat_list, period_dist3_stat_list, period_dist10_stat_list, \
+           period_dist10_interval_list, targetList
+
+
+
+################################################################################
+# 获得血糖事件分布(按时间)图表数据
+# +-- sensor_glucose   #列表，每一个元素代表一天的数据
+#      +-- (n)  #列表，每一个元素代表一个点的数据
+#           +-- (n) #列表 [minute,glucose]
+# +-- dev_count   #列表，每个元素代表一个小时的数据，共25个元素，最后一个数据只是为了作图的需要（可以去掉）
+#      +-- (n)   #列表，[hour,highCount,lowCount],高低血糖事件的次数
+# +-- dev_range  # 列表，每个元素代表一个时间点血糖值的高低偏离幅度
+#      +-- (n)   # 列表， [minute,highDev,lowDev]
+# +-- risk_index # 列表，每个元素代表一个时间点的高低血糖风险指数
+#      +-- (n)   # 列表，[minute,highRisk,lowRisk]
+# @param uid- 用户id
+################################################################################
+#@debug.exeTime
+def getGlucoseEventDistByTime(uid, datelist):
+    dev_range = []
+    risk_index = []
+    day_num = len(datelist)
+    
+    sg_high, sg_low = dao2.setting_dao.getGlucoseTarget(uid)
+    #
+    #sensor_glucose = dao2.sgdao.getSGMultiDay(uid, datelist, True)
+    sensor_glucose = sgUtil.getSGMultiDayNew(uid, datelist, True, preproc='CR')
+    ## [1458211980.0, 18.1667, 0.0, 25.92, u'C']
+    '''
+    for i in range(0, day_num):
+        sensor_glucose[i] = filter(lambda x: x[1]<=22.22
+                                   and x[1]!=0 
+                                   ## and x[4]!='NC'
+                                   , 
+                                   sensor_glucose[i]) '''
+    sensor_glucose_avg = glucoseutil.calSGCurveAvg(sensor_glucose, [0,24*60])
+    sensor_glucose.append(sensor_glucose_avg)    ## day_num = len(sensor_glucose) - 1
+    
+    
+    # 
+    dev_high_cnt = [0]*24
+    dev_low_cnt = [0]*24
+    GluHlist = []
+    GluLlist = []
+    GluTlist = []
+    
+    SecHlist = []
+    SecLlist = []
+    SecTlist = []
+    
+    RangeHlist = []
+    RangeLlist = []
+    
+    SecRangeHlist = []
+    SecRangeLlist = []
+    
+    RiskHlist = []
+    RiskLlist = []
+    
+    SecRiskHlist = []
+    SecRiskLlist = []
+    
+    reslist = []    
+    
+    highnumlist = []
+    lownumlist = []
+    targetnumlist = []
+    hasdatanumlist = []
+    for j in range(0, 720):
+        highnumlist.append([0, None])
+        lownumlist.append([0, None])
+        targetnumlist.append([0, None])
+        hasdatanumlist.append([0, None])
+        
+    highrangelist = []
+    lowrangelist = []
+    for j in range(0, 720):
+        highrangelist.append([0, None])
+        lowrangelist.append([0, None])
+    
+    highrisklist = []
+    lowrisklist = []
+    for j in range(0, 720):
+        highrisklist.append([0, None])
+        lowrisklist.append([0, None])
+    for i in range(0, day_num):
+        sglist = sensor_glucose[i]
+        
+        sglen = len(sglist)
+        
+        for j in xrange(0, sglen):
+            midx = ((datetime.datetime.fromtimestamp(sglist[j][0]).hour*60+
+                    datetime.datetime.fromtimestamp(sglist[j][0]).minute)/2)
+            
+            hasdatanumlist[midx][0] += 1
+            hasdatanumlist[midx][1] = midx
+            if sglist[j][1] > sg_high:
+                highnumlist[midx][0] += 1
+                highnumlist[midx][1] = midx
+                highrangelist[midx][0] += sglist[j][1]-sg_high
+                highrangelist[midx][1] = midx
+            
+            elif sglist[j][1] < sg_low:
+                lownumlist[midx][0] += 1
+                lownumlist[midx][1] = midx
+                lowrangelist[midx][0] += sg_low-sglist[j][1]
+                lowrangelist[midx][1] = midx
+            
+            elif sglist[j][1] >= sg_low and sglist[j][1] <= sg_high:
+                targetnumlist[midx][0] += 1
+                targetnumlist[midx][1] = midx
+            
+            
+            if sglist[j][1]*18>112.55:
+                highrisklist[midx][0] += 22.77*(math.log(sglist[j][1]*18)**1.084-5.381)**2
+            else:
+                highrisklist[midx][0] += 0
+            highrisklist[midx][1] = midx
+            
+            
+            if sglist[j][1]!=0 and sglist[j][1]*18<112.55:
+                if math.log(sglist[j][1]*18)>=0:
+                    lowrisklist[midx][0] += 22.77*(math.log(sglist[j][1]*18)**1.084-5.381)**2
+                else:
+                    lowrisklist[midx][0] += 22.77*(-math.log(sglist[j][1]*18)**1.084-5.381)**2
+            else:
+                lowrisklist[midx][0] += 0
+            lowrisklist[midx][1] = midx
+    
+    '''debug.app_trace(['app middle chartdata lownumlist: line 324', lownumlist])
+    debug.app_trace(['app middle chartdata highnumlist: line 325', highnumlist])
+    debug.app_trace(['app middle chartdata targetnumlist: line 326', targetnumlist])
+    debug.app_trace(['app middle chartdata hasdatanumlist: line 327', hasdatanumlist]) '''
+    
+    def getNumSecList(numlist, hasdatanumlist):
+        Glulist = []
+        Seclist = []
+        for idx in xrange(0, 720):
+            if (    numlist[idx][0] >= 0 and 
+                    hasdatanumlist[idx][0] > 0 and 
+                    numlist[idx][0] * 1.0 / hasdatanumlist[idx][0] > 0.5
+                ):
+                Glulist.append([idx, numlist[idx][0]])
+                tmplen = len(Glulist)
+                if (tmplen >= 2 and 
+                      (
+                          (numlist[idx-1][1] and 
+                           Glulist[-1][0] - Glulist[-2][0] > 1 and 
+                           Glulist[-2][0] - Glulist[0][0] > 7 and 
+                           Glulist[-2][0] - Glulist[0][0] + 1 == len(Glulist[0:-1]) ) 
+                        or
+                          (not numlist[idx-1][1] and 
+                           Glulist[-1][0] - Glulist[-2][0] > 5 and 
+                           Glulist[-2][0] - Glulist[0][0] > 7 and 
+                           Glulist[-2][0] - Glulist[0][0] + 1 == len(Glulist[0:-1]))
+                       )
+                    ):
+                    hsum = sum(map(lambda x: x[1], Glulist[0:-1]))
+                    Seclist.append([Glulist[0][0], Glulist[-2][0], hsum])
+                    Glulist = [ [idx, numlist[idx][0]] ]
+                elif (tmplen >= 2 and Glulist[-1][0] - Glulist[-2][0] > 1):
+                    Glulist = [ [idx, numlist[idx][0]] ]
+        
+        return Seclist, Glulist
+    
+    def getRangeSecList(rangelist, hasdatanumlist, threshold):
+        Rangelist = []
+        Seclist = []
+        for idx in xrange(0, 720):
+            if (rangelist[idx][0]>=0 and hasdatanumlist[idx][0]>0 and 
+              rangelist[idx][0]*1.0/hasdatanumlist[idx][0] > threshold*1.0/18):
+                Rangelist.append([idx, rangelist[idx][0]])            
+                lenH = len(Rangelist)
+                if (lenH>=2 and 
+                      (
+                          (rangelist[idx-1][1] and
+                           Rangelist[-1][0] - Rangelist[-2][0] > 1 and 
+                           Rangelist[-2][0] - Rangelist[0][0] > 7 and 
+                           Rangelist[-2][0] - Rangelist[0][0] + 1 == len(Rangelist[0:-1]) )
+                       or 
+                          (not rangelist[idx-1][1] and 
+                           Rangelist[-1][0] - Rangelist[-2][0] > 5 and 
+                           Rangelist[-2][0] - Rangelist[0][0] > 7 and
+                           Rangelist[-2][0] - Rangelist[0][0] + 1 == len(Rangelist[0:-1]) )
+                      )
+                    ):
+                    rangesum = sum(map(lambda x: x[1], Rangelist[0:-1]))
+                    Seclist.append([Rangelist[0][0], Rangelist[-2][0], rangesum])
+                    Rangelist = [ [idx,rangelist[idx][0]] ]
+                elif (lenH >= 2 and Rangelist[-1][0] - Rangelist[-2][0] > 1):
+                    Rangelist = [ [idx, rangelist[idx][0]] ]
+        
+        return Seclist, Rangelist
+    
+    
+    def getRiskSecList(risklist, hasdatanumlist, threshold):
+        Risklist = []
+        Seclist = []
+        for idx in xrange(0, 720):
+            if (risklist[idx][0]>=0 and hasdatanumlist[idx][0]>0 and 
+              risklist[idx][0]*1.0/hasdatanumlist[idx][0] > threshold):
+                Risklist.append([idx, risklist[idx][0]])            
+                lenH = len(Risklist)
+                if (lenH>=2 and 
+                        (   (risklist[idx-1][1] and 
+                             Risklist[-1][0] - Risklist[-2][0] > 1 and 
+                             Risklist[-2][0] - Risklist[0][0] > 7 and
+                             Risklist[-2][0] - Risklist[0][0] + 1 == len(Risklist[0:-1]))
+                          or 
+                            (not risklist[idx-1][1] and 
+                             Risklist[-1][0] - Risklist[-2][0] > 5 and 
+                             Risklist[-2][0] - Risklist[0][0] > 7 and 
+                             Risklist[-2][0] - Risklist[0][0] + 1 == len(Risklist[0:-1]) )
+                        )
+                    ):
+                    risksum = sum(map(lambda x: x[1], Risklist[0:-1]))
+                    Seclist.append([Risklist[0][0], Risklist[-2][0], risksum])
+                    Risklist = [ [idx, risklist[idx][0]] ]
+                elif (lenH >= 2 and Risklist[-1][0] - Risklist[-2][0] > 1):
+                    Risklist = [ [idx, risklist[idx][0]] ]
+        
+        return Seclist, Risklist
+    
+    ## for high and low glucose event
+    SecHlist, GluHlist = getNumSecList(highnumlist, hasdatanumlist)        
+    SecLlist, GluLlist = getNumSecList(lownumlist, hasdatanumlist)
+    #debug.app_trace(['app middle chartdata SecHlist, GluHlist: line 421', SecHlist, GluHlist])
+    
+    ## for high and low range event
+    SecRangeHlist, RangeHlist = getRangeSecList(highrangelist, hasdatanumlist, 60)
+    SecRangeLlist, RangeLlist = getRangeSecList(lowrangelist, hasdatanumlist, 20)
+    
+    ## for high and low risk event
+    SecRiskHlist, RiskHlist = getRiskSecList(highrisklist, hasdatanumlist, 9)
+    SecRiskLlist, RiskLlist = getRiskSecList(lowrisklist, hasdatanumlist, 5)
+    
+    if not SecHlist and GluHlist and GluHlist[-1][0]-GluHlist[0][0]>7:
+        hsum = sum(map(lambda x: x[1], GluHlist))
+        SecHlist = [ [GluHlist[0][0], GluHlist[-1][0], hsum] ]
+    elif SecHlist:
+        if GluHlist and GluHlist[-1][0]-GluHlist[0][0]>7:
+            hsum = sum(map(lambda x: x[1], GluHlist))
+            SecHlist.append([GluHlist[0][0],GluHlist[-1][0],hsum])
+    if not SecLlist and GluLlist and GluLlist[-1][0]-GluLlist[0][0]>7:
+        lsum = sum(map(lambda x: x[1], GluLlist))
+        SecLlist = [ [GluLlist[0][0], GluLlist[-1][0], lsum] ]
+    elif SecLlist:
+        if GluLlist and GluLlist[-1][0]-GluLlist[0][0]>7:
+            lsum = sum(map(lambda x: x[1], GluLlist))
+            SecLlist.append([GluLlist[0][0],GluLlist[-1][0],lsum])
+    
+    if not SecRangeHlist and RangeHlist and RangeHlist[-1][0]-RangeHlist[0][0]>7:
+        rangesum = sum(map(lambda x: x[1], RangeHlist))
+        SecRangeHlist = [ [RangeHlist[0][0], RangeHlist[-1][0], rangesum] ]
+    elif SecRangeHlist:
+        if RangeHlist and RangeHlist[-1][0]-RangeHlist[0][0]>7:
+            rangesum = sum(map(lambda x: x[1], RangeHlist))
+            SecRangeHlist.append([RangeHlist[0][0], RangeHlist[-1][0], rangesum])
+    if not SecRangeLlist and RangeLlist and RangeLlist[-1][0]-RangeLlist[0][0]>7:
+        rangesum = sum(map(lambda x: x[1], RangeLlist))
+        SecRangeLlist = [ [RangeLlist[0][0], RangeLlist[-1][0], rangesum] ]
+    elif SecRangeLlist:
+        if RangeLlist and RangeLlist[-1][0]-RangeLlist[0][0]>7:
+            rangesum = sum(map(lambda x:x[1], RangeLlist))
+            SecRangeLlist.append([RangeLlist[0][0], RangeLlist[-1][0]])
+    
+    if not SecRiskHlist and RiskHlist and RiskHlist[-1][0]-RiskHlist[0][0]>7:
+        risksum = sum(map(lambda x: x[1], RiskHlist))
+        SecRiskHlist = [ [RiskHlist[0][0], RiskHlist[-1][0], risksum] ]
+    elif SecRiskHlist:
+        if RiskHlist and RiskHlist[-1][0]-RiskHlist[0][0]>7:
+            risksum = sum(map(lambda x: x[1], RiskHlist))
+            SecRiskHlist.append([RiskHlist[0][0], RiskHlist[-1][0], risksum])
+    if not SecRiskLlist and RiskLlist and RiskLlist[-1][0]-RiskLlist[0][0]>7:
+        risksum = sum(map(lambda x: x[1], RiskLlist))
+        SecRiskLlist = [ [RiskLlist[0][0], RiskLlist[-1][0], risksum] ]
+    elif SecRiskLlist:
+        if RiskLlist and RiskLlist[-1][0]-RiskLlist[0][0]>7:
+            risksum = sum(map(lambda x: x[1], RiskLlist))
+            SecRiskLlist.append([RiskLlist[0][0], RiskLlist[-1][0], risksum])
+    
+    reslist = [SecHlist, SecLlist, SecRangeHlist, 
+               SecRangeLlist, SecRiskHlist, SecRiskLlist, 
+               hasdatanumlist]
+    
+    '''debug.app_trace(['app middle chartdata SecHlist: line 480', highnumlist, lownumlist, SecHlist])
+    debug.app_trace(['app middle chartdata SecLlist: line 481', SecLlist])
+    debug.app_trace(['app middle chartdata SecTlist: line 482', SecTlist])
+    debug.app_trace(['app middle chartdata SecRangeHlist: line 483', SecRangeHlist])
+    debug.app_trace(['app middle chartdata SecRangeLlist: line 484', SecRangeLlist])
+    debug.app_trace(['app middle chartdata SecRiskHlist: line 485', SecRiskHlist])
+    debug.app_trace(['app middle chartdata SecRiskLlist: line 486', SecRiskLlist])'''
+    
+    lowriskfactor = [0]*720
+    highriskfactor = [0]*720
+    for idx in range(0,720):
+        lowriskfactor[idx] = [idx, lowrisklist[idx][0] * 1.0 / hasdatanumlist[idx][0]
+                              if hasdatanumlist[idx][0] > 0 else None]
+        highriskfactor[idx] = [idx, highrisklist[idx][0] * 1.0 / hasdatanumlist[idx][0]
+                               if hasdatanumlist[idx][0] > 0 else None]
+    # debug.app_trace(['app middle chartdata lowrisklist: ', lowriskfactor])
+    # debug.app_trace(['app middle chartdata highrisklist: ', highriskfactor])
+    risk_index_chart = [highriskfactor, lowriskfactor]
+    risk_index = [SecRiskHlist, SecRiskLlist]
+    
+    devrangehigh = [0]*720
+    devrangelow = [0]*720
+    for idx in range(0,720):
+        devrangelow[idx] = [idx, lowrangelist[idx][0]*1.0 / hasdatanumlist[idx][0] 
+                              if hasdatanumlist[idx][0] > 0 else None]
+        devrangehigh[idx] = [idx, highrangelist[idx][0]*1.0 / hasdatanumlist[idx][0]
+                               if hasdatanumlist[idx][0] > 0 else None]
+    # debug.app_trace(['app middle chartdata devrangelow: ', devrangelow])
+    # debug.app_trace(['app middle chartdata devrangehigh: ', devrangehigh])
+    dev_range_chart = [devrangehigh, devrangelow]
+    dev_range = [SecRangeHlist, SecRangeLlist]
+    
+    devcounthigh = [0]*720
+    devcountlow = [0]*720
+    devcounttarget = [0]*720
+    # debug.app_trace(['app middle chartdata hasdatanumlist: line 476 ', hasdatanumlist])
+    for idx in range(0,720):
+        devcountlow[idx] = [idx, lownumlist[idx][0]
+                              if hasdatanumlist[idx][0] > 0 else None]
+        devcounthigh[idx] = [idx, highnumlist[idx][0]
+                               if hasdatanumlist[idx][0] > 0 else None]
+        devcounttarget[idx] = [idx, targetnumlist[idx][0] 
+                               if hasdatanumlist[idx][0] >0 else None]
+    # debug.app_trace(['app middle chartdata devcountlow: line 482 ', devcountlow])
+    # debug.app_trace(['app middle chartdata devcounthigh: line 483 ', devcounthigh])
+    dev_count_chart = [devcounthigh, devcountlow, devcounttarget]
+    dev_count = [SecHlist, SecLlist]
+    #debug.app_trace(['app middle chartdata SecHlist, SecLlist: line 524', SecHlist, SecLlist])
+    
+    
+    def getAndSec(OriginalList):
+        and_section = []
+        tmplen = len(OriginalList)
+        for i in range(0, tmplen):
+            curEle = OriginalList[i]
+            tmphlen = len(curEle)
+        
+            if i==0:
+                and_section += map(lambda x: [x[0], x[1], 1], curEle)
+            elif not curEle:
+                and_section = []
+                break
+        
+            if curEle and i>0:
+                for tmpi in range(0, tmphlen):
+                    tmpele = curEle[tmpi]
+                    tmpsec = filter(lambda x: 
+                                (x[0]>=tmpele[0] and x[0]<tmpele[1]-7) or 
+                                (x[1]>tmpele[0]+7 and x[1]<=tmpele[1]) or
+                                (x[0]<=tmpele[0] and x[1]>=tmpele[1]) or
+                                (x[0]>tmpele[0] and x[1]<tmpele[1]), and_section)
+                    if tmpsec:
+                        for item in tmpsec:
+                            andtimeAI = True
+                            itemidx = and_section.index(item)
+                            if item[0]>=tmpele[0] and item[0]<tmpele[1]-7:
+                                if item[1]-tmpele[1]>7:
+                                    sec = [tmpele[1], item[1]]
+                                    andtimeAI = False
+                                    appendsec = [item[0], tmpele[1]]
+                                    and_section.append(appendsec+[item[2]+1])
+                                else:
+                                    sec = [item[0], tmpele[1] if tmpele[1]<item[1] else item[1]]
+                            elif item[1]>tmpele[0]+7 and item[1]<=tmpele[1]:
+                                sec = [tmpele[0] if tmpele[0]>item[0] else item[0], item[1]]
+                            elif item[0]<=tmpele[0] and item[1]>=tmpele[1]:
+                                if item[1]-tmpele[1]>7:
+                                    sec = [tmpele[1], item[1]]
+                                    andtimeAI = False
+                                    appendsec = [tmpele[0], tmpele[1]]
+                                    and_section.append(appendsec+[item[2]+1])
+                                else:
+                                    sec = [tmpele[0], tmpele[1]]
+                            elif item[0]>tmpele[0] and item[1]<tmpele[1]:
+                                sec = [item[0], item[1]]
+                            if andtimeAI:
+                                andtime = item[2]+1
+                            else:
+                                andtime = item[2]
+                            andsec = sec+[andtime]
+                            and_section[itemidx] = andsec
+        return and_section
+    
+    def getOrSec(OriginalList):
+        or_section = []
+        tmplen = len(OriginalList)
+        for i in range(0, tmplen):
+            curEle = OriginalList[i]
+            
+            if not or_section:
+                or_section += curEle
+            
+            if curEle:
+                tmphlen = len(curEle)
+                for tmpi in range(0, tmphlen):
+                    tmpele = curEle[tmpi]
+                    tmpsec = filter(lambda x: 
+                                (x[0]>=tmpele[0] and x[0]<=tmpele[1]) or 
+                                (x[1]>=tmpele[0] and x[1]<=tmpele[1]) or
+                                (x[0]<=tmpele[0] and x[1]>=tmpele[1]),
+                                or_section)
+                    if tmpsec:
+                        tmpseclist = tmpsec
+                        if tmpele not in tmpseclist:
+                            tmpseclist.append(tmpele)
+                        secsidx = min(x[0] for x in tmpseclist)
+                        seceidx = max(x[1] for x in tmpseclist)
+                        if len(tmpsec)>=2:
+                            for item in tmpsec:
+                                if item in or_section:
+                                    or_section.remove(item)
+                            or_section.append([secsidx, seceidx])
+                        else:
+                            secidx = or_section.index(tmpsec[0])
+                            or_section[secidx] = [secsidx, seceidx]
+                    else:
+                        or_section.append(curEle[tmpi])
+        return or_section
+    
+    Hlist = [
+             map(lambda x: [x[0], x[1]], SecHlist),
+             map(lambda x: [x[0], x[1]], SecRangeHlist),
+             map(lambda x: [x[0], x[1]], SecRiskHlist)
+             ]
+    Hlen = len(Hlist)
+    and_sectionH = getAndSec(Hlist)
+    #debug.app_trace(['app middle chartdata Hlist: line 623', Hlist])
+    #debug.app_trace(['app middle chartdata and_sectionH: line 624', and_sectionH])
+    
+    or_sectionH = getOrSec(Hlist)
+    #debug.app_trace(['app middle chartdata or_sectionH: line 627 ', or_sectionH])
+    
+    Llist = [
+             map(lambda x: [x[0], x[1]], SecLlist),
+             map(lambda x: [x[0], x[1]], SecRangeLlist),
+             map(lambda x: [x[0], x[1]], SecRiskLlist)
+             ]
+    #debug.app_trace(['app middle chartdata Llist: line 634', Llist])
+    Llen = len(Llist)
+    and_sectionL = getAndSec(Llist)    
+    #debug.app_trace(['app middle chartdata Llist and_sectionL: line 637', Llist, and_sectionL])
+    or_sectionL = getOrSec(Llist)    
+    #debug.app_trace(['app middle chartdata or_sectionL: line 639', or_sectionL])
+    
+    and_sectionH = filter(lambda x: x[2]>=3, and_sectionH)
+    and_sectionL = filter(lambda x: x[2]>=3, and_sectionL)
+    #debug.app_trace(['app middle chartdata and_sectionH and_sectionL: line 643', 
+    #                 and_sectionH, and_sectionL])
+    and_section = [and_sectionH, and_sectionL]
+    or_section = [or_sectionH, or_sectionL]
+    
+    
+    return [sensor_glucose, dev_count, dev_range, risk_index, and_section, or_section, 
+            dev_count_chart, dev_range_chart, risk_index_chart, reslist]
+
+
+################################################################################
+# 获得血糖事件的统计
+# @param uid- 用户id
+# 高低血糖事件及原因的统计。
+################################################################################
+#@debug.exeTime
+def getGlucoseEventAnalysis(uid, datelist):
+    glucose_low = []
+    glucose_high = []
+    # 高低血糖的阈值。
+    GlucoseHigh, GlucoseLow=dao2.setting_dao.getGlucoseTarget(uid)
+    #
+    GluLowList, GluHighList, tmpSgdata, GluLowSec, GluHighSec = gea.getGlucoseHighLow(uid, datelist)
+    
+    GluLowCnt = len(GluLowSec)
+    GluHighCnt = len(GluHighSec) 
+    
+    # 下面的代码就是分析高/低血糖事件的相关事件。   
+    # 从这里获取血糖高低事件的日期时间    
+    
+    ## basal adjust over
+    t1=time.time()
+    dt = datetime.datetime.strptime(datelist[0], '%Y-%m-%d')
+    tmpBasaldata = dao2.basaldao.getBasalInjectMultiDay(uid, datelist, False)
+    adjHOverCnt,adjLOverCnt,adjHOverTCnt,adjLOverTCnt = \
+        gea.getGeaAdjBasalOverCnt(tmpBasaldata, GluLowList, GluHighList)    
+    
+    ## Manual Bolus
+    tmpBolus=bolusUtil.getBolusByTypeMultiDay(uid, datelist, False)
+    
+    ## preprocess bolus data
+    tbs = tmpBolus
+    for i in range(0, len(tbs)):
+        content = tbs[i][5]
+        tbs[i][5] = json.loads(content, encoding='utf8') if content else {}
+            
+        if tbs[i][2] is None:
+            tbs[i][2]=0
+        if tbs[i][3] is None:
+            tbs[i][3]=0
+    ManBolCnt, ManBolTCnt = gea.getGeaBolManual(dt, tbs, GluLowList)
+       
+    ## Caw Bolus
+    LCawBolCnt,HCawBolCnt,LCawBolTCnt,HCawBolTCnt = gea.getGeaBolCaw(dt, tmpBolus, GluLowList, GluHighList)
+    
+    ## Bolus guide
+    adjHBolGuideCnt, adjLBolGuideCnt, adjHBolGuideTCnt, adjLBolGuideTCnt = \
+        gea.getGeaBolGuide(dt, tmpBolus, GluLowList, GluHighList)
+        
+    ## correct Bolus multiple times
+    multiCorrBolCnt, multiCorrBolTCnt = gea.getGeaBolMultiCorr(dt, tmpBolus, GluLowList)
+        
+    ## manual Bolus multiple times
+    multiManBolCnt, multiManBolTCnt = gea.getGeaBolMultiMan(dt, tmpBolus, GluLowList)
+    
+    ## Bolus when Sg Down or Up
+    SgDownBolCnt, SgDownBolTCnt, SgUpBolCnt, SgUpBolTCnt = \
+        gea.getGeaSgUpDown(dt, tmpBolus, tmpSgdata, GluLowList, GluHighList)
+        
+    ## Correct Bolus when Sg Down
+    SgDownCorrBolCnt, SgDownCorrBolTCnt = gea.getGeaSgDownCorr(dt, tmpBolus, tmpSgdata, GluLowList)
+    
+    ## Correct over when Sg Up or Down
+    SgHCorrOverCnt, SgHCorrOverTCnt, SgLCorrOverCnt, SgLCorrOverTCnt = \
+      gea.getGeaSgCorrOver(tmpSgdata, GluLowList, GluHighList, GlucoseLow, GlucoseHigh, GluLowSec, GluHighSec)
+    
+    
+    ## get low Sg at night
+    #NightLowSgCnt, NightLowSgTCnt = gea.getGeaSgNightLowCnt(tmpSgdata, GluLowList)
+    NightLowSgCnt = gea.getGeaSgNightLowCnt(tmpSgdata, GluLowList)
+    NightLowSgTCnt = len(datelist)
+    
+    ## get down phenomenon for Sg
+    #DawnPheCnt, DawnPheTCnt = gea.getGeaSgDawnPheCnt(tmpSgdata, GluHighList)
+    DawnPheCnt = gea.getGeaSgDawnPheCnt(tmpSgdata, GluHighList)
+    DawnPheTCnt = len(datelist)
+    
+    ## get Sg come down fast count
+    SgVeryDownCnt, SgVeryDownTCnt = gea.getGeaSgVeryDown(tmpSgdata, GluLowList)    
+    
+    ## get big Carb by Bolus
+    LbigCarbCnt, HbigCarbCnt, LbigCarbTCnt, HbigCarbTCnt = gea.getGeaBolBigCaw(dt, tmpBolus, GluLowList, GluHighList)
+    
+    ## get big exercise event before Sg down
+    tmpExerEvent = journalutil.dao.getEventMD(uid, datelist, 'EXR', False)
+    bigExeCnt, bigExeTCnt = gea.getGeaBigExerEvent(dt, tmpExerEvent, GluLowList)
+    
+    
+    ## get basal long suspend causing high Sg
+    LongSusCnt, LongSusTCnt = gea.getGeaLongSus(dt, tmpBasaldata, GluHighList)
+    
+    ## get no bolus after sg Up Count
+    SgUpNoBolCnt, SgUpNoBolTCnt = gea.getGeaSgUpNoBol(dt, tmpBolus, tmpSgdata, GluHighList)
+    t2=time.time()
+    debug.app_trace(['gea exe 1:', t2-t1])
+    #   
+    '''glucose_low.append(["基础率调高", adjHOverCnt])
+    glucose_low.append(["手动大剂量", ManBolCnt])
+    glucose_low.append(["食物大剂量", LCawBolCnt])
+    glucose_low.append(["调高大剂量向导", adjHBolGuideCnt])
+    glucose_low.append(["多次校正大剂量", multiCorrBolCnt])
+    glucose_low.append(["多次手动大剂量", multiManBolCnt])
+    glucose_low.append(["血糖降低时大剂量", SgDownBolCnt])
+    glucose_low.append(["血糖降低时校正大剂量", SgDownCorrBolCnt])
+    glucose_low.append(["血糖偏高校正过度", SgHCorrOverCnt])
+    glucose_low.append(["夜间低血糖", NightLowSgCnt])
+    glucose_low.append(["血糖快速降低", SgVeryDownCnt])
+    glucose_low.append(["大进食量", LbigCarbCnt])
+    glucose_low.append(["大运动量", bigExeCnt])'''
+    
+    glucose_low.append(['Basal Rate Increase', adjHOverCnt])
+    glucose_low.append(['Manual Bolus', ManBolCnt])
+    glucose_low.append(['Bolus Calculator Food Bolus', LCawBolCnt])
+    glucose_low.append(['Bolus Calculator Override (+)', adjHBolGuideCnt])
+    glucose_low.append(['Multiple Correction Boluses', multiCorrBolCnt])
+    glucose_low.append(['Multiple Manual Boluses', multiManBolCnt])
+    glucose_low.append(['Bolus with Falling Sensor Rate of Change', SgDownBolCnt])
+    glucose_low.append(['Corr. Bolus with Falling Sensor Rate of Change', SgDownCorrBolCnt])
+    glucose_low.append(['Hyperglycemia Preceding Hypoglycemia', SgHCorrOverCnt])
+    glucose_low.append(['Nocturnal Hypoglycemia (11pm-5am)', NightLowSgCnt])
+    glucose_low.append(['Rapid Falling Sensor Rate of Change', SgVeryDownCnt])
+    glucose_low.append(['Carbohydrate Entry (>80g)', LbigCarbCnt])
+    glucose_low.append(['Heavy Exercise', bigExeCnt])
+    
+    '''glucose_high.append(["基础率调低", adjLOverCnt])
+    glucose_high.append(["食物大剂量", HCawBolCnt])
+    glucose_high.append(["调低大剂量向导", adjLBolGuideCnt])
+    glucose_high.append(["血糖升高时大剂量", SgUpBolCnt])
+    glucose_high.append(["血糖升高时缺失大剂量", SgUpNoBolCnt])
+    glucose_high.append(["低血糖校正过度", SgLCorrOverCnt])
+    glucose_high.append(["黎明现象", DawnPheCnt])
+    glucose_high.append(["长时间输注暂停", LongSusCnt])
+    glucose_high.append(["大进食量", HbigCarbCnt])'''
+    
+    glucose_high.append(['Basal Rate Decrease', adjLOverCnt])
+    glucose_high.append(['Bolus Calculator Food Bolus', HCawBolCnt])
+    glucose_high.append(['Bolus Calculator Override (-)', adjLBolGuideCnt])
+    glucose_high.append(['Bolus with Rising Sensor Rate of Change', SgUpBolCnt])
+    glucose_high.append(['Rising Sensor Rate of Change without Bolus', SgUpNoBolCnt])
+    glucose_high.append(['Overcorrection of Hypoglycemia', SgLCorrOverCnt])
+    glucose_high.append(['Dawn Phenomenon (3am-7am)', DawnPheCnt])
+    glucose_high.append(['Pump Suspends (>60 minutes)', LongSusCnt])
+    glucose_high.append(['Carbohydrate Entry (>80g)', HbigCarbCnt])
+    
+    event_stat_pieh = []
+    event_stat_piel = []
+    
+    glucose_highList = []
+    if adjLOverTCnt>0:
+        glucose_highList.append(("基础率调低", 
+                                 round(adjLOverCnt*1.0/(adjLOverTCnt*1.0), 3), 
+                                 adjLOverTCnt) )
+    if HCawBolTCnt>0:
+        glucose_highList.append( ( "食物大剂量",
+                                 round(HCawBolCnt*1.0/(HCawBolTCnt*1.0), 3), 
+                                 HCawBolTCnt) )
+    if adjLBolGuideTCnt>0:
+        glucose_highList.append( ( "调低大剂量向导",
+                                 round(adjLBolGuideCnt*1.0/(adjLBolGuideTCnt*1.0+0.1), 3), 
+                                 adjLBolGuideTCnt) )
+    if SgUpBolTCnt>0: 
+        glucose_highList.append( ( "血糖升高时大剂量", 
+                                 round(SgUpBolCnt*1.0/(SgUpBolTCnt*1.0), 3), 
+                                 SgUpBolTCnt) )
+    if SgUpNoBolTCnt>0: 
+        glucose_highList.append( ( "血糖升高时缺失大剂量", 
+                                 round(SgUpNoBolCnt*1.0/((SgUpNoBolTCnt+0.1)*1.0), 3), 
+                                 SgUpNoBolTCnt) )
+    if SgLCorrOverTCnt>0: 
+        glucose_highList.append( ( "低血糖校正过度", 
+                                 round(SgLCorrOverCnt*1.0/(SgLCorrOverTCnt*1.0), 3),
+                                 SgLCorrOverTCnt) )
+    if DawnPheTCnt>0: 
+        glucose_highList.append( ( "黎明现象", 
+                                 round(DawnPheCnt*1.0/(DawnPheTCnt*1.0), 3),
+                                 DawnPheTCnt) )
+    if LongSusTCnt>0:
+        glucose_highList.append( ( "长时间输注暂停", 
+                                 round(LongSusCnt*1.0/(LongSusTCnt*1.0), 3), 
+                                 LongSusTCnt) )
+    if HbigCarbTCnt>0: 
+        glucose_highList.append( ( "大进食量", 
+                                 round(HbigCarbCnt*1.0/(HbigCarbTCnt*1.0), 3), 
+                                 HbigCarbTCnt) )
+    #glucose_highList.sort(key=lambda x:x[1])
+    glucose_highList = sorted(glucose_highList, key=itemgetter(1,2))
+    
+    ghlen = len(glucose_highList)
+    if ghlen >= 4:
+        for i in range(0, 4):
+            tmptitle = glucose_highList[ghlen-i-1][0]+"(共"+str( glucose_highList[ghlen-i-1][2] )+")"
+            tmpdata = [ [str(glucose_highList[ghlen-i-1][1]*100)+"%", 
+                             glucose_highList[ghlen-i-1][1]*100 ],
+                        [str(100-glucose_highList[ghlen-i-1][1]*100)+"%", 
+                             100-glucose_highList[ghlen-i-1][1]*100] ]
+            event_stat_pieh.append({
+                    "title": tmptitle, 
+                    "data": tmpdata
+                            })
+    elif ghlen > 0:
+        for i in range(0, ghlen):
+            tmptitle = glucose_highList[ghlen-i-1][0]+"(共"+str(glucose_highList[ghlen-i-1][2])+")"
+            tmpdata = [
+                       [str( glucose_highList[ghlen-i-1][1]*100 )+"%",
+                            glucose_highList[ghlen-i-1][1]*100 ],
+                       [str( 100-glucose_highList[ghlen-i-1][1]*100 )+"%",
+                            100-glucose_highList[ghlen-i-1][1]*100]]
+            event_stat_pieh.append({
+                    "title": tmptitle, 
+                    "data": tmpdata})
+    else:
+        for i in range(1, 5):
+            event_stat_pieh.append({
+                    "title":"N/A", 
+                    "data":None
+                    })
+    
+    glucose_lowList = []
+    if adjHOverTCnt>0:
+        glucose_lowList.append( ("基础率调高",
+                                round(adjHOverCnt*1.0/(adjHOverTCnt*1.0), 3),
+                                adjHOverTCnt) )
+    if ManBolTCnt>0:
+        glucose_lowList.append( ( "手动大剂量",
+                                round(ManBolCnt*1.0/(ManBolTCnt*1.0), 3),
+                                ManBolTCnt) )
+    if LCawBolTCnt>0:
+        glucose_lowList.append( ( "食物大剂量",
+                                round(LCawBolCnt*1.0/(LCawBolTCnt*1.0), 3),
+                                LCawBolTCnt) )
+    if adjHBolGuideTCnt>0:
+        glucose_lowList.append( ( "调高大剂量向导",
+                                round(adjHBolGuideCnt*1.0/(adjHBolGuideTCnt*1.0), 3),
+                                adjHBolGuideTCnt) )
+    if multiCorrBolTCnt>0:
+        glucose_lowList.append( ( "多次校正大剂量",
+                                round(multiCorrBolCnt*1.0/(multiCorrBolTCnt*1.0), 3),
+                                multiCorrBolTCnt) )
+    if multiManBolTCnt>0:
+        glucose_lowList.append( ( "多次手动大剂量",
+                                round(multiManBolCnt*1.0/(multiManBolTCnt*1.0), 3),
+                                multiManBolTCnt) )
+    if SgDownBolTCnt>0:
+        glucose_lowList.append( ( "血糖降低时大剂量", 
+                                round(SgDownBolCnt*1.0/(SgDownBolTCnt*1.0), 3),
+                                SgDownBolTCnt) )
+    if SgDownCorrBolTCnt>0:
+        glucose_lowList.append( ( "血糖降低时校正大剂量", 
+                                round(SgDownCorrBolCnt*1.0/(SgDownCorrBolTCnt*1.0), 3),
+                                SgDownCorrBolTCnt) )
+    if SgHCorrOverTCnt>0:
+        glucose_lowList.append( ( "血糖偏高校正过度", 
+                                round(SgHCorrOverCnt*1.0/(SgHCorrOverTCnt*1.0), 3),
+                                SgHCorrOverTCnt) )
+    if NightLowSgTCnt>0:
+        glucose_lowList.append( ( "夜间低血糖", 
+                                round(NightLowSgCnt*1.0/(NightLowSgTCnt*1.0), 3),
+                                NightLowSgTCnt) )
+    if SgVeryDownTCnt>0:
+        glucose_lowList.append( ( "血糖快速降低", 
+                                round(SgVeryDownCnt*1.0/(SgVeryDownTCnt*1.0), 3),
+                                SgVeryDownTCnt) )
+    if LbigCarbTCnt>0:
+        glucose_lowList.append( ( "大进食量", 
+                                round(LbigCarbCnt*1.0/(LbigCarbTCnt*1.0), 3), 
+                                LbigCarbTCnt) )
+    if bigExeTCnt>0:
+        glucose_lowList.append( ( "大运动量", 
+                                round(bigExeCnt*1.0/(bigExeTCnt*1.0+0.1), 3),
+                                bigExeTCnt) )
+    #glucose_lowList.sort(key=lambda x:x[1])
+    glucose_lowList = sorted(glucose_lowList, key=itemgetter(1,2))
+    
+    #debug.app_trace(['app middle chartdata glucose_lowList: line 917', glucose_lowList])
+    gllen = len(glucose_lowList)
+    if gllen >= 4:
+        for i in range(0, 4):
+            tmptitle = glucose_lowList[gllen-i-1][0]+"(共"+str( glucose_lowList[gllen-i-1][2] )+")"
+            tmpdata = [
+                       [str( glucose_lowList[gllen-i-1][1]*100 )+"%",
+                            glucose_lowList[gllen-i-1][1]*100 ],
+                       [str( 100-glucose_lowList[gllen-i-1][1]*100 )+"%",
+                            100-glucose_lowList[gllen-i-1][1]*100]]
+            event_stat_piel.append({
+                    "title": tmptitle, 
+                    "data": tmpdata})
+    elif gllen > 0:
+        for i in range(0, gllen):
+            tmptitle = glucose_lowList[gllen-i-1][0]+"(共"+str( glucose_lowList[gllen-i-1][2] )+")"
+            tmpdata = [
+                       [str( glucose_lowList[gllen-i-1][1]*100 )+"%",
+                            glucose_lowList[gllen-i-1][1]*100 ],
+                       [str( 100-glucose_lowList[gllen-i-1][1]*100 )+"%",
+                            100-glucose_lowList[gllen-i-1][1]*100]]
+            event_stat_piel.append({
+                    "title": tmptitle, 
+                    "data": tmpdata})
+    else:
+        for i in range(1, 5):
+            event_stat_piel.append({
+                    "title":"N/A", 
+                    "data": None
+                    })
+    
+    event_stat_pie = {
+                      "event_stat_pieh": event_stat_pieh,
+                      "event_stat_piel":event_stat_piel}
+    
+    return [glucose_low, glucose_high, event_stat_pie, GluLowCnt, GluHighCnt,
+            glucose_lowList, glucose_highList]
+
+
+################################################################################
+# 获得分时模式图表的数据,提供两种功能，一种是计算画小时平均统计的箱式图的数据，一种是提供小时平均统计表的数据
+# hour_model_chart #列表，每个元素代表一个小时的数据，
+#  +-- (n)  #列表， [mean，median,q1,q3,min_regular_value,max_regular_value,
+#           #     min_outlier,max_outlier]
+# 
+# hour_model_tbl  #列表，共25个元素，前24个元素代表每个小时的统计，最后一个元素代表全天的统计,统计表
+#  +-- (n)  #字典, t-正常，l-低，u-高
+#       +-- {tp,lp,up,avg,sd,se,max,min,median,q1,q3,day_up,day_lp,
+#            bg_num,bg_avg,mad,rog2}
+#
+# @param uid- 用户id
+################################################################################
+def getSGHourModelChart(uid,datelist):
+    
+    #: 计算每个小时的SG数据,BG数据
+    hour_sg_list = []
+    hour_sg_day_avg_list = []
+    hour_bg_list = []
+    
+    #
+    ts=[]
+    day_num = len(datelist)
+    for i in range(0, day_num):
+        tmpdt = datetime.datetime.strptime(datelist[i],'%Y-%m-%d')
+        for j in range(0,24):
+            tmpst=tmpdt+datetime.timedelta(hours=j)
+            tmpet=tmpdt+datetime.timedelta(hours=j+1)
+            ts.append([tmpst, tmpet])
+    #
+    #rv=dao2.sgdao.getSGByTimeSection(uid, ts, True)
+    rv=sgUtil.getSGByTimeSectionNew(uid, ts, True, preproc='CR')
+    for i in range(0, 24):
+        hour_sg_merge = []
+        for j in range(0,day_num):
+            hour_sg_merge += rv[j*24+i]
+            
+        hour_sg_list.append(hour_sg_merge)
+    #
+    #debug.saveJson(uid, hour_sg_list)
+    # 下面的功能主要是进行箱状统计和分布统计
+    hour_sg_box_stat_list = []
+    hour_dist_list = []
+    # 获得SG的高低门限。
+    sg_high_level,sg_low_level = dao2.setting_dao.getGlucoseTarget(uid)
+    #
+    for i in range(0,24):
+        hour_sg_box_stat = glucoseutil.calSGBoxStat(hour_sg_list[i])
+        hour_dist = glucoseutil.calSGDistPercent(hour_sg_list[i], [sg_low_level,sg_high_level])
+        
+        hour_sg_box_stat_list.append(hour_sg_box_stat)
+        hour_dist_list.append(hour_dist)
+    
+    # 
+    return [hour_sg_box_stat_list, hour_dist_list]
+
+
+################################################################################
+# get sensor glucose overlay data
+# 
+#
+# @param uid- 用户id
+################################################################################
+def getSGOverlayChart(uid,datelist):
+    
+    day_num = len(datelist) 
+    
+    #
+    ts=[]    
+    for i in range(0, day_num):
+        tmpdt = datetime.datetime.strptime(datelist[i],'%Y-%m-%d')
+        tmpst=tmpdt
+        tmpet=tmpdt+datetime.timedelta(days=1)        
+        ts.append([tmpst, tmpet])
+    #
+    #rv = dao2.sgdao.getSGByTimeSection(uid, ts, True)
+    rv=sgUtil.getSGByTimeSectionNew(uid, ts, True)
+    
+    # 
+    return rv
+
+
+
+################################################################################
+# 获得优化对比报告数据
+# @param uid- 用户id
+################################################################################
+def getContrastSummary(uid,dt1,dt2,day_num1, day_num2):
+    hour_avg_1 = []
+    hour_avg_2 = []
+    sg_dist_1 = []
+    sg_dist_2 = []
+    # 
+    #debug.app_trace(["getContrastSummary args:", dt1, dt2, day_num1, day_num2])
+    sg_high, sg_low=dao2.setting_dao.getGlucoseTarget(uid)
+    
+    #
+    dl1=[]
+    dl2=[]
+    for i in range(0, day_num1):
+        dl1.append(dt1+datetime.timedelta(days=i))
+    for i in range(0, day_num2):
+        dl2.append(dt2+datetime.timedelta(days=i))
+    
+    # 
+    t1=time.time()
+    # 第一阶段
+    t11=time.time()
+    #hour_sg_list=dao2.sgdao.getHourSG(uid, dl1)
+    hour_sg_list=sgUtil.getHourSGNew(uid, dl1)
+    t12=time.time()
+    #debug.app_trace(['t12-t11:', (t12-t11)])
+    #
+    t21=time.time()
+    assert len(hour_sg_list) == 24
+    for hour_sg in hour_sg_list:
+        hour_avg = glucoseutil.calSGAvg(hour_sg, 'chart')
+        sg_dist = glucoseutil.calSGDistPercent(hour_sg, [sg_low, sg_high])
+        hour_avg_1.append(hour_avg)
+        sg_dist_1.append(sg_dist)
+    t22=time.time()
+    #debug.app_trace(['t22-t21:', (t22-t21)])
+    
+    #第二阶段
+    #hour_sg_list = dao2.sgdao.getSGMultiDayByHour(uid, dt2, day_num)
+    # 第一个阶段的getHourSG只要6秒，第二阶段的getHourSG却要29秒。
+    t31=time.time()
+    #hour_sg_list=dao2.sgdao.getHourSG(uid, dl2) 
+    hour_sg_list=sgUtil.getHourSGNew(uid, dl2)  
+    t32=time.time()
+    #debug.app_trace(['t32-t31:', (t32-t31)])
+    
+    assert len(hour_sg_list) == 24
+    #debug.saveJson(uid, hour_sg_list)
+    #debug.app_trace(['sg low high level:', sg_low, sg_high])
+    for hour_sg in hour_sg_list:
+        hour_avg = glucoseutil.calSGAvg(hour_sg, 'chart')
+        sg_dist = glucoseutil.calSGDistPercent(hour_sg, [sg_low, sg_high])
+        hour_avg_2.append(hour_avg)
+        sg_dist_2.append(sg_dist)
+    #
+    # 2015-11-23 查询时间达37秒之久
+    t2=time.time()
+    #debug.app_trace(['t2-t1:', (t2-t1)])
+    
+    overall_contrast = {}
+    
+    #: 计算总体对比数据
+    #: 第1阶段的各项指标
+    for key in ["first_range", "second_range"]:
+        if key == "first_range":
+            dt_low = datetime.datetime(dt1.year,dt1.month,dt1.day)
+            dt_high = dt_low + datetime.timedelta(days=day_num1)
+            dateList=dl1
+        elif key=="second_range":
+            dt_low = datetime.datetime(dt2.year,dt2.month,dt2.day)
+            dt_high = dt_low + datetime.timedelta(days=day_num2)    
+            dateList=dl2
+        
+        #tmpsgdata = dao2.sgdao.getSgDataByTime(uid, dt_low, dt_high)
+        tmpsgdata = sgUtil.getSGDataByTimeNew(uid, dt_low, dt_high)
+        sg_list = tmpsgdata
+        
+        range_stat = {}
+        
+        # HBA1C的统计
+        hba1c_list=journalutil.dao.getEvent(uid, dt_low, dt_high, 'HBA1C')
+        #debug.app_trace(['hba1c_list:', hba1c_list])
+        tmpStat=journalutil.dao.hba1cEventStat(hba1c_list)
+        range_stat["a1c"]=tmpStat['avg']
+        
+        # sg_avg,sg_sd,sg_iqr,sg_tp,sg_up,sg_lp,
+        # 这个统计的数值用来画对比图的总体对比图。平均值，方差，iqr两个指标会与单位有关。
+        # 但是对比图的总体对比图没有对血糖单位进行处理，也就没有单位重复转换的问题。
+        temp_result = glucoseutil.calSGStat(sg_list, sg_low, sg_high)
+        range_stat["sg_avg"] = temp_result["avg"]
+        range_stat["sg_sd"] = temp_result["sd"]
+        range_stat["sg_iqr"] = temp_result["iqr"]
+        range_stat["sg_tp"] = temp_result["tp"]
+        range_stat["sg_up"] = temp_result["up"]
+        range_stat["sg_lp"] = temp_result["lp"]
+        
+        # ROG>2 (mg/dL)/min的统计. ROG>2%的意思是(ROG>2)%, 计算剧烈变化的血糖值的比例。
+        '''
+        num_rog2 = 0
+        for i in range( 0,len(sg_list) ):
+            if sg_list[i][2]*18 >= 2:
+                num_rog2 += 1
+        sgllen = len(sg_list)
+        if sgllen > 0:
+            range_stat["sg_rog2"] = round( num_rog2*1.0/(sgllen*1.0), 2 )
+        else:
+            range_stat["sg_rog2"] = 0
+        '''
+        #glucoseutil.calSGRateStat(sg_list)
+        tmpStat=glucoseutil.calSGRateDistStat(sg_list, 
+                                              SG_RATE.STABLE, SG_RATE.MEDIAN, SG_RATE.FAST)
+        range_stat["sg_rog2"] = tmpStat['lpr']
+        
+        # 对比图的计算都是按天平均化的数据。
+        #range_stat["sg_use"] = glucoseutil.calSGSpan(sg_list)
+        range_stat["sg_use"]=sgUtil.getSGUseTime(uid, dateList)
+        
+        # bg_avg,bg_num,bg_low_num,bg_mad,
+        # 指尖血的平均值，指尖血的个数，指尖血低的个数。
+        #bg_list = dao2.calibdao.getBGData(uid,dt_low,dt_high)
+        bg_list = calibUtil.getCalibRecordByTime(uid, dt_low, dt_high, rf='S')
+        stat_dict = glucoseutil.calBGStat(bg_list, sg_low)
+        range_stat["bg_avg"] = stat_dict["avg"]
+        range_stat["bg_num"] = stat_dict["cnt"]
+        range_stat["bg_low_num"] = stat_dict["lcnt"]
+        
+        # MARD 单位百分比, BG>80mg/dL, 计算与SG的相对偏差, BG<80mg/dL, 计算与SG的绝对偏差。
+        # 然后求和取平均。 评价BG和SG之间的偏差。
+        '''
+        sum_mard = 0
+        sglen = len(sg_list)
+        bglen = len(bg_list)
+        for i in range( 0,sglen ):
+            if i<bglen and bg_list[i][1]*18 > 80:
+                sum_mard += abs( (sg_list[i][1]- bg_list[i][1])*1.0/(bg_list[i][1]*1.0) )
+            elif i<bglen:
+                sum_mard += abs (sg_list[i][1]- bg_list[i][1])
+        if sglen>0:
+            range_stat["bg_mard"] = sum_mard/sglen
+        else:
+            range_stat["bg_mard"] = 0
+        '''
+        range_stat["bg_mard"] = glucoseutil.calBGMard(bg_list, sg_list)
+        
+        # ins_total,ins_bolus,ins_num,
+        temp_result = inject.getInjectStatByTime(uid,dt_low,dt_high)
+        range_stat["ins_total"] = temp_result[1]+temp_result[3]
+        range_stat["ins_bolus"] = temp_result[1]
+        range_stat["ins_basal"] = temp_result[3]
+        range_stat["ins_num"] = temp_result[0]
+        
+        # carb_gram,carb_num}
+        #temp_result = _get_record_stat(uid,dt_low, dt_high,"carb")
+        carb_result = journalutil.dao.getCarbEventStat(uid, dt_low, dt_high)
+        range_stat["carb_num"] = carb_result["num"]
+        range_stat["carb_gram"] = carb_result["total"]
+        
+        overall_contrast[key] = range_stat
+    
+    # 计算变化率和评价
+    #for key in ["a1c","sg_avg,sg_sd,sg_iqr,sg_tp,sg_up,sg_lp,
+    #            sg_rog2,sg_use,bg_avg,bg_num,bg_low_num,bg_mad,
+    #            ins_total,ins_bolus,ins_num,carb_gram,carb_num]:
+    ''' 
+    # 这一段是报告填表时用的数据， 画图时不需要。
+    key_list = overall_contrast["first_range"].keys()
+    rate_dict = {}
+    eval_dict = {}
+    for key in key_list:
+        val1 = overall_contrast["first_range"][key]
+        val2 = overall_contrast["second_range"][key]
+        try:
+            rate_dict[key] = round((val2-val1)*100 / float(val1), 1)
+        except:
+            rate_dict[key] = 0
+        eval_dict[key] = 0
+        
+    overall_contrast["change_rate"] = rate_dict
+    overall_contrast["evaluation"] = eval_dict
+    ''' 
+    oc = overall_contrast
+    
+    overall_contrast = [{"category":"a1c%","range":100,
+                         "val1":oc["first_range"]["a1c"],
+                         "val2":oc["second_range"]["a1c"],
+                         "type":"normal"},
+                        
+                        {"category":"动态血糖平均值","range":100,
+                         "val1":oc["first_range"]["sg_avg"],
+                         "val2":oc["second_range"]["sg_avg"],
+                         "type":"normal"},
+                        
+                        {"category":"平均值标准差","range":100,
+                         "val1":oc["first_range"]["sg_sd"],
+                         "val2":oc["second_range"]["sg_sd"],
+                         "type":"normal"},
+                        
+                        {"category":"四分位距","range":100,
+                         "val1":oc["first_range"]["sg_iqr"],
+                         "val2":oc["second_range"]["sg_iqr"],
+                         "type":"normal"},
+                        
+                        {"category":"正常%","range":100,
+                         "val1":oc["first_range"]["sg_tp"],
+                         "val2":oc["second_range"]["sg_tp"],
+                         "type":"normal"},
+                        
+                        {"category":"偏高%","range":100,
+                         "val1":oc["first_range"]["sg_up"],
+                         "val2":oc["second_range"]["sg_up"],
+                         "type":"normal"},
+                        
+                        {"category":"偏低%","range":100,
+                         "val1":oc["first_range"]["sg_lp"],
+                         "val2":oc["second_range"]["sg_lp"],
+                         "type":"normal"},
+                        
+                        {"category":"ROG>2%","range":100,
+                         "val1":oc["first_range"]["sg_rog2"],
+                         "val2":oc["second_range"]["sg_rog2"],
+                         "type":"normal"},
+                        
+                        {"category":"血糖探头使用时间","range":100,
+                         "val1":oc["first_range"]["sg_use"],
+                         "val2":oc["second_range"]["sg_use"],
+                         "type":"normal"},
+                        
+                        {"category":"指尖血平均值","range":100,
+                         "val1":oc["first_range"]["bg_avg"],
+                         "val2":oc["second_range"]["bg_avg"],
+                         "type":"normal"},
+                        
+                        {"category":"指尖血次数","range":100,
+                         "val1":oc["first_range"]["bg_num"],
+                         "val2":oc["second_range"]["bg_num"],
+                         "type":"normal"},
+                        
+                        {"category":"低血糖次数","range":80,
+                         "val1":oc["first_range"]["bg_low_num"],
+                         "val2":oc["second_range"]["bg_low_num"],
+                         "type":"normal"},
+                        
+                        {"category":"MARD","range":70,
+                         "val1":oc["first_range"]["bg_mard"],
+                         "val2":oc["second_range"]["bg_mard"],
+                         "type":"normal"},
+                        
+                        {"category":"胰岛素",
+                         "val2_1":oc["second_range"]["ins_bolus"],
+                         "val2_2":oc["second_range"]["ins_basal"],"range":100,
+                         "val1":oc["first_range"]["ins_total"],
+                         "val2":oc["second_range"]["ins_total"],
+                         "type":"stack",
+                         "val1_2":oc["first_range"]["ins_basal"],
+                         "val1_1":oc["first_range"]["ins_bolus"]},
+                        
+                        {"category":"大剂量次数","range":80,
+                         "val1":oc["first_range"]["ins_num"],
+                         "val2":oc["second_range"]["ins_num"],
+                         "type":"normal"},
+                        
+                        {"category":"食物量","range":2000,
+                         "val1":oc["first_range"]["carb_gram"],
+                         "val2":oc["second_range"]["carb_gram"],
+                         "type":"normal"},
+                        
+                        {"category":"进食次数","range":60,
+                         "val1":oc["first_range"]["carb_num"],
+                         "val2":oc["second_range"]["carb_num"],
+                         "type":"normal"}]
+    
+    return [hour_avg_1, hour_avg_2, sg_dist_1, sg_dist_2, overall_contrast]
+
+
+
+################################################################################
+# 获得趋势分析图表数据
+# +-- glucose_analysis #字典
+#      +-- sg #列表，每个元素代表一天的数据
+#           +-- (n)  #列表，[mean,median,q1,q3,min_regular_value,max_regular_value,
+#                    #     min_outlier,max_outlier]
+#      +-- bg  #列表，每个元素代表一天的数据
+#           +-- (n)  #列表，[mean,median,q1,q3,min_regular_value,max_regular_value,
+#                    #     min_outlier,max_outlier]
+#      +-- sgr #列表，每个元素代表一天的数据
+#           +-- (n)  # 列表，[spr,mpr,lpr,lastr]
+# +-- inject_summary  #列表，每个元素代表一天的数据
+#      +-- (n)   #列表，[大剂量总量，基础量，大剂量，大剂量次数，大剂量平均值]
+# @param uid- 用户id
+# 2015-11-23  要求根据设置的时间跨度来决定趋势分析的时间粒度。interval来指定对比的粒度。
+#   internal为1表示分析天，为7表示分析周，...
+################################################################################
+def getTrendAnalysis(uid, datelist, interval):
+    glucose_analysis = []
+    inject_summary = []
+    
+    # 计算glucose_analysis
+    interval_num = len(datelist)
+    ts=[]
+    day_sg_list=[]
+    day_bg_list=[]
+    #
+    if interval==1:
+        for i in range(0, interval_num):
+            tmpst = datetime.datetime.strptime(datelist[i],'%Y-%m-%d')
+            tmpet = tmpst+datetime.timedelta(days=1)
+            ts.append([tmpst, tmpet])
+        # 
+        #day_sg_list=dao2.sgdao.getSGByTimeSection(uid, ts, True)
+        day_sg_list=sgUtil.getSGByTimeSectionNew(uid, ts, True, preproc='CR')
+        #day_bg_list=dao2.calibdao.getBGByTimeSection(uid, ts, True)
+        day_bg_list=calibUtil.getCalibRecordByTimeSection(uid, ts, True)
+    elif interval>1:
+        for i in range(0, interval_num):
+            ts=misc.datelistToTimeSection(datelist[i])
+            #tmpsg=dao2.sgdao.getSGByTimeSection(uid, ts)
+            tmpsg=sgUtil.getSGByTimeSectionNew(uid, ts, preproc='CR')
+            #tmpbg=dao2.calibdao.getBGByTimeSection(uid, ts)
+            tmpbg=calibUtil.getCalibRecordByTimeSection(uid, ts)
+            day_sg_list.append(tmpsg)
+            day_bg_list.append(tmpbg)
+    #
+    #debug.app_trace(['day_bg_list:', day_bg_list])
+    #
+    sg_high, sg_low=dao2.setting_dao.getGlucoseTarget(uid)
+    
+    sgr_level = {"stable": SG_RATE.STABLE,
+                 "median": SG_RATE.MEDIAN, 
+                 "fast": SG_RATE.FAST}
+    #
+    for i in range(0, interval_num):
+        day_stat = {}
+        #
+        sg_avg_sd_stat=[]
+        bg_avg_sd_stat=[]
+        
+        # calSGStat这个函数主要在reportdata.py里面调用。
+        # 这里只用到了平均值和标志差两个指标。之前是用来画点线图的。现在点线图去掉了。
+        temp_result = glucoseutil.calSGStat(day_sg_list[i], sg_low, sg_high)
+        if temp_result["num"] != 0:
+            sg_avg_sd_stat= [temp_result["avg"], temp_result["sd"]]
+                        
+        temp_result = glucoseutil.calBGStat(day_bg_list[i], sg_low)
+        if temp_result["num"] != 0:
+            bg_avg_sd_stat = [temp_result["avg"], temp_result["sd"]]
+        
+        
+        sgr_dist = glucoseutil.calSGRateDistPercent(day_sg_list[i], sgr_level)
+        
+        day_stat["sg"] = sg_avg_sd_stat
+        day_stat["bg"] = bg_avg_sd_stat
+        day_stat["sgr"] = sgr_dist
+        #
+        sgbs=glucoseutil.calSGBoxStat(day_sg_list[i])
+        day_stat['sgbs']=sgbs
+        sgdist=glucoseutil.calSGDistPercent(day_sg_list[i], [sg_low, sg_high])
+        #bgdist=glucoseutil.calBGDistPercent(day_bg_list[i], sg_low, sg_high)
+        bgdist=glucoseutil.calBGDist(day_bg_list[i], sg_low, sg_high)
+        day_stat['sgdist']=sgdist
+        day_stat['bgdist']=bgdist
+        
+        #
+        glucose_analysis.append(day_stat)
+    
+    # 下面是统计胰岛素输注的部分
+    inject_stat_list = inject.getInjectStatTrend(uid, datelist, interval)
+    
+    # [大剂量总量，基础量，大剂量，大剂量次数，大剂量平均值]
+    for inject_stat in inject_stat_list:
+        bolus_cnt = inject_stat[0]
+        bolus_total = inject_stat[1]
+        #basal_cnt = inject_stat[2]
+        basal_total = inject_stat[3]
+        bolus_avg = 0 if bolus_cnt==0 else round(bolus_total/bolus_cnt,2)
+                
+        inject_summary.append([bolus_total+basal_total,
+                               basal_total,
+                               bolus_total,
+                               bolus_cnt, 
+                               bolus_avg])
+    #debug.app_trace(['app middle chartdata glucose_analysis:', glucose_analysis])
+    # 
+    return [glucose_analysis, inject_summary]
+
+
+# encoding:utf8
+import datetime
+import math
+import time
+import json
+
+from flask import g
+from sqlalchemy import *
+
+from app.tcld import db
+from app.app_cfg import *
+from app.dao.dao2 import dao2
+from app.middle import debug
+from app.middle import statistics
+from app.middle.miscUtil import misc
+from app.model.models import *
+
+class JournalType(object):
+    BG="BG"  #指尖血
+    CARB = "CARB"  #进食
+    INS= "INS"    #注射胰岛素
+    EXR = "EXR"  #锻炼
+    HEL = "HEL"  #健康
+    HBA1C = "HBA1C" #糖化血红蛋白水平
+    DOSE = "DOSE" # dose
+    URINEK = "URINEK"  # 尿酮
+    OTR = "OTR"  #其他
+
+
+eventkeymap = {u'运动': 'EXR',
+               u'食物': 'CARB',
+               u'注射胰岛素': 'INS',
+               u'指尖血糖': 'BG',
+               u'HbA1c': 'HBA1C',
+               u'服药': 'DOSE',
+               u'尿酮': 'URINEK',
+               u'其他': 'OTR'}
+
+eventkeymap_en = {
+    'exercise': 'EXR',
+    'carb': 'CARB',
+    'insulin': 'INS',
+    'blood glucose': 'BG',
+    'hba1c': 'HBA1C',
+    'dose': 'DOSE',
+    'urine ketone': 'URINEK',
+    'other': 'OTR'
+}
+
+exerciseMap = {
+    0: '轻度',
+    1: '中度',
+    2: '剧烈'}
+
+
+class EventDAO(object):
+    '''EventDAO class'''
+
+    def __init__(self):
+        pass
+
+        # @note 更新日志记录。
+
+    def eventUpdate(self, condition):
+        edit_id = condition.get('id', None)
+        edit_date = condition.get('date', None)
+        edit_time = condition.get('time', None)
+        edit_event = condition.get('event', None)
+        contentstr = condition.get('content')
+
+        #
+        if edit_event in eventkeymap:
+            edit_event = eventkeymap[edit_event]
+
+        db.session.query(EventRecord).filter(EventRecord.id == edit_id). \
+            update({"time": edit_date + " " + edit_time,
+                    "type": edit_event,
+                    "content": contentstr})
+        db.session.commit()
+
+        #
+
+    def eventDeleteById(self, condition):
+        id = condition.get('id', None)
+
+        db.session.query(EventRecord).filter(EventRecord.id == id).delete()
+        db.session.commit()
+
+    #
+    def eventDeleteByDate(self, condition):
+        date_del = condition.get('date', None)
+        uid = condition.get('uid', None)
+
+        db.session.execute("delete from event_record where date(time)=:date_del and user_id=:uid",
+                           {"date_del": date_del.encode("utf8") + " 00:00:00", "uid": uid})
+        db.session.commit()
+
+    # -- 查询事件日志 ----
+    # 这个函数最好能够改进一下，增加可读性。
+    # eventclick - 表示是否按事件排序。
+    def searchEventByDatePage(self, condition):
+        result = {'res': 'SUC', 'page': None, 'event': None}
+
+        sd = condition.get('date_start', None)
+        ed = condition.get('date_end', None)
+        datetimeorder = condition.get('datetime_order', None)
+        eventorder = condition.get('event_order', None)
+        eventclick = condition.get('event_click', None)
+        page = int(condition.get('page', 1))
+        uid = condition.get('uid', None)
+        filter_event = eventkeymap[condition['filter_event']] if condition.get('filter_event') \
+                                                                 and condition.get('filter_event') != u'全部' \
+                                                                 and condition.get('filter_event') != 'all' else None
+        # debug.app_trace(['app dao event_dao filter_event:', filter_event])
+
+        pagination = self.searchEventByDatePageBaseQuery(datetimeorder, filter_event, sd, ed, uid, page)
+
+        EventList = []
+        for item in pagination.items:
+            itemdate = datetime.datetime.strptime(str(item.date), '%Y-%m-%d')
+            itemDate = itemdate.strftime('%Y-%m-%d')
+
+            if filter_event:
+                tmpResult = db.session.query(EventRecord.id,
+                                             func.DATE(EventRecord.time).label('date'),
+                                             EventRecord.time, EventRecord.type, EventRecord.content).filter(
+                    "date(time)=:itemDate and user_id=:uid and type=:filter_event").params(
+                    itemDate=itemDate, uid=uid, filter_event=filter_event)
+            else:
+                tmpResult = db.session.query(EventRecord.id,
+                                             func.DATE(EventRecord.time).label('date'),
+                                             EventRecord.time, EventRecord.type, EventRecord.content).filter(
+                    "date(time)=:itemDate and user_id=:uid").params(
+                    itemDate=itemDate, uid=uid)
+
+            if eventclick != "true":
+                if datetimeorder == "descending":
+                    tmpResult = tmpResult.order_by(desc(func.TIME(EventRecord.time)))
+                elif datetimeorder == "ascending":
+                    tmpResult = tmpResult.order_by(asc(func.TIME(EventRecord.time)))
+            else:
+                if eventorder == "ascending":
+                    if datetimeorder == "ascending":
+                        tmpResult = tmpResult.order_by(
+                            asc(EventRecord.type), asc(func.TIME(EventRecord.time)))
+                    elif datetimeorder == "descending":
+                        tmpResult = tmpResult.order_by(
+                            asc(EventRecord.type), desc(func.TIME(EventRecord.time)))
+                elif eventorder == "descending":
+                    if datetimeorder == "ascending":
+                        tmpResult = tmpResult.order_by(
+                            desc(EventRecord.type), asc(func.TIME(EventRecord.time)))
+                    elif datetimeorder == "descending":
+                        tmpResult = tmpResult.order_by(
+                            desc(EventRecord.type), desc(func.TIME(EventRecord.time)))
+
+            eventsPerDate = self.searchEventByDatePageDataTransform(pagination, itemDate, tmpResult)
+            EventList.append(eventsPerDate)
+            result = {'res': 'SUC', 'page': pagination, 'event': EventList}
+        return result
+
+    def searchEventByDatePageBaseQuery(self, datetimeorder, filter_event,
+                                       sd, ed, uid, page, itemnum=EVENTS_PER_PAGE):
+
+        if filter_event:
+            # debug.app_trace(['app dao event_dao filter_event case 1:', filter_event])
+            tmpquery = EventRecord.query.distinct().with_entities(
+                func.DATE(EventRecord.time).label('date')).filter(
+                "date(time)>=:sd and date(time)<=:ed and user_id=:uid and type=:filter_event").params(
+                sd=sd, ed=ed, uid=uid, filter_event=filter_event)
+        else:
+            # debug.app_trace(['app dao event_dao filter_event case 2'])
+            tmpquery = EventRecord.query.distinct().with_entities(
+                func.DATE(EventRecord.time).label('date')).filter(
+                "date(time)>=:sd and date(time)<=:ed and user_id=:uid").params(
+                sd=sd, ed=ed, uid=uid)
+        if datetimeorder == "ascending":
+            pagination = tmpquery.order_by(
+                asc(func.DATE(EventRecord.time))).paginate(
+                page, per_page=itemnum, error_out=False)
+        elif datetimeorder == "descending":
+            pagination = tmpquery.order_by(
+                desc(func.DATE(EventRecord.time))).paginate(
+                page, per_page=itemnum, error_out=False)
+
+        return pagination
+
+    # 分页查找信息。  tmpResult是查询数据库的结果。
+    def searchEventByDatePageDataTransform(self, pagination, date, tmpResult):
+
+        tmp_obj = {}
+        tmp_obj["date"] = date
+        tmp_obj["data"] = []
+        for entry in tmpResult:
+            tmp_event = {}
+            tmp_event["id"] = entry.id
+            tmp_event["time"] = entry.time.strftime('%H:%M:%S')
+
+            event_type = entry.type
+            tmp_event["type"] = event_type
+            if event_type in eventkeymap_en.values():
+                tmp_event["type"] = eventkeymap_en.keys()[eventkeymap_en.values().index(event_type)]
+            else:
+                tmp_event["type"] = entry.type
+
+            try:
+                tmp_content = json.loads(entry.content, encoding='utf8')
+                tmp_content = self.transformEventFromMobile2Web(event_type, tmp_content)
+                tmp_event["content"] = tmp_content
+            except Exception, e:
+                tmp_event["content"] = {"remark": "--", "detail": "--"}
+
+            tmp_obj["data"].append(tmp_event)
+
+        return tmp_obj
+
+    # @note 获取事件日志的日期列表。
+    def getEventDateList(self, uid):
+        # query using mysql sentence and querying the distinct date only
+        strq = "select distinct date(time) as date from event_record where " + \
+               "user_id=:uid order by date(time) desc"
+        temp_result0 = db.session.execute(strq, {"uid": uid})
+        num0 = temp_result0.rowcount
+
+        date_list = []
+        for i in range(0, num0):
+            obj = {}
+            record = temp_result0.fetchone()
+            recorddate = datetime.datetime.strptime(str(record.date), '%Y-%m-%d')
+            recorddate1 = recorddate.strftime('%Y-%m-%d')
+            obj["date"] = recorddate1
+            date_list.append(recorddate1)
+
+        return date_list
+
+    # @note 插入事件日志记录.
+    def insertEvent(self, uid, condition):
+
+        #
+        # debug.app_trace(["EventDAO:insert:", condition.get('event', None)])
+        ndt = datetime.datetime.now()
+        addeventobj = {}
+        addeventobj["id"] = '%d-%s-%s' % (uid, ndt.strftime('%Y%m%d%H%M%S'), misc.randomStr(4))
+        addeventobj["user_id"] = uid
+        addeventobj["time"] = condition.get('date', None) + " " + condition.get('time', None)
+        addeventobj["content"] = condition.get('content')
+        #
+        event_type = condition.get('event', None)
+
+        addeventobj["type"] = event_type
+        #
+
+        if event_type in eventkeymap:
+            addeventobj["type"] = eventkeymap[event_type]
+        #
+        eventobj = EventRecord(
+            id=addeventobj["id"],
+            user_id=addeventobj["user_id"],
+            time=addeventobj["time"],
+            type=addeventobj["type"],
+            content=addeventobj["content"]
+        )
+
+        db.session.add(eventobj)
+        db.session.commit()
+
+    # @note 获得运动事件记录。
+    def getBigExerciseEvent(self, uid, dt, Flag):
+        if Flag == 'pre':
+            bigExeFlag = False
+
+            st = dt + datetime.timedelta(seconds=-3600 * 2)
+            result = db.session.query(EventRecord.time, EventRecord.content).filter(
+                db.and_(EventRecord.time >= st, EventRecord.time < dt,
+                        EventRecord.user_id == uid,
+                        EventRecord.type == 'EXR')).all()
+            num = len(result)
+            for i in range(0, num):
+                t = result[i][0]
+                content = (result[i][1]).encode("utf8")
+                t = misc.unixTimestamp(t)
+
+                try:
+                    content = json.loads(content, encoding='utf8')
+                    duration = int(content['duration'])
+                    flag = int(content['flag'])
+                    if (duration > 60 and flag == 1) or \
+                            (duration > 30 and flag == 2) or \
+                            (duration > 10 and flag == 3):
+                        bigExeFlag = True
+                except Exception, e:
+                    pass
+
+            return bigExeFlag
+
+        elif Flag[0] == 'total':
+            bigExeCount = 0
+
+            et = dt + datetime.timedelta(days=Flag[1])
+            result = db.session.query(EventRecord.time, EventRecord.content).filter(
+                db.and_(EventRecord.time >= dt, EventRecord.time <= et,
+                        EventRecord.user_id == uid,
+                        EventRecord.type == 'EXR')).all()
+            num = len(result)
+            for i in range(0, num):
+                t = result[i][0]
+                content = (result[i][1]).encode("utf8")
+                t = misc.unixTimestamp(t)
+
+                try:
+                    content = json.loads(content, encoding='utf8')
+                    duration = int(content['duration'])
+                    flag = int(content['flag'])
+                    if ((duration > 60 and flag == 1) or
+                            (duration > 30 and flag == 2) or
+                            (duration > 10 and flag == 3)):
+                        bigExeFlag = True
+                except Exception, e:
+                    pass
+            return bigExeCount
+
+    # -- HbA1c事件日志 ----
+    # @note 获得糖化血红蛋白水平事件记录。
+    def getHbA1cEvent(self, uid, st, et):
+        res = []
+        result = db.session.query(EventRecord.time, EventRecord.content).filter(
+            db.and_(EventRecord.time >= st, EventRecord.time < et,
+                    EventRecord.user_id == uid,
+                    EventRecord.type == 'HBA1C')).all()
+        num = len(result)
+
+        for i in range(0, num):
+            t = result[i][0]
+            content = (result[i][1]).encode("utf8")
+            try:
+                content = json.loads(content, encoding='utf8')
+                hba1c = float(content['hba1c'])
+                res.append([t, hba1c])
+            except Exception, e:
+                pass
+        return res
+
+    # -- 合并功能，消除重复。 ----
+    # @note 获得食物事件记录。
+    def getEvent(self, uid, st, et, eventType):
+        ts = [[st, et]]
+        rv = self.getEventByTimeSection(uid, eventType, ts, False)
+        return rv
+
+    # @note 获得多天的事件日志数据
+    def getEventMD(self, uid, datelist, eventType, div=True):
+        res = []
+        dn = len(datelist)
+        ts = []
+        for i in range(0, dn):
+            dt = datetime.datetime.strptime(datelist[i], '%Y-%m-%d')
+            rv = misc.dayOffset(dt, 0)
+            st = rv[0]
+            et = rv[1]
+            ts.append([st, et])
+        rv = self.getEventByTimeSection(uid, eventType, ts, div)
+        return rv
+
+    # @note 根据时间区间来查询事件日志。
+    def getEventByTimeSection(self, uid, eventType, ts, div=False):
+        strTsSql = misc.tsToSql(ts, 'event_record.time')
+        #
+        tssize = len(ts)
+        res1 = []
+        res2 = misc.createEmptyList([tssize])
+        strSql = '''select id,time,type,content from event_record where user_id=%d and
+                type='%s' and del_flag='N' and  %s;''' % (uid, eventType, strTsSql)
+        rv = db.session.execute(strSql)
+        num = rv.rowcount
+        # debug.app_trace(['num:', num])
+        for i in xrange(num):
+            rowObj = rv.fetchone()
+            id, dt, eventType, content = rowObj[:]
+            t = time.mktime(dt.timetuple())
+            try:
+                content = json.loads(content, encoding='utf8')
+                record = None
+
+                if eventType == 'BG':
+                    if 'bg' in content:
+                        bg = float(content['bg'])
+                    elif 'value' in content:
+                        bg = float(content['value']) / 18.0
+                    else:
+                        continue
+                    record = [t, bg]
+                elif eventType == 'CARB':
+                    if 'carb' in content:
+                        carb = int(content["carb"])
+                    elif 'value' in content:
+                        carb = int(content["value"])
+                    else:
+                        continue
+                    record = [t, carb]
+                elif eventType == 'INS':
+                    if 'insulin' in content:
+                        insulin = float(content['insulin'])
+                    elif 'value' in content:
+                        insulin = float(content['value'])
+                    else:
+                        continue
+                    record = [t, insulin]
+                elif eventType == 'EXR':
+                    if 'duration' in content:
+                        duration = int(content['duration'])
+                        flag = content['flag']
+                    elif 'value' in content:
+                        duration = int(content['value'])
+                        flag = exerciseMap[content['exerciseIntensity']]
+                    else:
+                        continue
+                    record = [t, duration, flag]
+                elif eventType == 'HBA1C':
+                    # debug.app_trace(['content:', content])
+                    if 'hba1c' in content:
+                        hba1c = float(content['hba1c'])
+                        # debug.app_trace(['hba1c:', hba1c])
+                    elif 'value' in content:
+                        hba1c = float(content['value'])
+                    else:
+                        continue
+                    record = [t, hba1c]
+                    # debug.app_trace(['record:', record])
+
+                #
+                if record is None: continue
+                if not div:
+                    res1.append(record)
+                else:
+                    for i in range(0, tssize):
+                        if dt >= ts[i][0] and dt < ts[i][1]:
+                            res2[i].append(record)
+            except Exception, e:
+                debug.app_trace(['event content wrong:', id])
+
+        if not div:
+            return res1
+        return res2
+
+    # @note 查询多天多个阶段的事件日志。
+    def getEventMDMP(self, uid, datelist, periods, eventType):
+        period_record_list = []
+        ts = misc.timeSection(datelist, periods)
+        # rv=self.getCarbEventByTimeSection(uid, ts, True)
+        rv = self.getEventByTimeSection(uid, eventType, ts, True)
+        dn = len(datelist)
+        pn = len(periods)
+        for p in range(0, pn):
+            prv = []
+            for d in range(0, dn):
+                prv += rv[d * pn + p]
+            #
+            period_record_list.append(prv)
+        return period_record_list
+
+    #
+    # -- 移动端数据上传和下载。 --------------------------------------------------
+    def getEventForMobile(self, uid, st, et):
+        res = []
+        dt_low = st
+        dt_high = et
+        query_result = db.session.query(EventRecord).filter(
+            db.and_(EventRecord.time >= dt_low, EventRecord.time < dt_high)).filter(
+            EventRecord.user_id == uid).filter(EventRecord.del_flag != 'Y').order_by(EventRecord.time).all()
+
+        #
+        for record in query_result:
+            t = time.mktime(record.time.timetuple())
+
+            contentjson = json.loads(record.content, encoding='utf8')
+            tmp_content = self.transformEventFromWeb2Mobile(record.type, contentjson)
+            tmpli = [record.id, t, record.type, json.dumps(tmp_content, encoding='utf8',
+                                                           indent=2, ensure_ascii=False)]
+            res.append(tmpli)
+        return res
+
+    # @note 保存APP上传的日志记录。
+    def savaEventFromMobile(self, uid, data):
+        for record in data:
+            # debug.app_trace(["mobile_upload:journal record:",record])
+            dt = datetime.datetime.fromtimestamp(record[1])
+            #
+            pkid = record[0]
+            rv = db.session.query(EventRecord).filter(
+                EventRecord.id == pkid).first()
+            if rv is None:
+                rowobj = EventRecord(
+                    id=record[0],
+                    user_id=uid,
+                    time=dt,
+                    type=record[2],
+                    content=record[3])
+                #
+                db.session.add(rowobj)
+            else:
+                # eventTime,eventType,content
+                rv.time, rv.type, rv.content = record[1:4]
+                rv.time = datetime.datetime.fromtimestamp(rv.time)
+                db.session.merge(rv)
+        #
+        db.session.commit()
+
+    # @note 删除记录
+    def deleteEventFromMobile(self, uid, ids):
+        db.session.query(EventRecord).filter(EventRecord.id.in_(ids)). \
+            update({'del_flag': 'Y'}, synchronize_session=False)
+        db.session.commit()
+
+    # @transform event content from mobile form to web form
+    def transformEventFromMobile2Web(self, event_type, content):
+        if event_type == 'BG':
+            content["bg"] = content["bg"] if "bg" in content else content["value"] / 18.0
+        elif event_type == 'CARB':
+            content["carb"] = content["carb"] if "carb" in content else content["value"]
+        elif event_type == 'EXR':
+            content["duration"] = content["duration"] if "duration" in content else content["value"]
+            content["flag"] = content["flag"] if "flag" in content else exerciseMap[content["exerciseIntensity"]]
+        elif event_type == 'INS':
+            content["insulin"] = content["insulin"] if "insulin" in content else content["value"]
+
+        content["remark"] = content["remark"] if "remark" in content else content["note"]
+
+        return content
+
+    # @transform event content from mobile form to web form
+    def transformEventFromWeb2Mobile(self, event_type, content):
+        try:
+            if event_type == 'BG':
+                content["value"] = float(content["value"]) if "value" in content else float(content["bg"]) * 18
+            elif event_type == 'CARB':
+                content["value"] = float(content["value"]) if "value" in content else float(content["carb"])
+            elif event_type == 'EXR':
+                content["value"] = float(content["value"]) if "value" in content else float(content["duration"])
+                content["exerciseIntensity"] = content["exerciseIntensity"] \
+                    if "exerciseIntensity" in content else \
+                    float(exerciseMap.keys()[exerciseMap.values().index(content["flag"])])
+            elif event_type == 'INS':
+                content["value"] = content["value"] if "value" in content else float(content["insulin"])
+
+            content["note"] = content["note"] if "note" in content else content["remark"]
+        except Exception, e:
+            debug.app_trace(['content:', content])
+        return content
+
+        ''' save app data
+            if ([typeString isEqualToString:@"BG"]) {
+                        data.type = @(LogTypeGlucose);
+                        data.period = [contentDic objectForKey:@"period"];
+                        data.glucoseType = [contentDic objectForKey:@"glucoseType"];
+                        data.value = [contentDic objectForKey:@"value"];
+                    } else if ([typeString isEqualToString:@"INS"]) {
+                        data.type = @(LogTypeInsulin);
+                        data.period = [contentDic objectForKey:@"period"];
+                        data.name = [contentDic objectForKey:@"name"];
+                        data.insulinType = [contentDic objectForKey:@"insulinType"];
+                        data.value = [contentDic objectForKey:@"value"];
+                    } else if ([typeString isEqualToString:@"CARB"]) {
+                        data.type = @(LogTypeFood);
+                        data.name = [contentDic objectForKey:@"name"];
+                        data.value = [contentDic objectForKey:@"value"];
+                    } else if ([typeString isEqualToString:@"EXR"]) {
+                        data.type = @(LogTypeExercise);
+                        data.exerciseType = [contentDic objectForKey:@"exerciseType"];
+                        data.exerciseIntensity = [contentDic objectForKey:@"exerciseIntensity"];
+                        data.value = [contentDic objectForKey:@"value"];
+                        data.exerciseEnergy = [contentDic objectForKey:@"exerciseEnergy"];
+                    } else if ([typeString isEqualToString:@"OTR"]) {
+                        data.type = @(LogTypeOther);
+                    }'''
+
+    # -- 日志时间的统计分析功能。 ------------------------------------------------
+
+    # @note
+    def getCarbEventStat(self, uid, st, et):
+        stat = {'num': 0, 'total': 0.0, 'max': "N/A", 'min': "N/A", 'avg': "N/A", 'sd': "N/A",}
+        data = self.getEvent(uid, st, et, 'CARB')
+        #
+        vlist = []
+        for item in data:
+            vlist.append(item[1])
+
+        #
+        if len(vlist) == 0:
+            return stat
+        #
+        stat['num'] = len(vlist)
+        stat['total'] = sum(vlist)
+
+        stat["max"] = max(vlist)
+        stat["min"] = min(vlist)
+
+        tmp = statistics.calculate_avg_sd(vlist)
+        stat["avg"] = round(tmp[0])
+        stat["sd"] = round(tmp[1], 1)
+
+        #
+        return stat
+
+    def getExerciseEventStat(self, uid, st, et):
+        stat = {'num': 0, 'total': 0.0, 'max': "N/A", 'min': "N/A",
+                'avg': "N/A", 'sd': "N/A", "avgtense": "N/A"}
+        data = self.getEvent(uid, st, et, 'EXR')
+        vlist = []
+        for item in data:
+            vlist.append(item[1])
+        #
+        if len(vlist) == 0:
+            return stat
+        #
+        stat['num'] = len(vlist)
+        stat['total'] = sum(vlist)
+        stat["max"] = max(vlist)
+        stat["min"] = min(vlist)
+
+        tmp = statistics.calculate_avg_sd(vlist)
+        stat["avg"] = round(tmp[0])
+        stat["sd"] = round(tmp[1], 1)
+
+        #
+        return stat
+
+    # @note 通用的统计分析功能
+    def commonStat(self, vlist):
+        stat = {'num': 0, 'total': 0.0, 'max': "N/A", 'min': "N/A", 'avg': "N/A", 'sd': "N/A",}
+        #
+        vlen = len(vlist)
+        stat['num'] = len(vlist)
+
+        stat['total'] = 0.0
+        for i in range(0, vlen):
+            stat['total'] += float(vlist[i])
+
+        stat["max"] = max(vlist)
+        stat["min"] = min(vlist)
+
+        tmp = statistics.calculate_avg_sd(vlist)
+        stat["avg"] = tmp[0]
+        stat["sd"] = tmp[1]
+
+        return stat
+
+    # @note 食物事件的统计分析
+    def carbEventStat(self, data):
+        stat = {'num': 0, 'total': 0.0, 'max': "--", 'min': "--", 'avg': "--", 'sd': "--",}
+
+        #
+        vlist = []
+        for item in data:
+            vlist.append(item[1])
+
+        #
+        if len(vlist) == 0:
+            return stat
+        #
+        stat = self.commonStat(vlist)
+        # @note 进行一些小数点截除操作。
+        stat['total'] = round(stat['total'], 1)
+        stat['max'] = round(stat['max'], 1)
+        stat['min'] = round(stat['min'], 1)
+        stat['avg'] = round(stat['avg'], 1)
+        stat['sd'] = round(stat['sd'], 2)
+
+        #
+        return stat
+
+    # @note 血糖值事件的统计分析
+    def bgEventStat(self, data):
+        stat = {'num': 0, 'total': 0.0, 'max': "--", 'min': "--", 'avg': "--", 'sd': "--",}
+
+        #
+        vlist = []
+        for item in data:
+            vlist.append(item[1])
+
+        #
+        if len(vlist) == 0:
+            return stat
+        #
+        stat = self.commonStat(vlist)
+        # @note 进行一些小数点截除操作。
+        glucose_unit = g.setting.get('glucose_unit', 'mmol/L')
+        if glucose_unit == 'mmol/L':
+            stat['total'] = round(stat['total'], 1)
+            stat['max'] = round(stat['max'], 1)
+            stat['min'] = round(stat['min'], 1)
+            stat['avg'] = round(stat['avg'], 1)
+            stat['sd'] = round(stat['sd'], 2)
+        elif glucose_unit == 'mg/dL':
+            stat['total'] = int(round(stat['total'] * 18.0, 0))
+            stat['max'] = int(round(stat['max'] * 18.0, 0))
+            stat['min'] = int(round(stat['min'] * 18.0, 0))
+            stat['avg'] = int(round(stat['avg'] * 18.0, 0))
+            stat['sd'] = round(stat['sd'] * 18.0, 1)
+
+        #
+        return stat
+
+    # @note 运动事件的统计分析
+    def exerciseEventStat(self, data):
+        stat = {'num': 0, 'total': 0.0, 'max': "--", 'min': "--", 'avg': "--", 'sd': "--",}
+
+        #
+        vlist = []
+        for item in data:
+            vlist.append(item[1])
+
+        #
+        if len(vlist) == 0:
+            return stat
+        #
+        stat = self.commonStat(vlist)
+        # @note 进行一些小数点截除操作。
+        stat['total'] = round(stat['total'], 1)
+        stat['max'] = round(stat['max'], 1)
+        stat['min'] = round(stat['min'], 1)
+        stat['avg'] = round(stat['avg'], 1)
+        stat['sd'] = round(stat['sd'], 2)
+        stat['num'] = stat['num']
+
+        #
+        return stat
+
+    # @note 胰岛素事件的统计分析
+    def injectEventStat(self, data):
+        stat = {'num': 0, 'total': 0.0, 'max': "--", 'min': "--", 'avg': "--", 'sd': "--",}
+
+        #
+        vlist = []
+        for item in data:
+            vlist.append(item[1])
+
+        #
+        if len(vlist) == 0:
+            return stat
+        #
+        stat = self.commonStat(vlist)
+        # @note 进行一些小数点截除操作。
+        stat['total'] = round(stat['total'], 2)
+        stat['max'] = round(stat['max'], 2)
+        stat['min'] = round(stat['min'], 2)
+        stat['avg'] = round(stat['avg'], 2)
+        stat['sd'] = round(stat['sd'], 2)
+
+        #
+        return stat
+
+    # @note hba1c事件的统计分析
+    def hba1cEventStat(self, data):
+        stat = {'num': 0, 'max': "--", 'min': "--", 'avg': "--", 'sd': "--",}
+
+        #
+        vlist = []
+        for item in data:
+            vlist.append(item[1])
+
+        #
+        # debug.app_trace(['hba1cEventStat vlist:', vlist])
+        if len(vlist) == 0:
+            return stat
+        #
+        stat = self.commonStat(vlist)
+        # @note 进行一些小数点截除操作。
+        # stat['total'] = round(stat['total'], 2)
+        stat['max'] = round(stat['max'], 2)
+        stat['min'] = round(stat['min'], 2)
+        stat['avg'] = round(stat['avg'], 2)
+        stat['sd'] = round(stat['sd'], 2)
+
+        #
+        return stat
+
+dao=EventDAO()
+
+# @note 按小时计算一天的血糖值。
+def calDayJournalStat(day_event, catag):
+    stat_result = {}
+    num = len(day_event)
+    if num==0:
+        stat_result["no_data"]=1
+        return stat_result
+    
+    total_val = 0.0
+    total_cnt = 0
+    glucose_unit=g.setting.get('glucose_unit', 'mmol/L')
+    #for i in range(0,num):
+    for record in day_event:
+        t,val=record[0:2]
+        dt=datetime.datetime.fromtimestamp(t)
+        #time = day_event[i][0]
+        #hour=time/60
+        #minute=time%60
+        #val=day_event[i][1]
+        hour=dt.hour
+        key="hour%d"%hour
+        if catag=="bg":
+            if glucose_unit=='mmol/L':stat_result[key]='%.1f' % val
+            elif glucose_unit=='mg/dL':stat_result[key]='%.0f' % (val*18.0)
+        else:
+            stat_result[key]=val
+        total_val += float(val)
+        total_cnt += 1
+    
+    
+    if catag=="bg":
+        if glucose_unit=='mmol/L':total_format = "%.1f/%d"
+        elif glucose_unit=='mg/dL':
+            total_val *= 18.0
+            total_format = "%.0f/%d"
+        stat_result["total"]=total_format % (total_val/total_cnt,total_cnt)
+    # 食物统计为总量和次数
+    elif catag=="carb":
+        total_format = "%.0f/%d"
+        stat_result["total"]=total_format % (total_val, total_cnt)
+    elif catag=="insulin":
+        total_format = "%.2f/%d"
+        stat_result["total"]=total_format % (total_val/total_cnt,total_cnt)
+    elif catag=="exercise":
+        total_format = "%.0f/%d"
+        stat_result["total"]=total_format % (total_val/total_cnt,total_cnt)
+    
+    
+    return stat_result
+
+###################################################################
+# -- 事件日志数据的访问 -------------------------------------------------
+def searchEventPage(info):
+    rvobj = {}
+    
+    # rv的值有可能是空值。
+    rv = dao.searchEventByDatePage(info)
+    if rv==None:return rvobj
+    #
+    eventpage = rv['page']
+    
+    if eventpage is None: return rvobj
+    
+    rvobj['date'] = rv['event']
+    rvobj['itemnum'] = eventpage.total
+    rvobj['has_next'] = eventpage.has_next
+    rvobj['has_prev'] = eventpage.has_prev
+    rvobj['next_num'] = eventpage.next_num
+    rvobj['prev_num'] = eventpage.prev_num
+    rvobj['pages'] = eventpage.pages
+    rvobj['page'] = eventpage.page
+    
+    return rvobj

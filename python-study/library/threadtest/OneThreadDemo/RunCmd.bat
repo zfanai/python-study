@@ -1,0 +1,2 @@
+python onethr.py
+pause

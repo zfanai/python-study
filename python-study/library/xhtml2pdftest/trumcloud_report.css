@@ -1,0 +1,176 @@
+
+@font-face {
+    font-family: simsun;
+    src: url(c:\windows\fonts\simsun.ttc);
+}
+
+body {font-family:SimSun;}
+
+
+.mt_page_header .mt_header_title{
+	text-align:center;	
+}
+
+.mt_page_header .mt_header_title .main_title{
+	margin-top:10px;
+	margin-bottom:10px;
+	text-align:center;
+}
+
+.mt_page_header .mt_header_title .sub_title{
+	margin-top:5px;
+	margin-bottom:5px;
+	text-align:center;
+}
+
+.mt_page_header #mt_header_logo{
+	position:absolute;
+}
+
+
+.mt_page_footer .mt_footer_info {
+	width:30%;
+	display:inline-block;
+}
+
+.mt_page_footer .footer_info_left {
+	text-align:left;
+}
+
+.mt_page_footer .footer_info_center {
+	text-align:center;
+}
+
+.mt_page_footer .footer_info_right {
+	text-align:right;
+}
+
+
+
+.mt_report_header .report_header_tbl {
+	width:100%;
+}
+
+
+.mt_report_chart_warp {
+	width:96%;
+	margin-left:2%;
+	margin-right:2%;
+}
+
+.content_title {
+	font-size:14px;
+	margin-top:10px;
+	margin-bottom:10px;
+}
+/*********************************************************************/
+
+.mt_report_layout_tbl {
+	width:96%;
+	margin-left:2%;
+	margin-right:2%;
+}
+
+.mt_report_layout_tbl table {
+	width:100%;
+	border-width:1px;
+	font-size:12px;
+}
+
+
+.mt_report_statistics_tbl, 
+.mt_report_tbl_wrapper
+{
+	width:96%;
+	margin-left:2%;
+	margin-right:2%;
+}
+
+.mt_report_tbl_wrapper table {
+	font-size:12px;
+}
+
+.mt_report_statistics_tbl table, 
+.mt_report_cell_tbl table {
+	width:100%;
+	border:solid;
+	border-width:1px;
+	font-size:12px;
+}
+
+table  td.tbl_header{
+	background-color:silver;
+}
+
+
+table  td.l_r_border{
+	border-right:solid;
+	border-right-width:1px;
+	border-left:solid;
+	border-left-width:1px;
+}
+
+table  td.l_border{
+	border-left:solid;
+	border-left-width:1px;
+}
+
+table  td.r_border{
+	border-right:solid;
+	border-right-width:1px;
+}
+
+table  td.t_border{
+	border-top:solid;
+	border-top-width:1px;
+}
+
+table  td.b_border{
+	border-bottom:solid;
+	border-bottom-width:1px;
+}
+
+
+table  td.ta_c{
+	text-align:center;
+}
+
+
+
+
+
+.mt_report_statistics_tbl table td.bg_lg{
+	background-color:#ddd;
+}
+
+
+.mt_report_statistics_tbl table .tbl_cell_para p{
+	margin-top:0px;
+	margin-bottom:0px;
+}
+
+/********************************************************************/
+body#period_model_pdf_report ,
+body#event_summary_pdf_report_catagory, 
+body#hour_model_pdf_report,
+body#contrast_summary_pdf_report,
+body#trend_analysis_pdf_report,
+body#event_summary_bytime_pdf_report
+{
+	width:277mm;
+	margin:auto;
+	
+}
+
+body#day_summary_pdf_report,
+body#event_distribution_pdf_report,
+body#event_distribution_bytime_pdf_report,
+body#user_dependency_pdf_report,
+body#device_settings_pdf_report,
+body#hba1c_pdf_report
+{
+	width:190mm;
+	margin:auto;
+	
+}
+

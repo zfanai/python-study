@@ -1,0 +1,18 @@
+
+C:\Users\zhoufan\Projects\Python\CodeRepository\LibraryTest\geventdemo>C:\Users\zhoufan\Programs\VirtualEnv\python27\Scripts\python gevent_queue.py      
+zf,waiter: <_MultipleWaiter greenlet=None> <bound method _MultipleWaiter.switch of <gevent.hub._MultipleWaiter object at 0x02858390>>
+zf,iwait 5:
+zf,_MultipleWaiter,get,1
+zf,Waiter,get,0
+zf,Waiter,get
+zf,Waiter,get,0
+zf,Waiter,get
+put a msg
+get a msg: msg #0
+zf,_MultipleWaiter,get,2
+zf,iwait <Greenlet at 0x26a9b70>
+zf,_MultipleWaiter,get,1
+zf,Waiter,get,0
+zf,Waiter,get
+zf,_MultipleWaiter,get,2
+zf,iwait <Greenlet at 0x26a9b20>

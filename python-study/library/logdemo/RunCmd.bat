@@ -1,0 +1,2 @@
+python LogDemo.py
+pause

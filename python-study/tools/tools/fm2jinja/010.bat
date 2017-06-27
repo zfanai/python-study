@@ -1,0 +1,1 @@
+call python fm2jinja.py 10_device_settings_report_tpl_fm.html 10_device_settings_report_tpl.html

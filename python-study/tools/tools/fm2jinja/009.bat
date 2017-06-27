@@ -1,0 +1,1 @@
+call python fm2jinja.py 09_trend_analysis_report_tpl_fm.html 09_trend_analysis_report_tpl.html

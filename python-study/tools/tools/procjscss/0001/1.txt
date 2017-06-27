@@ -1,0 +1,5 @@
+
+(python27) C:\Users\zhoufan\Projects\Python\CodeRepository\GadgetTest\Tools\procjscss>python procjscss.py C:\Users\zhoufan\Desktop\SWTeam\RECRUIT\RESUME\Android-2 
+start viewer
+10
+{u'\u5b66\u6821\uff1a': u'\u82cf\u5dde\u5927\u5b66', '\xd0\xd4\xb1\xf0': '\xc4\xd0', u'\u5b66\u5386/\u5b66\u4f4d\uff1a': u'\u672c\u79d1', u'\u4e13\u4e1a\uff1a': u'\u8ba1\u7b97\u673a\u79d1\u5b66\u4e0e\u6280\u672f', '\xb9\xa4\xd7\xf7\xbe\xad\xd1\xe9': '2\xc4\xea\xb9\xa4\xd7\xf7\xbe\xad\xd1\xe9', '\xc4\xea\xc1\xe4': '25 \xcb\xea', '\xd0\xd5\xc3\xfb': '\xb6\xa1\xd5\xf1\xcd\xfe'}

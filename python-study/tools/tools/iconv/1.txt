@@ -1,0 +1,6 @@
+trace:f,['C:\\Users\\zhoufan\\Projects\\Python\\CodeRepository\\CodeRepository\\GadgetTest\\Tools\\cleanfiles\\cleanfiles.py', 'utf-8', 'GB2312']
+trace:line,['# -*- coding: utf-8 -*-', 'utf-8', 'GB2312']
+trace:rv,# -*- coding: GB2312 -*-
+trace:f,['C:\\Users\\zhoufan\\Projects\\Python\\CodeRepository\\CodeRepository\\GadgetTest\\Tools\\walkdir\\walkdir.py', 'utf-8', 'GB2312']
+trace:line,['# -*- coding: utf-8 -*-', 'utf-8', 'GB2312']
+trace:rv,# -*- coding: GB2312 -*-

@@ -1,0 +1,1 @@
+celery  worker -A celeryapp -l info -P threads

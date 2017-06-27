@@ -1,0 +1,154 @@
+
+<!--
+每日总结报告的图表
+-->
+<div class="mt_report_chart_warp">
+	<img src="{%chart_base_url%}/{%day_summary_chart%}" width="100%"/>
+</div>
+<br/>
+
+<p>统计</p>
+<div class="mt_report_statistics_tbl">
+    
+    <table cellspacing="0">
+		<tr>
+        	<td colspan="5" class="tbl_header b_border ta_c">血糖</td>
+            <td colspan="2" rowspan="2" 
+            	class="tbl_header l_border">胰岛素</td>
+            <td colspan="2" rowspan="2" 
+            	class="tbl_header l_border">活动事件</td>
+        </tr>
+        
+        <tr>
+        	<td class="tbl_header r_border">项目</td>
+            <td class="tbl_header">指尖血</td>
+            <td class="tbl_header">传感器</td>
+            <td colspan="2" class="tbl_header l_border">变化速率</td>
+        </tr>
+        
+        <tr class="tbl_content">
+        	<td class="r_border">平均方差(mmol/L)</td>
+            <td>{% glucose.bg_avg_dev %}</td>
+            <td>{% glucose.sg_avg_dev %}</td>
+            <td class="l_border">标准差</td>
+            <td>{% glucose.sg_rate_sd %}</td>
+            <td class="l_border">总量(U)</td>
+            <td>{% insulin.total %}</td>
+            <td class="l_border">食物总量(g)</td>
+            <td>{% event.carb_total %}</td>
+        </tr> 
+       
+        <tr class="tbl_content">
+        	<td class="r_border">最小(mmol/L)</td>
+            <td>{% glucose.bg_min %}</td>
+            <td>{% glucose.sg_min %}</td>
+            <td class="l_border">绝对值&le;1%</td>
+            <td>{% glucose.sg_rate_low %}</td>
+            <td class="l_border">大剂量(U)/%</td>
+            <td>{% insulin.bolus %}</td>
+            <td class="l_border">进餐次数</td>
+            <td>{% event.meal_count %}</td>
+        </tr>
+
+        <tr class="tbl_content">
+        	<td class="r_border">最大(mmol/L)</td>
+            <td>{% glucose.bg_max %}</td>
+            <td>{% glucose.sg_max %}</td>
+            <td class="l_border">绝对值1-2%</td>
+            <td>{% glucose.sg_rate_medium %}</td>
+            <td class="l_border">基础量(U)/%</td>
+            <td>{% insulin.basal %}</td>
+            <td class="l_border">平均量+标准</td>
+            <td>{% event.meal_avg_sd %}</td>
+        </tr>
+ 
+        <tr class="tbl_content">
+        	<td class="r_border">正常%</td>
+            <td>{% glucose.bg_np %}</td>
+            <td>{% glucose.sg_np %}</td>
+            <td class="l_border">绝对值2-3%</td>
+            <td>{% glucose.sg_rate_high %}</td>
+            <td class="l_border">食物大剂量(U)</td>
+            <td>{% insulin.carb_bolus %}</td>
+            <td class="l_border">运动总时间</td>
+            <td>{% event.exercise_time %}</td>
+        </tr>
+
+        <tr class="tbl_content">
+        	<td class="r_border">偏低%</td>
+            <td>{% glucose.bg_lp %}</td>
+            <td>{% glucose.sg_lp %}</td>
+            <td class="l_border">绝对值&gt;3%</td>
+            <td>{% glucose.sg_rate_fast %}</td>
+            <td class="l_border">校正大剂量(U)</td>
+            <td>{% insulin.corr_bolus %}</td>
+            <td class="l_border">运动次数</td>
+            <td>{% event.exercise_count %}</td>
+        </tr>
+        
+        <tr class="tbl_content">
+            <td class="r_border">偏高%</td>
+            <td>{% glucose.bg_hp %}</td>
+            <td>{% glucose.sg_hp %}</td>
+            <td class="l_border">  </td>
+            <td></td>
+            <td class="l_border">正常大剂量(U)</td>
+            <td>{% insulin.normal_bolus %}</td>
+            <td class="l_border">平均时间</td>
+            <td>{% event.exercise_avg_time %}</td>
+        </tr>
+
+        <tr class="tbl_content">
+            <td class="r_border">读数次数/时间</td>
+            <td>{% glucose.bg_rds_time %}</td>
+            <td>{% glucose.sg_rds_time %}</td>
+            <td class="l_border">  </td>
+            <td>  </td>
+            <td class="l_border">扩展大剂量(U)</td>
+            <td>{% insulin.extent_bolus %}</td>
+            <td class="l_border">平均强度</td>
+            <td>{% event.exercise_avg_tense %}</td>
+        </tr>
+
+        <tr class="tbl_content">
+            <td class="r_border">低血糖次数/时间</td>
+            <td>{% glucose.bg_low_rds_time %}</td>
+            <td>{% glucose.sg_low_rds_time %}</td>
+            <td class="l_border">  </td>
+            <td>  </td>
+            <td class="l_border">临时基础量(U)</td>
+            <td>{% insulin.temp_basal %}</td>
+            <td class="l_border">  </td>
+            <td>  </td>
+        </tr>
+
+        <tr class="tbl_content">
+            <td class="r_border">告警次数</td>
+            <td>{% glucose.bg_alarm_cnt %}</td>
+            <td>{% glucose.sg_alarm_cnt %}</td>
+            <td class="l_border">  </td>
+            <td>  </td>
+            <td class="l_border">暂停输注时间</td>
+            <td>{% insulin.suspend_time %}</td>
+            <td class="l_border">  </td>
+            <td>  </td>
+        </tr>
+
+        <tr class="tbl_content">
+            <td class="r_border">  </td>
+            <td>  </td>
+            <td>  </td>
+            <td class="l_border">  </td>
+            <td>  </td>
+            <td class="l_border">泵告警次数</td>
+            <td>{% insulin.pump_alarm_cnt %}</td>
+            <td class="l_border">  </td>
+            <td>  </td>
+        </tr>               
+        
+    </table>
+</div>
+</div>
+
+</body>
+</html>

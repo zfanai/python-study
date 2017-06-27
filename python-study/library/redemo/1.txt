@@ -1,0 +1,27 @@
+
+b2233a
+# 
+app:('m:', <_sre.SRE_Match object at 0x0256D528>)
+(?=\d{2}).*a
+2233a
+app:('m:', <_sre.SRE_Match object at 0x0256D560>)
+(?!\d{2}).*a
+b2233a
+app:('m:', <_sre.SRE_Match object at 0x0256D528>)
+(?<=\d{2}).*a
+33a
+app:('m:', <_sre.SRE_Match object at 0x0256D560>)
+(?<!\d{2}).*a
+b2233a
+
+# ===============================================
+app:('m:', None)
+(?=\d{2})a
+app:('m:', <_sre.SRE_Match object at 0x0256D560>)
+(?!\d{2})a
+a
+app:('m:', <_sre.SRE_Match object at 0x0256D528>)
+(?<=\d{2})a
+a
+app:('m:', None)
+(?<!\d{2})a

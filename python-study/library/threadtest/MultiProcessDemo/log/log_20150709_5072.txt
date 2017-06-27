@@ -1,0 +1,2 @@
+[2015-07-09 13:12:51.970000]trace:['main:tp0,__name__,pid:', '__parents_main__', 5072]
+[2015-07-09 13:12:51.970000]trace:['main:tp9,__name__,pid:', '__parents_main__', 5072]

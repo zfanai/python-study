@@ -1,0 +1,212 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">   
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+{% set charset='utf8' %}
+{% set orient='heng' %}
+{% include 'report/pdf_common_head_tpl.html' %}
+
+
+<body id="${pdf_report_id}">
+
+{%include 'report/pdf_report_header_tpl.html'%}
+
+<div class="mt_page_body">
+
+<!--
+填写用户信息的表头
+-->
+
+{% include 'report/pdf_report_userinfo_tpl.html' %}
+
+<div class="mt_report_chart_warp">
+	<img src="${chart_base_url}/${sg_avg_trend_chart_id}" height="200px" width="100%"/>
+</div>
+
+<p>趋势统计表</p>
+<div class="mt_report_statistics_tbl">
+<table cellspacing="0">
+    <tr>
+    <td rowspan="2" class="b_border r_border">统计</td>
+    <td colspan="10" class="b_border r_border ta_c">基本</td>
+    <td colspan="3" class="b_border r_border ta_c">分布</td>
+    <td colspan="4" class="b_border r_border ta_c">偏低幅度</td>
+    <td colspan="4" class="b_border r_border ta_c">变化速率</td>
+    <td colspan="4" class="b_border ta_c">指尖血</td>
+    </tr>
+    <tr>
+    <td class="tbl_cell_para b_border"><p>平均</p><p>值</p></td>
+    <td class="tbl_cell_para b_border"><p>标准</p><p>值</p></td>
+    <td class="tbl_cell_para b_border"><p>变异</p><p>系数</p></td>
+    <td class="tbl_cell_para b_border"><p>均值标</p><p>准误</p></td>
+    <td class="tbl_cell_para b_border"><p>最大</p><p>值</p></td>
+    <td class="tbl_cell_para b_border"><p>最小</p><p>值</p></td>
+    <td class="tbl_cell_para b_border"><p>中位</p><p>数</p></td>
+    <td class="tbl_cell_para b_border"><p>1/4</p><p>分位</p></td>
+    <td class="tbl_cell_para b_border"><p>3/4</p><p>分位</p></td>
+    <td class="tbl_cell_para b_border r_border"><p>四分</p><p>位距</p></td>
+    
+    <td class="tbl_cell_para b_border"><p>偏高</p><p>%</p></td>
+    <td class="tbl_cell_para b_border"><p>偏低</p><p>%</p></td>
+    <td class="tbl_cell_para b_border r_border"><p>正常</p><p>%</p></td>
+    
+    <td class="tbl_cell_para b_border"><p>高限下</p><p>面积</p></td>
+    <td class="tbl_cell_para b_border"><p>低限下</p><p>面积</p></td>
+    <td class="tbl_cell_para b_border"><p>偏高</p><p>次数</p></td>
+    <td class="tbl_cell_para b_border r_border"><p>偏低</p><p>次数</p></td>
+    
+    <td class="tbl_cell_para b_border"><p>标准差</p><p>差</p></td>
+    <td class="tbl_cell_para b_border"><p>平稳</p><p></p></td>
+    <td class="tbl_cell_para b_border"><p>较快</p><p>波动</p></td>
+    <td class="tbl_cell_para b_border r_border"><p>快速</p><p>波动</p></td>
+    
+    <td class="tbl_cell_para b_border"><p>平均</p><p>值</p></td>
+    <td class="tbl_cell_para b_border"><p>标准差</p><p>值</p></td>
+    <td class="tbl_cell_para b_border"><p>测量</p><p>次数</p></td>
+    <td class="tbl_cell_para b_border"><p>低血糖</p><p>次数</p></td>
+    
+    </tr>
+    
+    {% set num=glucose_stat|length%}
+    
+    {#<#list 0..(num-1) as row>#}
+    {% for row in range(0, num) %}
+    
+    <tr>
+    {#
+    <#if row==(num-1)><#assign b_border="">
+    <#else><#assign b_border="b_border"></#if>
+    #}
+    {% if row==(num-1) %}{% set b_border="" %}
+    {% else %}{% set b_border="b_border" %}{% endif %}
+    
+    {#
+    <#if (row<(num-1))>
+    	<td class="${b_border} r_border">
+    	${glucose_stat[row].day}</td>
+    <#elseif row==(num-1)>
+    	<td class="${b_border} r_border">平均/总计</td>
+    </#if>
+    #}
+    {% if row<(num-1) %}
+    	<td class="${b_border} r_border">
+    	${glucose_stat[row].day}</td>
+   	{% elif row==(num-1) %}
+   		<td class="${b_border} r_border">平均/总计</td>
+   	{% endif %}
+
+    <td class="${b_border}">${glucose_stat[row].sg_avg}</td>
+    <td class="${b_border}">${glucose_stat[row].sg_sd}</td>
+    <td class="${b_border}">${glucose_stat[row].sg_cv}</td>
+    <td class="${b_border}">${glucose_stat[row].sg_se}</td>
+    <td class="${b_border}">${glucose_stat[row].sg_max}</td>
+    <td class="${b_border}">${glucose_stat[row].sg_min}</td>
+    <td class="${b_border}">${glucose_stat[row].sg_median}</td>
+    <td class="${b_border}">${glucose_stat[row].sg_q1}</td>
+    <td class="${b_border}">${glucose_stat[row].sg_q3}</td>
+    <td class="${b_border} r_border">${glucose_stat[row].sg_iqr}</td>
+    
+    <td class="${b_border}">${glucose_stat[row].sg_up}</td>
+    <td class="${b_border}">${glucose_stat[row].sg_lp}</td>
+    <td class="${b_border} r_border">${glucose_stat[row].sg_tp}</td>
+    
+    <td class="${b_border}">${glucose_stat[row].sg_aucu}</td>
+    <td class="${b_border}">${glucose_stat[row].sg_aucl}</td>
+    <td class="${b_border}">${glucose_stat[row].sg_nu}</td>
+    <td class="${b_border} r_border">${glucose_stat[row].sg_nl}</td>
+    
+    <td class="${b_border}">${glucose_stat[row].sg_sdr}</td>
+    <td class="${b_border}">${glucose_stat[row].sg_spr}</td>
+    <td class="${b_border}">${glucose_stat[row].sg_mpr}</td>
+    <td class="${b_border} r_border">${glucose_stat[row].sg_lpr}</td>
+    
+    <td class="${b_border}">${glucose_stat[row].bg_avg}</td>
+    <td class="${b_border}">${glucose_stat[row].bg_sd}</td>
+    <td class="${b_border}">${glucose_stat[row].bg_num}</td>
+    <td class="${b_border}">${glucose_stat[row].bg_low_num}</td>
+    
+    
+    </tr>
+    {% endfor %}
+</table>
+</div>    
+
+{%include 'report/pdf_report_header_tpl.html'%}
+
+<p>胰岛素输注量/事件总结</p>
+<div class="mt_report_chart_warp">
+	<img src="${chart_base_url}/${insulin_usage_trend_chart_id}" height="200px" width="100%"/>
+</div>
+
+<p>统计表</p>
+<div class="mt_report_statistics_tbl">
+<table cellspacing="0">
+    <tr>
+    <td rowspan="2" class="b_border r_border">统计</td>
+    <td colspan="6" class="b_border r_border ta_c">胰岛素</td>
+    <td colspan="2" class="b_border r_border ta_c">食物</td>
+    <td rowspan="2" class="b_border r_border ta_c">运动</td>
+    <td rowspan="2" class="b_border ta_c" width="30%">其它</td>
+    </tr>
+    
+    <tr>
+    <td class="b_border">总量</td>
+    <td class="b_border">基础量</td>
+    <td class="b_border">大剂量值</td>
+    <td class="b_border">大剂量%</td>
+    <td class="b_border">大剂量次数</td>
+    <td class="b_border r_border">大剂量平均值</td>
+    
+    <td class="b_border">进食量</td>
+    <td class="b_border r_border">进食次数</td>
+    
+    </tr>
+    
+    {#
+    <#assign num=insulin_and_event_stat?size>
+    
+    <#list 0..(num-1) as row>
+    
+    <#if row==(num-1)><#assign b_border="">
+    <#else><#assign b_border="b_border"></#if>
+    
+    <tr>
+    
+    <#if (row<(num-1))>
+    <td class="${b_border} r_border">${insulin_and_event_stat[row].day}</td>
+    <#elseif row==num-1>
+    <td class="${b_border} r_border">平均/总计</td>
+    </#if>
+    #}
+	{% set num=insulin_and_event_stat|length %}
+	{% for row in range(0,num) %}
+	{% if row==(num-1) %}{% set b_border="" %}
+	{% else %}{% set=b_border="b_border" %}{% endif %}
+    <tr>
+    {% if row<(num-1)%}
+    <td class="${b_border} r_border">${insulin_and_event_stat[row].day}</td>
+    {%elif row==(num-1)%}
+    <td class="${b_border} r_border">平均/总计</td>
+    {%endif%}
+    
+    <td class="${b_border}">${insulin_and_event_stat[row].ins_total}</td>
+    <td class="${b_border}">${insulin_and_event_stat[row].ins_basal}</td>
+    <td class="${b_border}">${insulin_and_event_stat[row].ins_bolus}</td>
+    <td class="${b_border}">${insulin_and_event_stat[row].ins_bolus_p}</td>
+    <td class="${b_border}">${insulin_and_event_stat[row].ins_bolus_n}</td>
+    <td class="${b_border} r_border">${insulin_and_event_stat[row].ins_bolus_avg}</td>
+    
+    <td class="${b_border}">${insulin_and_event_stat[row].carb_gram}</td>
+    <td class="${b_border} r_border">${insulin_and_event_stat[row].carb_num}</td>
+    
+    <td class="${b_border} r_border">${insulin_and_event_stat[row].exer_time}</td>
+    
+    <td class="${b_border}">${insulin_and_event_stat[row].other}</td>
+    
+    </tr>
+    {%endfor%}
+</table>
+</div>
+
+</div>
+</body>
+</html>

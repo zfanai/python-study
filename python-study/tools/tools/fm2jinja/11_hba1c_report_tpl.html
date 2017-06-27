@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">   
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+{% set charset='utf8' %}
+{% set orient='shu' %}
+{% include 'report/pdf_common_head_tpl.html' %}
+
+<body id="{{pdf_report_id}}">
+
+{% include 'report/pdf_report_header_tpl.html' %}
+
+<div class="mt_page_body">
+
+<!--
+填写用户信息的表头
+-->
+
+{% include "report/pdf_report_userinfo_tpl.html" %}
+
+<p>糖化血红蛋白记录</p>
+<div class="mt_report_statistics_tbl">
+<table cellspacing="0">
+<tr>
+	<td class="b_border r_border" width="20%">日期</td>
+    <td class="b_border r_border" width="25%">糖化血红蛋白值</td>
+    <td class="b_border r_border" width="25%">预估平均值</td>
+    <td class="b_border">备注</td>
+</tr>
+
+{% set num=hba1c_data?size %}
+
+{% for row in range(0,num) %}
+{% if row==(num-1) %}{% set b_border="" %}
+{% else %}{% set b_border="b_border" %}{% endif %}
+<tr>
+{% if (row<num-1) %}
+<td class="{{b_border}} r_border">{{hba1c_data[row].day}}{{hba1c_data[row].wday}}</td>
+{% else %}
+<td class="{{b_border}} r_border">平均/总计</td>
+{% endif %}
+
+<td class="{{b_border}} r_border">{{hba1c_data[row].thxt}}</td>
+<td class="{{b_border}} r_border">{{hba1c_data[row].fore_avg}}</td>
+<td class="{{b_border}}">{{hba1c_data[row].note}}</td>
+
+</tr>
+{% endfor %}
+
+</table>
+</div>
+
+
+</div>
+</body>
+</html>

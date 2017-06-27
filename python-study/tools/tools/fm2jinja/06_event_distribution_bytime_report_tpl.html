@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">   
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+
+{% set charset='utf8' %}
+{% set orient='shu' %}
+{% include 'report/pdf_common_head_tpl.html' %}
+
+<body id="{{pdf_report_id}}">
+
+{% include 'report/pdf_report_header_tpl.html' %}
+
+<div class="mt_page_body">
+
+<!--
+填写用户信息的表头
+-->
+
+{% include 'report/pdf_report_userinfo_tpl.html' %}
+
+<div class="mt_report_chart_warp">
+	<img src="{{chart_base_url}}/{{sg_overlay_chart_id}}" height="120px" width="100%"/>
+	<img src="{{chart_base_url}}/{{sg_hl_cnt_chart_id}}" height="100px" width="100%"/>
+    <img src="{{chart_base_url}}/{{sg_hl_dev_chart_id}}" height="100px" width="100%"/>
+    <img src="{{chart_base_url}}/{{sg_risk_chart_id}}" height="100px" width="100%"/>
+</div>
+
+
+<p class="content_title">分时统计</p>
+<div class="mt_report_statistics_tbl">
+<table cellspacing="0">
+    <tr>
+    <td class="b_border r_border">类型</td>
+    <td class="b_border r_border">项目</td>
+    
+    {#
+    <#list 0..23 as hour>
+    <td class="b_border">{{hour}}</td>
+    </#list>
+    #}
+    {% for in range(0, 24) %}
+    <td class="b_border">{{hour}}</td>
+    {% endfor %}
+    
+    <td class="l_border b_border r_border">段数</td>
+    <td class="b_border r_border">总长</td>
+    <td class="b_border r_border">平均</td>
+    <td class="b_border">数值</td>
+    </tr>
+    
+    {#<#list 0..9 as row>#}
+    {% for row in range(0, 10) %}
+    <tr>
+    
+    {#
+    <#if row==0>
+    <td rowspan="5" class="b_border r_border">低血糖
+    </td>
+    <#elseif row==5>
+    <td rowspan="5" class="r_border">高血糖
+    </td>
+    </#if>
+    #}
+	{% if row==0 %}
+    <td rowspan="5" class="b_border r_border">低血糖
+    </td>
+    {% elif row==5 %}
+    <td rowspan="5" class="r_border">高血糖
+    </td>
+    {% endif %}
+    
+    {#
+    <#if 0==row||5==row><#assign title="高概率">
+    <#elseif 1==row||6==row><#assign title="大幅度">
+    <#elseif 2==row||7==row><#assign title="高风险">
+    <#elseif 3==row||8==row><#assign title="交集时段">
+    <#elseif 4==row||9==row><#assign title="合集时段">
+    </#if>
+    #}
+    {% if 0==row||5==row %}{% set title="高概率" %}
+    {% elif 1==row||6==row %}{% set title="大幅度" %}
+    {% elif 2==row||7==row %}{% set title="高风险" %}
+    {% elif 3==row||8==row %}{% set title="交集时段" %}
+    {% elif 4==row||9==row %}{% set title="合集时段" %}
+    {% endif>
+    
+    {#
+    <#if 9==row><#assign b_border="">
+    <#else><#assign b_border="b_border">
+    </#if>
+    #}
+    {% if 9==row %}{% set b_border="" %}
+    {% else %}{% set b_border="b_border" %}
+    {% endif %}
+    
+    <td class="r_border {{b_border}}">{{title}}</td>
+    
+    {#
+    <#list 0..23 as col>
+    <td></td>
+    </#list>
+    #}
+    {% for col in range(0, 24) %}
+    <td></td>
+    {% endfor %}
+    
+    {#
+    <#if 0==row><#assign catagory=high_sg_event.high_prob>
+    <#elseif 1==row><#assign catagory=high_sg_event.big_amp>
+    <#elseif 2==row><#assign catagory=high_sg_event.high_risk>
+    <#elseif 3==row><#assign catagory=high_sg_event.and_section>
+    <#elseif 4==row><#assign catagory=high_sg_event.or_section>
+    <#elseif 5==row><#assign catagory=low_sg_event.high_prob>
+    <#elseif 6==row><#assign catagory=low_sg_event.big_amp>
+    <#elseif 7==row><#assign catagory=low_sg_event.high_risk>
+    <#elseif 8==row><#assign catagory=low_sg_event.and_section>
+    <#elseif 9==row><#assign catagory=low_sg_event.or_section>
+    </#if>
+    #}
+    {% if 0==row %}{% set catagory=high_sg_event.high_prob %}
+    {% elif 1==row %}{% set catagory=high_sg_event.big_amp %}
+    {% elif 2==row %}{% set catagory=high_sg_event.high_risk %}
+    {% elif 3==row %}{% set catagory=high_sg_event.and_section %}
+    {% elif 4==row %}{% set catagory=high_sg_event.or_section %}
+    {% elif 5==row %}{% set catagory=low_sg_event.high_prob %}
+    {% elif 6==row %}{% set catagory=low_sg_event.big_amp %}
+    {% elif 7==row %}{% set catagory=low_sg_event.high_risk %}
+    {% elif 8==row %}{% set catagory=low_sg_event.and_section %}
+    {% elif 9==row %}{% set catagory=low_sg_event.or_section %}
+    {% endif>
+    
+    <td class="l_border {{b_border}} r_border">{{catagory.duration_num}}</td>
+    <td class="{{b_border}} r_border">{{catagory.duration_total}}</td>
+    <td class="{{b_border}} r_border">{{catagory.duration_avg}}</td>
+    
+    {#
+    <#if (row>=0&&row<=2) || (row>=5&&row<=7)>
+    <td class="{{b_border}}">{{catagory.value_avg_total}}</td>
+    <#else>
+    <td class="{{b_border}}">--</td>
+    </#if>
+    #}
+    {% if (row>=0&&row<=2) || (row>=5&&row<=7) %}
+    <td class="{{b_border}}">{{catagory.value_avg_total}}</td>
+    {% else %}
+    <td class="{{b_border}}">--</td>
+    {% endif %}
+    
+    </tr>
+    {% endfor %}
+</table>
+</div>
+
+
+</div>
+</body>
+</html>

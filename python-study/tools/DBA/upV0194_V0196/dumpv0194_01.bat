@@ -1,0 +1,1 @@
+mysqldump -uroot -pmyzfsql85 flaskdbv0194 > flaskdbv0194.sql

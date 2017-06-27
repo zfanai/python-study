@@ -1,0 +1,1 @@
+python regexp.py in.txt out.txt

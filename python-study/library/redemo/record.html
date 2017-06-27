@@ -1,0 +1,431 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+
+{% include "bingo/include.js.html" %}
+{% include "bingo/include.js.plus.html" %}
+{% include "bingo/include.header.html" %}
+{% import 'bingo/common.macro.html' as cmac %}
+<script src="{{STATIC_DIR}}/js/jquery-ui.js"></script>
+<script src="{{STATIC_DIR}}/js/datepicker_config.js"></script>
+<link href="{{STATIC_DIR}}/css/jquery-ui.css" rel="stylesheet" type="text/css" />
+
+</head>
+<body>
+    <!--头部-->
+    {% include "bingo/_div_header.html" %}
+    
+    <!--中部-->
+    <div class="middle body_width">
+        <!--右边-->
+        <div class="m_right">
+            <!--头部-->
+            <div class="m_right_top">
+                <img src="{{STATIC_DIR}}/images/icon_left.png" class="m_right_left" />
+                <img src="{{STATIC_DIR}}/images/icon_right.png" class="m_right_right" />
+                {% include 'bingo/_div_iconmenu.html' %}
+            </div>
+            
+            <!-- 显示当前查看的账户的信息 -->
+            {% include 'bingo/viewotherinfo.html' %}
+            
+            <!--头部-->
+            <div class="m_right_tab">
+                <div class="m_r_tab_title">
+                    <span style="display:block; float:left; line-height:41px;">{{_('Profile')}}</span>
+                    <!-- <a href="javascript:" class="k_print_out"></a> -->
+                    <a id="print_report" href="javascript:" style="float:right;width:219px;height:41px">
+					<div style="background-color:#f9f9f9;width:100%;height:100%;font-size:20px;
+					            *text-align:center;background-image:url({{STATIC_DIR}}/images/k_print_out.png);
+								background-repeat:no-repeat">
+						<span style="line-height:42px;margin-left:80px;color:#222">{{_('Print Report')}}</span>
+					</div>
+					</a>
+                </div>
+                
+                <table cellpadding="0" cellspacing="0" class="m_r_table m_r_table_1" style="margin-bottom:25px;">
+                    <tr class="table_head">
+                        <td width="10%" height="auto" align="center" valign="middle"
+                          class="td_height">{{_('Username')}}</td>
+                        <td width="10%" height="auto" align="center" valign="middle"
+                          class="td_height">{{_('Realname')}}</td>
+                        <td width="10%" height="auto" align="center" valign="middle"
+                          class="td_height">{{_('Age')}}</td>
+                        <td width="10%" height="auto" align="center" valign="middle"
+                          class="td_height">{{_('Height')}}</td>
+                        <td width="20%" height="auto" align="center" valign="middle"
+                          class="td_height">{{_('Weight')}}</td>
+                        <td width="21%" height="auto" align="center" valign="middle"
+                          class="td_height">{{_('Diabetes type')}}</td>
+                        <td width="19%" height="auto" align="center" valign="middle"
+                          class="td_height">{{_('Diabetes age')}}</td>
+                    </tr>
+                    
+                    {% if appctx.viewother.viewother==1 %}
+                        {% set personinfo = appctx.viewuser.personinfo %}
+                    {% else %}
+                        {% set personinfo = appctx.personinfo %}
+                    {% endif %}
+                    
+                    {% if appctx.setting.height_unit=='ft-in' %}
+	                    {% set height=personinfo.height|float|int %}
+	                {% else %}
+	                    {% set height=personinfo.height %}
+	                {% endif %}
+	                
+	                {% if appctx.setting.weight_unit=='lb' %}
+	                    {% set weight=personinfo.weight|float*0.45 %}
+	                {% else %}
+	                    {% set weight=personinfo.weight %}
+	                {% endif %}
+                    <tr class="table_head record">
+                        <td width="10%" height="auto" align="center" 
+                          valign="middle" class="td_height">{{personinfo.username}}</td>
+                        <td width="10%" height="auto" align="center" 
+                          valign="middle" class="td_height">{{personinfo.realname}}</td>
+                        <td width="10%" height="auto" align="center" 
+                          valign="middle" class="td_height">{{personinfo.age}}</td>
+                        {% if appctx.setting.height_unit=='ft-in' %}
+                            {% set cm2inch = (height/2.54) %}
+                            {% set height_ft = (cm2inch/12)|round(0, 'floor')|int %}
+                            {% set height_in = (cm2inch%12)|round(0, 'ceil')|int %}
+                            <td width="10%" height="auto" align="center" 
+                              valign="middle" class="td_height">{{height_ft}} ft {{height_in}} in</td>
+                        {% else %}
+                            <td width="10%" height="auto" align="center" 
+                              valign="middle" class="td_height">{{height}} {{appctx.setting.height_unit}}</td>
+                        {% endif %}
+                        
+                        <td width="20%" height="auto" align="center" 
+                          valign="middle" class="td_height">{{weight}} {{appctx.setting.weight_unit}}</td>
+                        <td width="21%" height="auto" align="center" 
+                          valign="middle" class="td_height">{{appctx.diabetesinfo.diabetes_type}}</td>
+                        <td width="19%" height="auto" align="center" 
+                          valign="middle" class="td_height">
+                        {% if appctx.diabetesinfo is not none 
+                          and appctx.diabetesinfo.bln>0 %} {{appctx.diabetesinfo.bln}}年 
+                        {% else %} 0年 {% endif %} 
+                        {% if appctx.diabetesinfo is not none 
+                          and appctx.diabetesinfo.bly>0 %} {{appctx.diabetesinfo.bly}}个月 
+                        {% else %} 0个月 {% endif %}
+                        </td>
+                    </tr>
+                </table>
+                <div class="m_r_tab_title"><span>{{_('Health')}}</span></div>
+                <table cellpadding="0" cellspacing="0" class="m_r_table">
+                    <style type="text/css">
+                        .edit_hs_show:hover{color:#038cd5 !important;}
+                        .record_disease_del:hover{color:#038cd5 !important;}
+                        .record_disease_submit_edit:hover{color:#038cd5 !important;}
+                        .record_disease_cancel_edit:hover{color:#038cd5 !important;}
+                        #record_disease_a:hover{color:#038cd5 !important;}
+                    </style>
+                    <tr class="table_head">
+                        <td width="18%" height="auto" align="center" valign="middle"
+                          class="td_height">{{_('Common disease')}}</td>
+                        <td width="12%" height="auto" align="center" valign="middle"
+                          class="td_height">{{_('Confirm date')}}</td>
+                        <td width="50%" height="auto" align="center" valign="middle"
+                          class="td_height">{{_('Suggestion')}}</td>
+                        {% if appctx.privilege in ['All', 'W'] %}
+                        <td width="20%" height="auto" align="center" valign="middle"
+                          class="td_height">{{_('Operation')}}</td>
+                        {% endif %}
+                    </tr>
+                    
+                    {% for item in appctx.healthinfo %}
+                      <!-- show each item -->
+                      <tr class="table_head record record_disease_s" index="{{item.id}}">
+                        <td width="18%" height="auto" align="center" 
+                          valign="middle" class="td_height">{{item.disease_type}}</td>
+                        <td width="12%" height="auto" align="center" 
+                          valign="middle" class="td_height">{{item.confirm_time.strftime(cmac.PY_DATE_FORMAT)}}</td>
+                        <td width="50%" height="auto" align="center" 
+                          valign="middle" class="td_height">{{item.content}}</td>
+                        {% if appctx.privilege in ['All', 'W'] %}
+                        <td width="20%" height="auto" align="center" valign="middle" class="td_height">
+                            <a class="record_disease_s_edit edit_hs_show" 
+                              index="{{item.id}}" style="cursor:pointer;">{{_('Modify')}}</a> &nbsp;&nbsp;
+                            <a class="record_disease_s record_disease_del"
+                              index="{{item.id}}" style="cursor:pointer;">{{_('Delete')}}</a>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    
+                    <!-- edit one item -->
+                    <tr class="table_head record record_disease_e" index="{{item.id}}" style="display:none;">
+                        <td width="18%" height="auto" align="center" valign="middle" class="td_height">
+                            <div class="box_input_div" style=" margin:0px auto; width:122px; float:none;">
+                              <img src="{{STATIC_DIR}}/images/icon_29.png" class="box_icon_left" />
+                              <div class="select_body_box" style="width:72px;">{{item.disease_type}}</div>
+                              <img src="{{STATIC_DIR}}/images/icon_31.png" class="select_btn_box" />
+                              <div class="select_content disease_type_edit" style="width:120px;">
+                                  <ul>
+                                      <li value="冠心病"><font>冠心病</font></li>
+                                      <li value="高脂血"><font>高脂血</font></li>
+                                      <li value="高血压"><font>高血压</font></li>
+                                      <li value="肾病"><font>肾病</font></li>
+                                      <li value="神经病变"><font>神经病变</font></li>
+                                      <li value="肥胖症"><font>肥胖症</font></li>
+                                      <li value="外周动脉疾病"><font>外周动脉疾病</font></li>
+                                      <li value="视网膜病变"><font>视网膜病变</font></li>
+                                      <li value="烟瘾"><font>烟瘾</font></li>
+                                  </ul>
+                                  <input type="hidden" name="disease_type_edit" index="{{item.id}}" 
+                                      value="{{item.disease_type}}" class="disease_type_arr disease_type_edit"/>
+                              </div>
+                            </div>
+                        </td>
+                        <td width="12%" height="auto" align="center" valign="middle" class="td_height">
+                            <div class="box_input_div" style="margin:0px 0px 0px 10px; width:116px;">
+                                <input type="text" class="record_input1 add_datepicker diagnose_date_edit" 
+                                    name="diagnose_date_edit" readonly="readonly" value="{{item.confirm_time}}" 
+                                        index="{{item.id}}" style="width:93%;padding-left:5px;" />
+                            </div>
+                        </td>
+                        <td width="50%" height="auto" align="center" valign="middle" class="td_height">
+                            <input type="text" class="record_input suggest_edit"  index="{{item.id}}" 
+                                value="{{item.content}}" name="suggest_edit"/>
+                        </td>
+                        <td width="20%" height="auto" align="center" valign="middle" class="td_height">
+                        <a class="record_disease_s_edit record_disease_submit_edit" index="{{item.id}}" 
+                            style="cursor:pointer;">{{_('Save')}}</a>
+                        <a class="record_disease_s_edit record_disease_cancel_edit" index="{{item.id}}" 
+                            style="cursor:pointer;">{{_('Cancel')}}</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    
+                    <!-- 最后一行，新建病情按钮 -->
+                    {% if appctx.privilege in ['All', 'W'] %}
+                    <tr class="table_head record">
+                        <td height="auto" align="center" valign="middle" class="td_height" colspan="4">
+                            <a id="record_disease_a" style="width:93px;height:22px;display:block;cursor:pointer;">
+                            	<div style="width:100%;height:100%;font-size:15px;font-weight:bold;
+                            				background-image:url({{STATIC_DIR}}/images/icon_new.png);
+                            				background-repeat:no-repeat;">
+                            		<span style="margin-left:24px">{{_('Create')}}</span>
+                            	</div>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endif %}
+                </table>
+                
+                <div class="m_r_tab_title"><span>{{_('Prescription')}}</span></div>
+                <table cellpadding="0" cellspacing="0" class="m_r_table">
+                    <style type="text/css">
+                        .edit_d_show:hover{color:#038cd5 !important;}
+                        .record_dose_del:hover{color:#038cd5 !important;}
+                        .record_dose_submit_edit:hover{color:#038cd5 !important;}
+                        .record_dose_cancel_edit:hover{color:#038cd5 !important;}
+                        .record_disease_add_cancel:hover{color:#038cd5 !important;}
+                        .record_disease_submit:hover{color:#038cd5 !important;}
+                        .record_dose_submit:hover{color:#038cd5 !important;}
+                        .record_dose_cancel:hover{color:#038cd5 !important;}
+                        #record_dose_a:hover{color:#038cd5 !important;}
+                    </style>
+                    <tr class="table_head">
+                        <td width="18%" height="auto" align="center" valign="middle"
+                          class="td_height">{{_('Drug type')}}</td>
+                        <td width="12%" height="auto" align="center" valign="middle"
+                          class="td_height">{{_('Dose')}}</td>
+                        <td width="50%" height="auto" align="center" valign="middle"
+                          class="td_height">{{_('Remark')}}</td>
+                        {% if appctx.privilege in ['All', 'W'] %}
+                        <td width="20%" height="auto" align="center" valign="middle"
+                          class="td_height">{{_('Operation')}}</td>
+                        {% endif %}
+                    </tr>
+                    
+                    {% for item in appctx.doseinfo %}
+                        <tr class="table_head record record_dose_s" index="{{item.id}}">
+                            <td width="18%" height="auto" align="center" 
+                              valign="middle" class="td_height">{{item.medicine_type}}</td>
+                            <td width="12%" height="auto" align="center" 
+                              valign="middle" class="td_height">{{item.dosage}}</td>
+                            <td width="50%" height="auto" align="center" 
+                              valign="middle" class="td_height">{{item.remark}}</td>
+                            {% if appctx.privilege in ['All', 'W'] %}
+                            <td width="20%" height="auto" align="center" valign="middle" class="td_height">
+                                <a class="record_dose_s_edit edit_d_show" index="{{item.id}}"
+                                  style="cursor:pointer;">{{_('Modify')}}</a> &nbsp;&nbsp;
+                                <a class="record_dose_s record_dose_del" index="{{item.id}}"
+                                  style="cursor:pointer;">{{_('Delete')}}</a>
+                            </td>
+                            {% endif %}
+                        </tr>                        
+                        
+                        <tr class="table_head record record_dose_e" index="{{item.id}}" style="display:none;">
+                            <td width="80%" height="auto" align="center" valign="middle" class="td_height" colspan="3">
+                                <input type="text" class="record_input medicine_type_edit" index="{{item.id}}" 
+                                    value="{{item.medicine_type}}" style="width:20%; margin:0px 10px; float:left;" />
+                                <input type="text" class="record_input dosage_edit" index="{{item.id}}" 
+                                    value="{{item.dosage}}" style="width:20%; margin:0px 10px; float:left;" />
+                                                                
+                                <input type="text" class="record_input remark_edit" index="{{item.id}}" 
+                                    value="{{item.remark}}" style="width:20%; margin:0px 10px; float:left;" />
+                            </td>
+                            <td width="20%" height="auto" align="center" valign="middle" class="td_height">
+                                <a class="record_dose_s_edit record_dose_submit_edit" index="{{item.id}}"
+                                  style="cursor:pointer;">{{_('Save')}}</a>
+                                <a class="record_dose_s_edit record_dose_cancel_edit" index="{{item.id}}"
+                                  style="cursor:pointer;">{{_('Cancel')}}</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                     
+                    <!-- 新建服药情况 -->
+                    {% if appctx.privilege in ['All', 'W'] %}
+                    <tr class="table_head record">
+                        <td width="18%" height="auto" align="center" valign="middle" class="td_height" colspan="4">
+                            <a id="record_dose_a" style="width:120px;height:22px;display:block;cursor:pointer;">
+                            	<div style="width:100%;height:100%;font-size:15px;font-weight:bold;
+                            				background-image:url({{STATIC_DIR}}/images/icon_new.png);
+                            				background-repeat:no-repeat;">
+                            		<span style="margin-left:24px">{{_('Create')}}</span>
+                            	</div>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    
+                </table>
+                
+                <style type="text/css">
+                    #set_hover:hover{background-color:#038cd5 !important;}
+                </style>
+                <div class="m_r_tab_title">
+                    <span style="float:left;">{{_('Doctor suggestion')}}</span>
+                    
+                    <!-- 这个地方应该用AJAX方式 -->
+                    <!--<form name="suggest_search" action="{{url_for('main', mod='transfer')}}" method="post">-->
+                        <font style="float:left;margin-left:15px;margin-right:5px;">{{_('Search:')}}</font>
+                        <input type="hidden" name="next" value="record" />
+                        <input type="text" class="jour_inut xdatepicker" name="suggest_date_start" 
+                            value="" readonly="readonly"> </input>
+                        
+                        <font style="margin:0px 10px; float:left;">--</font>
+                        
+                        <input type="text" class="jour_inut xdatepicker" name="suggest_date_end" 
+                            value="" readonly="readonly"> </input>
+                        <!--  <input type='hidden' name='suggest_date_start'>
+                        <input type='hidden' name='suggest_date_end'> -->
+                        
+                        <a href="javascript:" class="suggest_search_by_date" 
+                           style="width:60px;height:30px;display:block;margin-left:20px;float:left">
+                            <div id="set_hover" style="background-color:#E1E1E1;width:100%;height:100%;
+                                    border-radius:5px;text-align:center;font-size:12px;">
+								<span style="*line-height:25px;color:#111">{{_('OK')}}</span>
+							</div>
+                        </a>
+                    <!--</form>-->
+                </div>
+                
+                <table cellpadding="0" cellspacing="0" class="m_r_table">
+                    <style type="text/css">
+                        .r_5_del:hover{color:#038cd5 !important;}
+                        #record_suggest_a:hover{color:#038cd5 !important;}
+                    </style>
+                    <tr class="table_head">
+                        <td width="20%" height="auto" align="center" valign="middle" 
+                          class="td_height">{{_('Doctor name')}}</td>
+                        <td width="20%" height="auto" align="center" valign="middle"
+                          class="td_height">{{_('Date')}}</td>
+                        <td width="40%" height="auto" align="center" valign="middle"
+                          class="td_height">{{_('Content')}}</td>
+                        {% if appctx.privilege in ['All', 'W'] %}
+                        <td width="20%" height="auto" align="center" valign="middle"
+                          class="td_height">{{_('Operation')}}</td>
+                        {% endif %}
+                    </tr>
+                    
+                    {% for item in appctx.doctor_suggest_info %}
+                      <tr class="table_head record r_5_s" index="{{item.id}}">
+                        <td width="20%" height="auto" align="center" 
+                          valign="middle" class="td_height">{{item.doctor_name}}</td>
+                        <td width="20%" height="auto" align="center" 
+                          valign="middle" class="td_height">{{item.suggest_date.strftime(cmac.PY_DATE_FORMAT)}}</td>
+                        <td width="40%" height="auto" align="center" 
+                          valign="middle" class="td_height">{{item.suggest_content}}</td>
+                        {% if appctx.privilege in ['All', 'W'] %}
+                        <td width="20%" height="auto" align="center" valign="middle" class="td_height">
+                            <a class="r_5_s r_5_del" index="{{item.id}}" style="cursor:pointer;">{{_('Delete')}}</a>
+                            <!-- <a class="modify">修改</a> <input type="image" src="{{STATIC_DIR}}/images/icon_48.png" /> -->
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                    
+                    {% if appctx.usertype=="D" %}
+                        <tr class="table_head record">
+                            <td height="auto" align="center" valign="middle" class="td_height" colspan="4">
+                                <a id="record_suggest_a" class="r_5 r_5_a" 
+                                   style="width:100px;height:22px;display:block;cursor:pointer;">
+                            	<div style="width:100%;height:100%;font-size:15px;font-weight:bold;
+                            				background-image:url({{STATIC_DIR}}/images/icon_new.png);
+                            				background-repeat:no-repeat;">
+                            		<span style="margin-left:24px">{{_('Create')}}</span>
+                            	</div>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+        <!--右边-->
+
+        <!--左边-->
+        <div class="m_left">
+            {% include 'bingo/_div_left.html' %}
+        </div> 
+        
+         <div style="clear:both;"></div>
+    </div>
+    <!--中部-->
+     <div style="clear:both;"></div>
+    <!--底部-->
+	{% include 'bingo/_div_footer.html' %}
+    
+    <!--包含-->
+    {% include 'bingo/_div_include.html' %}
+    
+    <!-- 确认对话框 -->
+    <div class="box s_2_i">
+        <div class="box_all"
+        	 style="width:447px; height:262px; background-color:#ffffff;margin:0px auto;">
+        	 
+        	<div style="width:447px;height:56px;background-color:#77ddff">
+	            <span style="font-size:20px;line-height:56px;color:#444;margin-left:20px;
+	              font-weight:bold;">{{_('Hint')}}</span>
+	        </div>
+        	
+            <div style="margin:60px 0px 0px 150px;">
+            <span style="font-size:14px;">{{_('Confirm to delete?')}}</span>
+            </div>
+  
+            <div class="box_bottom" style="background:none; padding-top:60px;">
+                <!--<a href="javascript:" class="k_sure kkk_sub" style="margin-left:247px;"></a>
+                <a href="javascript:" class="k_qx kkk_qx"></a>-->
+                <a class="kkk_qx nav-btn" style="display:block;width:80px;height:28px;
+                  float:right;cursor:pointer;margin-right:40px">
+		        	<div style="*background-color:#e9e9e9;width:100%;height:100%;font-size:14px;">
+						<span style="line-height:28px;color:#111;margin-left:10px">{{_('Cancel')}}</span>
+					</div>
+		        </a>
+		        
+		        <a class="kkk_sub nav-btn" style="display:block;width:80px;height:28px;float:right;cursor:pointer;">
+		        	<div style="*background-color:#e9e9e9;width:100%;height:100%;font-size:14px;">
+						<span style="line-height:28px;color:#111;margin-left:10px">{{_('Confirm')}}</span>
+					</div>
+		        </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

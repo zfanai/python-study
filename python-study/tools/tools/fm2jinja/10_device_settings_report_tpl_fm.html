@@ -1,0 +1,643 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">   
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+{% set charset='utf8' %}
+{% set orient='shu' %}
+{% include 'report/pdf_common_head_tpl.html' %}
+
+<body id="${pdf_report_id}">
+
+{% include 'report/pdf_report_header_tpl.html' %}
+
+<div class="mt_page_body">
+
+<!--
+填写用户信息的表头
+-->
+
+{% include "report/pdf_report_userinfo_tpl.html" %}
+
+<p>基础量</p>
+<div class="mt_report_layout_tbl">
+<table cellspacing="0">
+<tr>
+<td>
+	<div>
+    <table cellspacing="0">
+    <tr>
+    <td class="b_border">基础量最大值</td>
+    <td class="b_border">${basal_settings.max_rate}</td>
+    <td class="b_border">临时基础量类型</td>
+    <td class="b_border">${basal_settings.tbasal_type}</td>
+    <td class="b_border">胰岛素量(U/h)</td>
+    <td class="b_border">${basal_settings.inject}</td>
+    <td width="10%"></td>
+    </tr>
+    </table>
+    </div>
+</td>
+<td></td>
+
+</tr>
+
+<tr>
+<td width="70%">
+	<p>基础量程序</p>
+    <img src="basal_chart" height="100px" width="90%"/>
+</td>
+
+<td width="30%" valign="bottom">
+	<div class="mt_report_cell_tbl">
+    <table cellspacing="0">
+    <tr>
+    <td colspan="4" class="b_border ta_c">标准</td>
+    </tr>
+    <tr>
+    <td class="b_border">24h总计</td>
+    <td class="b_border r_border">${basal_settings.stand_basal.day_total}</td>
+    <td class="b_border">编辑时间</td>
+    <td class="b_border"></td>
+    </tr>
+    
+    <tr>
+    <td class="b_border">开始</td>
+    <td class="b_border r_border">U/h</td>
+    <td class="b_border">开始</td>
+    <td class="b_border">U/h</td>
+    </tr>
+    
+    {% for row in range(0,3) %}
+    {% if row==2 %}{% set b_border="" %}
+    {% else %}{% set b_border="b_border" %}{% endif %}
+    <tr>
+    
+    {% set basal_program=basal_settings.stand_basal.seg %}
+    {% set num=basal_program|length %}
+    
+    {% if (row*2<num) %}
+    <td class="${b_border}">${basal_program[row*2][0]}</td>
+    <td class="${b_border} r_border">${basal_program[row*2][1]}</td>
+    {% else %}
+    <td class="${b_border}">&nbsp;</td>
+    <td class="${b_border} r_border">&nbsp;</td>
+    {% endif %}
+    
+
+    {% if (row*2+1<num) %}
+    <td class="${b_border}">${basal_program[row*2+1][0]}</td>
+    <td class="${b_border}">${basal_program[row*2+1][1]}</td>
+    {% else %}
+    <td class="${b_border}">&nbsp;</td>
+    <td class="${b_border}">&nbsp;</td>
+    {% endif %}
+    
+    </tr>
+    {% endfor %}
+    
+    </table>
+    </div>
+</td>
+</tr>
+
+</table>
+</div>
+
+{#<#macro basal basal_program title>#}
+{% macro basal(basal_program, title) %}
+	<div class="mt_report_cell_tbl">
+    <table cellspacing="0">
+    <tr>
+    <td colspan="4" class="b_border ta_c">${title}</td>
+    </tr>
+    
+    <tr>
+    <td colspan="2" class="b_border r_border">24h总计</td>
+    <td colspan="2" class="b_border">${basal_program.day_total}</td>
+    </tr>
+    
+    <tr>
+    <td class="b_border">开始</td>
+    <td class="b_border r_border">U/h</td>
+    <td class="b_border">开始</td>
+    <td class="b_border">U/h</td>
+    </tr>
+    
+    {% list 0..23 as row %}
+    {% if row==23 %}{% set b_border="" %}
+    {% else %}{% set b_border="b_border" %}{% endif %}
+    <tr>
+    
+    {% set num=basal_program.seg|length %}
+    
+    {% if (row*2<num) %}
+    <td class="${b_border}">${basal_program.seg[row*2][0]}</td>
+    <td class="${b_border} r_border">${basal_program.seg[row*2][1]}</td>
+    {% else %}
+    <td class="${b_border}">&nbsp;</td>
+    <td class="${b_border} r_border">&nbsp;</td>
+    {% endif %}
+    
+    {% if (row*2+1<num) %}
+    <td class="${b_border}">${basal_program.seg[row*2+1][0]}</td>
+    <td class="${b_border}">${basal_program.seg[row*2+1][1]}</td>
+    {% else %}
+    <td class="${b_border}">&nbsp;</td>
+    <td class="${b_border}">&nbsp;</td>
+    {% endif %}
+    
+    </tr>
+    {% endlist %}
+    </table>
+    </div>
+{#</#macro>#}
+{% endmacro %}
+
+<br/>
+<div class="mt_report_layout_tbl">
+<table cellspacing="0">
+<tr>
+<td valign="top" width="23%">
+	{#<@basal basal_program=basal_settings.exer_basal title="锻炼"/>#}
+	{{ basal(basal_settings.exer_basal, "锻炼") }}
+</td>
+<td width="2%"></td>
+<td valign="top" width="23%">
+	{#<@basal basal_program=basal_settings.holiday_basal title="假日"/>#}
+	{{ basal(basal_settings.holiday_basal "假日") }}
+</td>
+<td width="2%"></td>
+<td valign="top" width="23%">
+	{#<@basal basal_program=basal_settings.program_a_basal title="程序A"/>#}
+	{{ basal(basal_settings.program_a_basal "程序A") }}
+</td>
+<td width="2%"></td>
+<td valign="top" width="23%">
+	{#<@basal basal_program=basal_settings.program_b_basal title="程序B"/>#}
+	{{ basal(basal_settings.program_b_basal "程序B") }}
+</td>
+
+</tr>
+</table>
+</div>
+
+{#<#include "./pdf_report_header_tpl.html">#}
+{% include 'report/pdf_report_header_tpl.html' %}
+
+<p>大剂量</p>
+<div class="mt_report_tbl_wrapper">
+<table cellspacing="0" width="100%">
+<tr>
+    <td class="b_border">大剂量最大值</td>
+    <td class="b_border">${bolus_settings.max_bolus}</td>
+    <td class="b_border">大剂量步长</td>
+    <td class="b_border">${bolus_settings.bolus_step}</td>
+    <td width="5%"></td>
+    <td class="b_border">大剂量向导</td>
+    <td class="b_border">${bolus_settings.bolus_wizard}</td>
+</tr>
+    
+<tr>
+    <td>组合/扩展大剂量</td>
+    <td>${bolus_settings.extent_option}</td>
+    <td>指尖血糖提醒</td>
+    <td>${bolus_settings.bg_reminder}</td>
+    <td width="5%"></td>
+    <td>活性胰岛素时间</td>
+    <td>${bolus_settings.ins_active_time}</td>
+</tr>
+
+</table>
+</div>
+<br/>
+
+{#<#macro bolus_reminder settings>#}
+{% macro bolus_reminder(settings) %}
+<div class="mt_report_cell_tbl">
+    <table cellspacing="0">
+    <tr>
+    <td colspan="2" class="ta_c b_border">大剂量提醒</td>
+    </tr>
+    
+    <tr>
+    <td class="b_border">开始</td>
+    <td class="b_border">结束</td>
+    </tr>
+    
+    {% for row in range(0,4)%}
+    {% if row==3 %}{% set b_border="" %}
+    {% else %}{% set b_border="b_border" %}{% endif %}
+    <tr>
+    
+    {% set num=settings|length %}
+    
+    {% if (row<num) %}
+    <td class="${b_border}">${settings[row][0]}</td>
+    <td class="${b_border}">${settings[row][1]}</td>
+    {% else %}
+    <td class="${b_border}">&nbsp;</td>
+    <td class="${b_border}">&nbsp;</td>
+    {%  endif %}
+    
+    </tr>
+    {% endfor %}
+    
+    </table>
+</div>
+{#</#macro>#}
+{% endmacro %}
+
+{#<#macro bolus_wizard settings title catagory>#}
+{% macro bolus_wizard(settings, title, catagory) %}
+<div class="mt_report_cell_tbl">
+    <table cellspacing="0">
+    <tr>
+    <td colspan="4" class="b_border ta_c">${title}</td>
+    </tr>
+    
+    <tr>
+    <td class="b_border">开始</td>
+    <td class="b_border r_border">${catagory}</td>
+    <td class="b_border">开始</td>
+    <td class="b_border">${catagory}</td>
+    </tr>
+    
+    {% for row in range(0, 4) %}
+    {% if row==3 %}{% set b_border="" %}
+    {% else %}{% set b_border="b_border" %}{% endif %}
+    <tr>
+    	
+        {% set num=settings|length %}
+        {% if (row*2<num) %}
+    	<td class="${b_border}">${settings[row*2][0]}</td>
+        <td class="${b_border} r_border">${settings[row*2][1]}</td>
+        {% else %}
+        <td class="${b_border}">&nbsp;</td>
+        <td class="${b_border} r_border">&nbsp;</td>
+        {% endif %}
+        
+        {% if (row*2+1<num) %}
+        <td class="${b_border}">${settings[row*2+1][0]}</td>
+        <td class="${b_border}">${settings[row*2+1][1]}</td>
+        {% else %}
+        <td class="${b_border}">&nbsp;</td>
+        <td class="${b_border}">&nbsp;</td>
+        {% endif %}
+        
+        
+    </tr>
+    {% endfor %}
+    </table>
+</div>
+{#</#macro>#}
+{% endmacro %}
+
+<div class="mt_report_layout_tbl">
+<table cellspacing="0">
+<tr>
+<td valign="top" width="23%">
+	{#<@bolus_reminder settings=bolus_settings.bolus_reminder/>#}
+	{{bolus_reminder(bolus_settings.bolus_reminder)}}
+</td>
+<td width="2%"></td>
+<td valign="top" width="23%">
+	{#<@bolus_wizard settings=bolus_settings.ins_carb_ratio title="胰岛素食物比" catagory="食物"/>#}
+	{{ bolus_wizard(bolus_settings.ins_carb_ratio, "胰岛素食物比", "食物") }}
+</td>
+<td width="2%"></td>
+<td valign="top" width="23%">
+	{#<@bolus_wizard settings=bolus_settings.ins_sen title="胰岛素灵敏度" catagory="血糖"/>#}
+	{{ bolus_wizard(bolus_settings.ins_sen, "胰岛素灵敏度", "血糖") }}
+</td>
+<td width="2%"></td>
+<td valign="top" width="23%">
+	{#<@bolus_wizard settings=bolus_settings.bg_target title="目标血糖范围" catagory="范围"/>#}
+	{{ bolus_wizard(bolus_settings.bg_target, "目标血糖范围", "范围") }}
+</td>
+</tr>
+</table>
+</div>
+
+<p>设置</p>
+<div class="mt_report_tbl_wrapper">
+<table cellspacing="0" width="100%">
+<tr>
+	<td>告警及提示方式</td>
+    <td>${user_settings.alarm_type}</td>
+    <td>声音关闭提示</td>
+    <td>${user_settings.beep_off_tip_option}</td>
+	<td>低血糖输注暂停</td>
+    <td>${user_settings.suspend_on_lowbg_option}</td>
+    <td>自动停止输注告警</td>
+    <td>${user_settings.auto_off_option}</td>
+</tr>
+<tr>
+	<td>指令响应提示</td>
+    <td>${user_settings.cmd_response}</td>
+    <td>间隔</td>
+    <td>${user_settings.beep_off_tip_interval}</td>
+	<td>低限</td>
+    <td>${user_settings.suspend_on_lowbg_level}</td>
+    <td>无按键时间超过</td>
+    <td>${user_settings.auto_off_time}</td>
+</tr>
+<tr>
+<td colspan="8">&nbsp;</td>
+</tr>
+<tr>
+	<td>低储药量剩余量</td>
+    <td>${user_settings.low_reservoir_ins}</td>
+    <td>每小时最大输注量</td>
+    <td>${user_settings.hour_bolus_max}</td>
+	<td>储药贴过期提前时间</td>
+    <td>${user_settings.patch_expire_ahead}</td>
+    <td></td>
+    <td></td>
+</tr>
+<tr>
+	<td>低储药量剩余时间</td>
+    <td>${user_settings.low_reservoir_time}</td>
+    <td>每天最大输注量</td>
+    <td>${user_settings.day_bolus_max}</td>
+	<td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+</tr>
+<tr>
+<td colspan="8">&nbsp;</td>
+</tr>
+<tr>
+	<td>时间制</td>
+    <td>${user_settings.time_style}</td>
+    <td>屏幕超时</td>
+    <td>${user_settings.screen_timeout}</td>
+	<td>键盘锁</td>
+    <td>${user_settings.keypad_lock}</td>
+    <td>设备选项</td>
+    <td>${user_settings.device_option}</td>
+</tr>
+<tr>
+	<td>血糖单位</td>
+    <td>${user_settings.glucose_unit}</td>
+    <td>背光超时</td>
+    <td>${user_settings.backlight_timeout}</td>
+	<td>安全锁密码</td>
+    <td>${user_settings.password_option}</td>
+    <td>闹钟</td>
+    <td>${user_settings.clock_option}</td>
+</tr>
+</table>
+</div>
+<br/>
+
+<div class="mt_report_tbl_wrapper">
+<table cellspacing="0" width="100%">
+{% for row in range(0,2) %}
+<tr>
+{% if row==0 %}
+<td rowspan="2" width="5%">闹钟</td>
+<td class="b_border" width="10%">时间</td>
+{% elseif row==1 %}
+<td>模式</td>
+{% endif %}
+
+{% if row==0 %}{% set b_border="b_border" %}
+{% else %}{% set b_border="" %}{% endif %}
+
+{% for col in range(0, 8) %}
+
+{% set clock=user_settings.clock %}
+{% set num=clock|length %}
+{% if (col<num) %}
+<td class="${b_border}" width="10%">${clock[col][row]}</td>
+{% else %}
+<td class="${b_border}" width="10%">&nbsp;</td>
+{% endif %}
+    
+{% endfor %}
+
+</tr>
+{% endfor %}
+</table>
+</div>
+<br/>
+
+<p>传感器</p>
+<div class="mt_report_tbl_wrapper">
+<table cellspacing="0" width="100%">
+<tr>
+<td width="15%">血糖告警</td>
+<td>${sensor_settings.sensor_alarm_option}</td>
+</tr>
+</table>
+</div>
+<br/>
+
+
+{#<#macro sensor_alarm_threshold threshold>#}
+{% macro sensor_alarm_threshold(threshold) %}
+<div class="mt_report_cell_tbl">
+    <table cellspacing="0">
+    <tr>
+    	<td colspan="6" class="b_border ta_c">血糖告警门限</td>
+    </tr>
+    
+    <tr>
+    	<td class="b_border">开始</td>
+        <td class="b_border">低限</td>
+        <td class="b_border r_border">高限</td>
+        <td class="b_border">开始</td>
+        <td class="b_border">低限</td>
+        <td class="b_border">高限</td>
+    </tr>
+    
+    {% for row in range(0,4) %}
+    {% if row==3 %}{% set b_border="" %}
+    {% else %}{% set b_border="b_border" %}{% endif %}
+    <tr>
+    	{% set num=threshold|length %}
+        {% if (row*2<num) %}
+    	<td class="${b_border}">${threshold[row*2][0]}</td>
+        <td class="${b_border}">${threshold[row*2][1]}</td>
+        <td class="${b_border} r_border">${threshold[row*2][2]}</td>
+        {% else %}
+        <td class="${b_border}">&nbsp;</td>
+        <td class="${b_border}">&nbsp;</td>
+        <td class="${b_border} r_border">&nbsp;</td>
+        {% endif %}
+        
+        {% if (row*2+1<num) %}
+        <td class="${b_border}">${threshold[row*2+1][0]}</td>
+        <td class="${b_border}">${threshold[row*2+1][1]}</td>
+        <td class="${b_border}">${threshold[row*2+1][2]}</td>
+        {% else %}
+        <td class="${b_border}">&nbsp;</td>
+        <td class="${b_border}">&nbsp;</td>
+        <td class="${b_border}">&nbsp;</td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+    </table>
+</div>
+{% endmacro %}
+
+{#<#macro sensor_alarm_repeat settings>#}
+{% macro sensor_alarm_repeat(settings) %}
+<div class="mt_report_cell_tbl">
+    <table cellspacing="0">
+    <tr>
+    	<td colspan="3" class="ta_c b_border">重复告警间隔</td>
+    </tr>
+    
+    <tr>
+    	<td class="b_border r_border" width="20%">高血糖</td>
+        <td class="b_border r_border">${settings.high[0]}</td>
+        <td class="b_border">${settings.high[1]}</td>
+    </tr>
+    <tr>
+        <td class="r_border">低血糖</td>
+        <td class="r_border">${settings.low[0]}</td>
+        <td>${settings.low[1]}</td>
+    </tr>
+  
+    </table>
+</div>
+{% endmacro %}
+
+{#<#macro sensor_forecast_alarm settings>#}
+{% macro sensor_forecast_alarm(settings) %}
+<div class="mt_report_cell_tbl">
+    <table cellspacing="0">
+    <tr>
+    	<td colspan="3" class="ta_c b_border">血糖异常预测告警</td>
+    </tr>
+    
+    <tr>
+    	<td class="b_border r_border" width="20%">高血糖</td>
+        <td class="b_border r_border">${settings.high[0]}</td>
+        <td class="b_border">${settings.high[1]}</td>
+    </tr>
+    <tr>
+        <td class="r_border">低血糖</td>
+        <td class="r_border">${settings.low[0]}</td>
+        <td>${settings.low[1]}</td>
+    </tr>
+  
+    </table>
+</div>
+{% endmacro %}
+
+{#<#macro sensor_rate_alarm settings>#}
+{% macro sensor_rate_alarm(settings) %}
+<div class="mt_report_cell_tbl">
+    <table cellspacing="0">
+    <tr>
+    	<td colspan="3" class="ta_c b_border">变化异常告警</td>
+    </tr>
+    
+    <tr>
+    	<td class="b_border r_border" width="20%">上升</td>
+        <td class="b_border r_border">${settings.rise[0]}</td>
+        <td class="b_border">${settings.rise[1]}</td>
+    </tr>
+    <tr>
+        <td class="r_border">下降</td>
+        <td class="r_border">${settings.fall[0]}</td>
+        <td>${settings.fall[1]}</td>
+    </tr>
+  
+    </table>
+</div>
+{% endmacro %}
+
+{% macro sensor_alarm_settings(settings) %}
+<div class="mt_report_cell_tbl">
+    <table cellspacing="0">
+    <tr>
+    	<td colspan="3" class="ta_c b_border">传感器告警</td>
+    </tr>
+    
+    <tr>
+    	<td class="b_border r_border" width="40%">校准提醒</td>
+        <td class="b_border r_border">${settings.calib_remind_option}</td>
+        <td class="b_border">${settings.calib_remind_time}</td>
+    </tr>
+    <tr>
+        <td class="b_border r_border">自动校准</td>
+        <td class="b_border r_border">${settings.auto_calib_option}</td>
+        <td class="b_border">&nbsp;</td>
+    </tr>
+    <tr>
+        <td class="b_border r_border">未校准更新数据显示</td>
+        <td class="b_border r_border">${settings.no_calib_display}</td>
+        <td class="b_border">&nbsp;</td>
+    </tr>
+    <tr>
+        <td class="b_border r_border">信号丢失告警</td>
+        <td class="b_border r_border">${settings.sensor_lost_time}</td>
+        <td class="b_border">&nbsp;</td>
+    </tr>
+    <tr>
+        <td class="r_border">血糖趋势图显示</td>
+        <td class="r_border">${settings.trend_time_scope}</td>
+        <td>&nbsp;</td>
+    </tr>            
+  
+    </table>
+</div>
+{% endmacro %}
+
+<div class="mt_report_layout_tbl">
+<table cellspacing="0">
+<tr>
+<td valign="top" width="42%" rowspan="7">
+	{#<@sensor_alarm_threshold threshold=sensor_settings.sensor_alarm_threshold/>#}
+	{{sensor_alarm_threshold(sensor_settings.sensor_alarm_threshold)}}
+</td>
+<td width="6%" rowspan="7"></td>
+<td valign="top" width="42%">
+{#<@sensor_alarm_repeat settings=sensor_settings.sensor_alarm_repeat/>#}
+{{sensor_alarm_repeat(sensor_settings.sensor_alarm_repeat)}}
+</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+</tr>
+
+<tr>
+<td valign="top">
+{#<@sensor_forecast_alarm settings=sensor_settings.sensor_forecast_alarm/>#}
+{{sensor_forecast_alarm(sensor_settings.sensor_forecast_alarm)}}
+</td>
+</tr>
+<tr>
+<td>&nbsp;</td>
+</tr>
+
+<tr>
+<td valign="top">
+{#<@sensor_rate_alarm settings=sensor_settings.sensor_rate_alarm/>#}
+{{sensor_rate_alarm(sensor_settings.sensor_rate_alarm)}}
+</td>
+</tr>
+<tr>
+<td>&nbsp;</td>
+</tr>
+
+<tr>
+<td valign="top">
+{#<@sensor_alarm_settings settings=sensor_settings.sensor_alarm_settings/>#}
+{{sensor_alarm_settings(sensor_settings.sensor_alarm_settings)}}
+</td>
+</tr>
+
+</table>
+</div>
+
+
+
+
+</div>
+</body>
+</html>

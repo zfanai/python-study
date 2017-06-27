@@ -1,0 +1,377 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">   
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf8" />  
+    <!--
+    <link href="file:///C:\Users\zhoufan\Projects\Python\LibraryTest\source\xhtml2pdftest\trumcloud_report_page_shu.css" rel="stylesheet" type="text/css" />
+    <link href="file:///C:\Users\zhoufan\Projects\Python\LibraryTest\source\xhtml2pdftest\trumcloud_report.css" rel="stylesheet" type="text/css" />
+    -->
+    
+</head>
+
+<style>
+
+    @font-face {
+        font-family: simsun;
+        src: url(c:\windows\fonts\simsun.ttc);
+    }
+
+    body {font-family:SimSun;}
+
+    .mt_page_header .mt_header_title{
+        text-align:center;	
+    }
+
+    .mt_page_header .mt_header_title .main_title{
+        margin-top:10px;
+        margin-bottom:10px;
+        text-align:center;
+    }
+
+    .mt_page_header .mt_header_title .sub_title{
+        margin-top:5px;
+        margin-bottom:5px;
+        text-align:center;
+    }
+
+    .mt_page_header #mt_header_logo{
+        position:absolute;
+    }
+
+    .mt_page_footer .mt_footer_info {
+        width:30%;
+        display:inline-block;
+    }
+
+    .mt_page_footer .footer_info_left {
+        text-align:left;
+    }
+
+    .mt_page_footer .footer_info_center {
+        text-align:center;
+    }
+
+    .mt_page_footer .footer_info_right {
+        text-align:right;
+    }
+
+    .mt_report_header .report_header_tbl {
+        width:100%;
+    }
+
+    .mt_report_chart_warp {
+        width:96%;
+        margin-left:2%;
+        margin-right:2%;
+    }
+
+    .content_title {
+        font-size:14px;
+        margin-top:10px;
+        margin-bottom:10px;
+    }
+    /*********************************************************************/
+
+    .mt_report_layout_tbl {
+        width:96%;
+        margin-left:2%;
+        margin-right:2%;
+    }
+
+    .mt_report_layout_tbl table {
+        width:100%;
+        border-width:1px;
+        font-size:12px;
+    }
+
+    .mt_report_statistics_tbl, 
+    .mt_report_tbl_wrapper
+    {
+        width:96%;
+        margin-left:2%;
+        margin-right:2%;
+    }
+
+    .mt_report_tbl_wrapper table {
+        font-size:12px;
+    }
+
+    .mt_report_statistics_tbl table, 
+    .mt_report_cell_tbl table {
+        width:100%;
+        border:solid;
+        border-width:1px;
+        font-size:12px;
+    }
+
+    table  td.tbl_header{
+        background-color:silver;
+    }
+
+    table  td.l_r_border{
+        border-right:solid;
+        border-right-width:1px;
+        border-left:solid;
+        border-left-width:1px;
+    }
+
+    table  td.l_border{
+        border-left:solid;
+        border-left-width:1px;
+    }
+
+    table  td.r_border{
+        border-right:solid;
+        border-right-width:1px;
+    }
+
+    table  td.t_border{
+        border-top:solid;
+        border-top-width:1px;
+    }
+
+    table  td.b_border{
+        border-bottom:solid;
+        border-bottom-width:1px;
+    }
+
+    table  td.ta_c{
+        text-align:center;
+    }
+
+    .mt_report_statistics_tbl table td.bg_lg{
+        background-color:#ddd;
+    }
+
+    .mt_report_statistics_tbl table .tbl_cell_para p{
+        margin-top:0px;
+        margin-bottom:0px;
+    }
+
+    body#day_summary_pdf_report{
+        width:190mm;
+        margin:auto;
+    }
+
+    @page {
+        size:210mm 297mm;
+
+        margin-top:10mm;
+        margin-bottom:10mm;
+        margin-left:10mm;
+        margin-right:10mm;
+    }
+</style>
+
+<body id="day_summary_pdf_report">
+
+<div class="mt_page_header">
+    <!--
+	<div id="mt_header_logo">
+    	<img src="file:///C:\Users\zhoufan\Projects\Python\TrumCloud\assets/img/medtrum_logo.jpg" />
+    </div>
+    -->
+    
+    <div class="mt_header_title">
+        <div class="main_title">每日总结报告</div>
+        
+        <div class="sub_title">2015-07-15</div>
+        
+        
+    </div>
+    <hr/>
+</div>
+<div class="mt_page_body">
+
+<!--
+填写用户信息的表头
+-->
+<div class="mt_report_header">
+    <table class="report_header_tbl">
+    	<tr>
+        	<td>姓名：123123</td>
+            <td>设备ID：null</td>
+            <td>联系电话：null</td>
+        </tr>
+        
+        <tr>
+        	<td colspan="3">病史信息：null</td>
+        </tr>
+        
+        <tr>
+        	<td colspan="3">HbA1c：null% (2015-07-15)</td>
+        </tr>
+    </table>
+</div>
+<br/>
+
+<!--
+每日总结报告的图表
+-->
+<!--
+<div class="mt_report_chart_warp">
+	<img src="file:///C:\Users\zhoufan/Data/TrumCloud/chart/1e04295e2a8e11e594f8a82066074685.jpg" width="100%"/>
+</div>
+-->
+
+<br/>
+
+<p>统计</p>
+<div class="mt_report_statistics_tbl">
+    
+    <table cellspacing="0">
+		<tr>
+        	<td colspan="5" class="tbl_header b_border ta_c">血糖</td>
+            <td colspan="2" rowspan="2" 
+            	class="tbl_header l_border">胰岛素</td>
+            <td colspan="2" rowspan="2" 
+            	class="tbl_header l_border">活动事件</td>
+        </tr>
+        
+        <tr>
+        	<td class="tbl_header r_border">项目</td>
+            <td class="tbl_header">指尖血</td>
+            <td class="tbl_header">传感器</td>
+            <td colspan="2" class="tbl_header l_border">变化速率</td>
+        </tr>
+        
+        <tr class="tbl_content">
+        	<td class="r_border">平均方差(mmol/L)</td>
+            <td>N/A</td>
+            <td>N/A</td>
+            <td class="l_border">标准差</td>
+            <td>N/A</td>
+            <td class="l_border">总量(U)</td>
+            <td>0</td>
+            <td class="l_border">食物总量(g)</td>
+            <td>0</td>
+        </tr> 
+       
+        <tr class="tbl_content">
+        	<td class="r_border">最小(mmol/L)</td>
+            <td>null</td>
+            <td>N/A</td>
+            <td class="l_border">绝对值&le;1%</td>
+            <td>N/A</td>
+            <td class="l_border">大剂量(U)/%</td>
+            <td>0.00/0%</td>
+            <td class="l_border">进餐次数</td>
+            <td>0</td>
+        </tr>
+
+        <tr class="tbl_content">
+        	<td class="r_border">最大(mmol/L)</td>
+            <td>null</td>
+            <td>N/A</td>
+            <td class="l_border">绝对值1-2%</td>
+            <td>N/A</td>
+            <td class="l_border">基础量(U)/%</td>
+            <td>0.00/0%</td>
+            <td class="l_border">平均量+标准</td>
+            <td>N/A</td>
+        </tr>
+ 
+        <tr class="tbl_content">
+        	<td class="r_border">正常%</td>
+            <td>N/A</td>
+            <td>N/A</td>
+            <td class="l_border">绝对值2-3%</td>
+            <td>N/A</td>
+            <td class="l_border">食物大剂量(U)</td>
+            <td>0</td>
+            <td class="l_border">运动总时间</td>
+            <td>0</td>
+        </tr>
+
+        <tr class="tbl_content">
+        	<td class="r_border">偏低%</td>
+            <td>N/A</td>
+            <td>N/A</td>
+            <td class="l_border">绝对值&gt;3%</td>
+            <td>N/A</td>
+            <td class="l_border">校正大剂量(U)</td>
+            <td>0</td>
+            <td class="l_border">运动次数</td>
+            <td>0</td>
+        </tr>
+        
+        <tr class="tbl_content">
+            <td class="r_border">偏高%</td>
+            <td>N/A</td>
+            <td>N/A</td>
+            <td class="l_border">  </td>
+            <td></td>
+            <td class="l_border">正常大剂量(U)</td>
+            <td>0</td>
+            <td class="l_border">平均时间</td>
+            <td>N/A</td>
+        </tr>
+
+        <tr class="tbl_content">
+            <td class="r_border">读数次数/时间</td>
+            <td>N/A</td>
+            <td>N/A</td>
+            <td class="l_border">  </td>
+            <td>  </td>
+            <td class="l_border">扩展大剂量(U)</td>
+            <td>0</td>
+            <td class="l_border">平均强度</td>
+            <td>N/A</td>
+        </tr>
+
+        <tr class="tbl_content">
+            <td class="r_border">低血糖次数/时间</td>
+            <td>N/A</td>
+            <td>N/A</td>
+            <td class="l_border">  </td>
+            <td>  </td>
+            <td class="l_border">临时基础量(U)</td>
+            <td>0</td>
+            <td class="l_border">  </td>
+            <td>  </td>
+        </tr>
+
+        <tr class="tbl_content">
+            <td class="r_border">告警次数</td>
+            <td>0</td>
+            <td>0</td>
+            <td class="l_border">  </td>
+            <td>  </td>
+            <td class="l_border">暂停输注时间</td>
+            <td>0</td>
+            <td class="l_border">  </td>
+            <td>  </td>
+        </tr>
+
+        <tr class="tbl_content">
+            <td class="r_border">  </td>
+            <td>  </td>
+            <td>  </td>
+            <td class="l_border">  </td>
+            <td>  </td>
+            <td class="l_border">泵告警次数</td>
+            <td>0</td>
+            <td class="l_border">  </td>
+            <td>  </td>
+        </tr>               
+        
+    </table>
+</div>
+</div>
+
+
+<!--
+页脚
+-->
+<!--
+<br/>
+<div class="mt_page_footer">
+	<span class="mt_footer_info footer_info_left">trumcloud</span>
+    <span class="mt_footer_info footer_info_center">page:1/1</span>
+    <span class="mt_footer_info footer_info_right">printed:2014/8/12 16:00</span> 
+</div>
+-->
+
+</body>
+</html>

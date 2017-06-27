@@ -1,0 +1,21 @@
+::python findreplace.py C:\Users\zhoufan\Projects\Python\LibraryTest\source "*.py" "tab" "    " 
+::python findreplace.py C:\Users\zhoufan\Projects\Python\TrumCloud\app\urlmap "*.py" "tab" "    " 
+::python findreplace.py C:\Users\zhoufan\Projects\Python\TrumCloud\app "*.py" "tab" "    " 
+::python findreplace.py C:\Users\zhoufan\Projects\Python\TrumCloud\app "*.py" "\"ERROR\"" "RESULT.ERROR" 
+::python findreplace.py C:\Users\zhoufan\Projects\Python\TrumCloud\app\templates\bingo "*.js" "'OK'" "'{{appctx.RESULT.OK}}'"
+::python findreplace.py C:\Users\zhoufan\Projects\Python\TrumCloud\app\static\bingo\myjs "*.js" "tab" "    " 
+::python findreplace.py C:\Users\zhoufan\Projects\Python\TrumCloud\app\templates\bingo "*.js" "tab" "    " 
+::python findreplace.py C:\Users\zhoufan\Projects\Python\TrumCloud\app "*.py" "from app.utils import *" "from app.middle.miscUtil import misc" 
+::python findreplace.py C:\Users\zhoufan\Projects\Python\TrumCloud\app "*.py" "RESULT.ERROR" "'ERR'"
+::python findreplace.py C:\Users\zhoufan\Projects\Python\TrumCloud\app "*.js" "{{appctx.RESULT.ERROR}}" "ERR"
+::python findreplace.py C:\Users\zhoufan\Projects\Python\TrumCloud\app "*.py" "RESULT.OK" "'OK'"
+::python findreplace.py C:\Users\zhoufan\Projects\Python\TrumCloud\app "*.js" "{{appctx.RESULT.OK}}" "OK"
+::python findreplace.py C:\Users\zhoufan\Projects\Python\TrumCloud\app "*.py" "GKEYS.USER_TYPE" "'user_type'"
+::python findreplace.py C:\Users\zhoufan\Projects\Python\TrumCloud\app "*.js" "{{appctx.GKEYS.USER_TYPE}}" "user_type" 
+
+::python findreplace.py C:\Users\zhoufan\Projects\Python\TrumCloud\app "*.py" "GKEYS.UID" "'uid'"
+::python findreplace.py C:\Users\zhoufan\Projects\Python\TrumCloud\app "*.js" "{{appctx.GKEYS.PASSWORD}}" "password" 
+::python findreplace.py C:\Users\zhoufan\Projects\Python\TrumCloud\app "*.py" "from app.common import *" "" 
+::python findreplace.py C:\Users\zhoufan\Projects\Python\TrumCloud\app "*.py" "#db.session.commit" "db.session.commit"
+::python findreplace.py C:\Users\zhoufan\Projects\Python\TrumCloud\app\templates\bingo
+python findreplace.py C:\Users\zhoufan\Projects\Python\TrumCloud\app

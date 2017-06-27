@@ -1,0 +1,2 @@
+python HistoryAnalyzer.py  1000259_00000000_20140516150423.DAT
+pause

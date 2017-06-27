@@ -1,0 +1,29 @@
+dir(A): ['__class__', '__delattr__', '__doc__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', 'p']
+dir(B): ['__class__', '__delattr__', '__dict__', '__doc__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'p']
+A.__dict__: {'p': 12, '__module__': '__main__', '__slots__': (), '__doc__': None}
+B.__dict__: {'__dict__': <attribute '__dict__' of 'B' objects>, '__module__': '__main__', '__weakref__': <attribute '__weakref__' of 'B' objects>, '__doc__': None}
+a.p: 12 12
+b.p: 12 12
+dir(b): ['__class__', '__delattr__', '__dict__', '__doc__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'name', 'p']
+name : 23
+__class__ : <class '__main__.B'>
+__delattr__ : <method-wrapper '__delattr__' of B object at 0x024F1F70>
+__dict__ : {'name': 23}
+__doc__ : None
+__format__ : <built-in method __format__ of B object at 0x024F1F70>
+__getattribute__ : <method-wrapper '__getattribute__' of B object at 0x024F1F70>
+__hash__ : <method-wrapper '__hash__' of B object at 0x024F1F70>
+__init__ : <method-wrapper '__init__' of B object at 0x024F1F70>
+__module__ : __main__
+__new__ : <built-in method __new__ of type object at 0x1E2282B8>
+__reduce__ : <built-in method __reduce__ of B object at 0x024F1F70>
+__reduce_ex__ : <built-in method __reduce_ex__ of B object at 0x024F1F70>
+__repr__ : <method-wrapper '__repr__' of B object at 0x024F1F70>
+__setattr__ : <method-wrapper '__setattr__' of B object at 0x024F1F70>
+__sizeof__ : <built-in method __sizeof__ of B object at 0x024F1F70>
+__slots__ : x
+__str__ : <method-wrapper '__str__' of B object at 0x024F1F70>
+__subclasshook__ : <built-in method __subclasshook__ of type object at 0x02547720>
+__weakref__ : None
+name : 23
+p : 12

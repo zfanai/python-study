@@ -1,0 +1,1 @@
+call flaskpython mysqlexec.py myzfsql85 medtrum_com medtrum_com.sql

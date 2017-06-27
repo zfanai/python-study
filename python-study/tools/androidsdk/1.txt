@@ -1,0 +1,9 @@
+
+C:\Users\zhoufan\Projects\Python\GadgetTest\source\androidsdk>python findgoogleapis.py C:\Users\zhoufan\Projects\DOC\Android\docs\static\css 
+trace: ['target_dir:', 'C:\\Users\\zhoufan\\Projects\\DOC\\Android\\docs\\static\\css']
+trace: ['_find_replace']
+trace: ['buf size:', 2558]
+trace: ['_find_replace']
+trace: ['buf size:', 1711]
+trace: ['_find_replace']
+trace: ['buf size:', 784]

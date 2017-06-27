@@ -1,0 +1,12 @@
+{{the}}we
+{% set da={"de":123434} %}
+{{ da.de }}
+123
+
+{% set index=0 %}
+{% set lt=[5,8,12] %}
+{% for i in lt %}
+i:{{i}}
+{%set index=index+1%}
+index:{{index}}
+{%endfor%}

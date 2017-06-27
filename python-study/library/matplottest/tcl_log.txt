@@ -1,0 +1,76 @@
+
+C:\Users\zhoufan\Projects\Python\LibraryTest\source\matplottest>cmd
+Microsoft Windows [版本 6.1.7600]
+版权所有 (c) 2009 Microsoft Corporation。保留所有权利。
+
+C:\Users\zhoufan\Projects\Python\LibraryTest\source\matplottest>flaskpython matplottest.py
+
+C:\Users\zhoufan\Projects\Python\LibraryTest\source\matplottest>C:\Users\zhoufan\Projects\Python\VirtualEnv\Flask\flask\Scripts\python matplottest.py
+sdf
+trace: ['get_build_version:', '2.7.6 (default, Feb 27 2014, 14:15:49) [MSC v.1500 32 bit (Intel)]']
+_png_module:tp0
+_png_module:tp1.12
+_png_module:tp9
+sdf
+Traceback (most recent call last):
+  File "matplottest.py", line 28, in <module>
+    func1()
+  File "matplottest.py", line 14, in func1
+    plot(X,C)
+  File "C:\Users\zhoufan\Projects\Python\VirtualEnv\Flask\flask\lib\site-packages\matplotlib-1.4.2-py2.7-win32.egg\matplotlib\pyplot.py", line 3092, in plot
+    ax = gca()
+  File "C:\Users\zhoufan\Projects\Python\VirtualEnv\Flask\flask\lib\site-packages\matplotlib-1.4.2-py2.7-win32.egg\matplotlib\pyplot.py", line 828, in gca
+    ax =  gcf().gca(**kwargs)
+  File "C:\Users\zhoufan\Projects\Python\VirtualEnv\Flask\flask\lib\site-packages\matplotlib-1.4.2-py2.7-win32.egg\matplotlib\pyplot.py", line 462, in gcf
+    return figure()
+  File "C:\Users\zhoufan\Projects\Python\VirtualEnv\Flask\flask\lib\site-packages\matplotlib-1.4.2-py2.7-win32.egg\matplotlib\pyplot.py", line 435, in figure
+    **kwargs)
+  File "C:\Users\zhoufan\Projects\Python\VirtualEnv\Flask\flask\lib\site-packages\matplotlib-1.4.2-py2.7-win32.egg\matplotlib\backends\backend_tkagg.py", line
+81, in new_figure_manager
+    return new_figure_manager_given_figure(num, figure)
+  File "C:\Users\zhoufan\Projects\Python\VirtualEnv\Flask\flask\lib\site-packages\matplotlib-1.4.2-py2.7-win32.egg\matplotlib\backends\backend_tkagg.py", line
+89, in new_figure_manager_given_figure
+    window = Tk.Tk()
+  File "C:\Python27\Lib\lib-tk\Tkinter.py", line 1749, in __init__
+    self.tk = _tkinter.create(screenName, baseName, className, interactive, wantobjects, useTk, sync, use)
+_tkinter.TclError: Can't find a usable init.tcl in the following directories:
+    C:/Python27/lib/tcl8.5 C:/Users/zhoufan/Projects/Python/VirtualEnv/Flask/flask/lib/tcl8.5 C:/Users/zhoufan/Projects/Python/VirtualEnv/Flask/lib/tcl8.5 C:/U
+sers/zhoufan/Projects/Python/VirtualEnv/Flask/flask/library C:/Users/zhoufan/Projects/Python/VirtualEnv/Flask/library C:/Users/zhoufan/Projects/Python/VirtualE
+nv/Flask/tcl8.5.9/library C:/Users/zhoufan/Projects/Python/VirtualEnv/tcl8.5.9/library
+
+
+
+This probably means that Tcl wasn't installed properly.
+
+
+C:\Users\zhoufan\Projects\Python\LibraryTest\source\matplottest>flaskpython matplottest.py > tcl_log.txt
+Traceback (most recent call last):
+  File "matplottest.py", line 28, in <module>
+    func1()
+  File "matplottest.py", line 14, in func1
+    plot(X,C)
+  File "C:\Users\zhoufan\Projects\Python\VirtualEnv\Flask\flask\lib\site-packages\matplotlib-1.4.2-py2.7-win32.egg\matplotlib\pyplot.py", line 3092, in plot
+    ax = gca()
+  File "C:\Users\zhoufan\Projects\Python\VirtualEnv\Flask\flask\lib\site-packages\matplotlib-1.4.2-py2.7-win32.egg\matplotlib\pyplot.py", line 828, in gca
+    ax =  gcf().gca(**kwargs)
+  File "C:\Users\zhoufan\Projects\Python\VirtualEnv\Flask\flask\lib\site-packages\matplotlib-1.4.2-py2.7-win32.egg\matplotlib\pyplot.py", line 462, in gcf
+    return figure()
+  File "C:\Users\zhoufan\Projects\Python\VirtualEnv\Flask\flask\lib\site-packages\matplotlib-1.4.2-py2.7-win32.egg\matplotlib\pyplot.py", line 435, in figure
+    **kwargs)
+  File "C:\Users\zhoufan\Projects\Python\VirtualEnv\Flask\flask\lib\site-packages\matplotlib-1.4.2-py2.7-win32.egg\matplotlib\backends\backend_tkagg.py", line
+81, in new_figure_manager
+    return new_figure_manager_given_figure(num, figure)
+  File "C:\Users\zhoufan\Projects\Python\VirtualEnv\Flask\flask\lib\site-packages\matplotlib-1.4.2-py2.7-win32.egg\matplotlib\backends\backend_tkagg.py", line
+89, in new_figure_manager_given_figure
+    window = Tk.Tk()
+  File "C:\Python27\Lib\lib-tk\Tkinter.py", line 1749, in __init__
+    self.tk = _tkinter.create(screenName, baseName, className, interactive, wantobjects, useTk, sync, use)
+_tkinter.TclError: Can't find a usable init.tcl in the following directories:
+    C:/Python27/lib/tcl8.5 C:/Users/zhoufan/Projects/Python/VirtualEnv/Flask/flask/lib/tcl8.5 C:/Users/zhoufan/Projects/Python/VirtualEnv/Flask/lib/tcl8.5 C:/Users/zhoufan/Projects/Python/VirtualEnv/Flask/flask/library C:/Users/zhoufan/Projects/Python/VirtualEnv/Flask/library C:/Users/zhoufan/Projects/Python/VirtualEnv/Flask/tcl8.5.9/library C:/Users/zhoufan/Projects/Python/VirtualEnv/tcl8.5.9/library
+
+
+
+This probably means that Tcl wasn't installed properly.
+
+
+C:\Users\zhoufan\Projects\Python\LibraryTest\source\matplottest>

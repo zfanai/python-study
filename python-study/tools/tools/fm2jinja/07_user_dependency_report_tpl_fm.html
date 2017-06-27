@@ -1,0 +1,150 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">   
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+{% set charset='utf8' %}
+{% set orient='shu' %}
+{% include 'report/pdf_common_head_tpl.html' %}
+
+<body id="${pdf_report_id}">
+
+{% include 'report/pdf_report_header_tpl.html' %}
+
+<div class="mt_page_body">
+
+<!--
+填写用户信息的表头
+-->
+
+{% include "report/pdf_report_userinfo_tpl.html" %}
+
+<br/>
+<div class="mt_report_statistics_tbl">
+<table cellspacing="0">
+    <tr>
+    <td class="b_border r_border tbl_cell_para">统计</td>
+    <td class="b_border r_border tbl_cell_para"><p>指尖血糖</p><p>次数</p></td>
+    <td class="b_border r_border tbl_cell_para"><p>大剂量</p><p>向导次数</p></td>
+    <td class="b_border r_border tbl_cell_para"><p>大剂量</p><p>向导调整次</p></td>
+    <td class="b_border r_border tbl_cell_para"><p>手动大剂量</p><p>次数</p></td>
+    <td class="b_border r_border tbl_cell_para"><p>食物大剂量</p><p>次数</p></td>
+    <td class="b_border r_border tbl_cell_para"><p>校正大剂量</p><p>次数</p></td>
+    <td class="b_border r_border tbl_cell_para"><p>传感器</p><p>使用时间</p></td>
+    <td class="b_border r_border tbl_cell_para"><p>储药贴</p><p>使用时间</p></td>
+    <td class="b_border r_border tbl_cell_para"><p>暂停输注</p><p>次数</p></td>
+    <td class="b_border tbl_cell_para"><p>暂停输注</p><p>时间</p></td>
+    </tr>
+    
+    {% set num=user_dependency|length %}
+    {% for row in range(0, num) %}
+    <tr>
+    	{% if row==(num-1) %}{% set b_border="" %}
+        {% else %}{% set b_border="b_border" %}
+        {% endif %}
+        {% set dayUse=user_dependency[row] %}
+        
+        {% if (row<(num-1)) %}
+        <td class="r_border ${b_border} tbl_cell_para"><p>${dayUse.day}</p><p>${dayUse.wday}</p></td>
+        {% else %}
+        <td class="r_border ${b_border} tbl_cell_para">平均/总计</td>
+        {% endif %}
+        
+
+        
+        <td class="${b_border} r_border">${dayUse.bgn}</td>
+        <td class="${b_border} r_border">${dayUse.bwn}</td>
+        <td class="${b_border} r_border">${dayUse.bwan}</td>
+        <td class="${b_border} r_border">${dayUse.mbn}</td>
+        <td class="${b_border} r_border">${dayUse.cbn}</td>
+        <td class="${b_border} r_border">${dayUse.crbn}</td>
+        <td class="${b_border} r_border">${dayUse.su}</td>
+        <td class="${b_border} r_border">${dayUse.pu}</td>
+        <td class="${b_border} r_border">${dayUse.susn}</td>
+        <td class="${b_border}">${dayUse.sust}</td>
+        
+    </tr>
+    <{% endfor %}
+</table>
+</div>
+
+<br/><br/>
+<div class="mt_report_layout_tbl">
+<table cellspacing="0">
+<tr>
+<td width="48%" valign="top">
+<div class="mt_report_cell_tbl">
+<table cellspacing="0">
+    <tr>
+    <td class="b_border r_border">传感器统计</td>
+    <td class="b_border r_border">开始日期</td>
+    <td class="b_border r_border">结束日期</td>
+    <td class="b_border">持续时间</td>
+    </tr>
+    
+    {% set num=sensor_use|length %}
+    {% if (num>1) %}
+        {% for row in range(0,num-1) %}
+        {% set session=sensor_use[row] %}
+        <tr>
+           
+            <td class="b_border r_border">${session.sensor}</td>
+            <td class="b_border r_border">${session.start}</td>
+            <td class="b_border r_border">${session.end}</td>
+            <td class="b_border ">${session.life}</td>
+            
+        </tr>
+        {% endfor %}
+        
+        <tr>
+        <td class="r_border">平均寿命</td>
+        <td>${sensor_use[num-1].avg_life}</td>
+        </tr>
+    {% else %}
+    	<tr>
+        <td>无</td>
+        </tr>
+    {% endif %}
+</table>
+</div>
+</td>
+<td width="4%"></td>
+<td width="48%">
+<div class="mt_report_cell_tbl">
+<table cellspacing="0">
+    <tr>
+    <td class="b_border r_border">储药贴统计</td>
+    <td class="b_border r_border">开始日期</td>
+    <td class="b_border r_border">结束日期</td>
+    <td class="b_border">持续时间</td>
+    </tr>
+    
+    {% set num=patch_use|length %}
+    {% if (num>1) %}
+        {% for row in range(0,num-2) %}
+        {% set session=patch_use[row] %}
+        <tr>
+ 			<td class="b_border r_border">${session.patch}</td>
+            <td class="b_border r_border">${session.start}</td>
+            <td class="b_border r_border">${session.end}</td>
+            <td class="b_border ">${session.life}</td>
+        </tr>
+        {% endfor %}
+        
+        <tr>
+        <td class="r_border">平均寿命</td>
+        <td>${patch_use[num-1].avg_life}</td>
+        </tr>
+    {% else %}
+    	<tr>
+        <td>无</td>
+        </tr>
+    {% endif %}
+</table>
+</div>
+</td>
+</tr>
+</table>
+</div>
+
+</div>
+</body>
+</html>

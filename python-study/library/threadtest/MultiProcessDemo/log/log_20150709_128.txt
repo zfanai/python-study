@@ -1,0 +1,7 @@
+[2015-07-09 13:12:51.892000]trace:['main:tp0,__name__,pid:', '__parents_main__', 128]
+[2015-07-09 13:12:51.924000]trace:['main:tp9,__name__,pid:', '__parents_main__', 128]
+[2015-07-09 13:12:51.939000]trace:['function f:x:', 1]
+[2015-07-09 13:12:51.939000]trace:['function f:x:', 3]
+[2015-07-09 13:12:51.939000]trace:['function f:x:', 4]
+[2015-07-09 13:12:51.939000]trace:['function f:x:', 6]
+[2015-07-09 13:12:51.955000]trace:['function f:x:', 8]

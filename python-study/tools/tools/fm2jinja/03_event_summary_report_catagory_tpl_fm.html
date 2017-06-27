@@ -1,0 +1,232 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">   
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+{% set charset='utf8' %}
+{% set orient='heng' %}
+{% include 'report/pdf_common_head_tpl.html' %}
+
+<body id="${pdf_report_id}">
+
+{% include 'report/pdf_report_header_tpl.html' %}
+
+
+<div class="mt_page_body">
+
+<!--
+填写用户信息的表头
+-->
+
+{% include "report/pdf_report_userinfo_tpl.html" %}
+
+{#<#list 0..3 as x>#}
+{% for x in range(0,4) %}
+    <!--
+    指尖血事件总结表
+    -->
+    {#
+    <#switch x>
+    <#case 0>
+    	<#assign catagory="指尖血">
+    	<#break>
+    <#case 1>
+    	<#assign catagory="食物">
+    	<#break>
+    <#case 2>
+    	<#assign catagory="大剂量">
+    	<#break>
+    <#case 3>
+    	<#assign catagory="运动">
+    	<#break>
+    <#default>
+    	<#assign catagory="">
+    	<#break>
+    </#switch>
+    #}
+    {% if x==0 %}{% set catagory="指尖血" %}
+    {% elif x==1 %}{% set catagory="食物" %}
+    {% elif x==2 %}{% set catagory="大剂量" %}
+    {% elif x==3 %}{% set catagory="运动" %}
+    {% else %}{% set catagory="" %}
+    {% endif %}
+    
+    <p>${catagory}事件汇总</p>
+    <div class="mt_report_statistics_tbl">
+        
+        <table cellspacing="0">
+            <tr>
+                <td rowspan="2" class="b_border r_border">${catagory}</td>
+                <td colspan="7" class="b_border r_border">凌晨</td>
+                <td colspan="5" class="b_border r_border">早餐</td>
+                <td colspan="5" class="b_border r_border">中餐</td>
+                <td colspan="5" class="b_border r_border">晚餐</td>
+                <td colspan="2" class="b_border r_border">晚间</td>
+                <td colspan="1" class="b_border"></td>
+            </tr>
+            
+            <tr>
+            
+                {#<#list 0..23 as x>
+                <#assign hour = (x+23)%24>
+                <#if x==6 || x==11 || x==16 || x==21 || x==23>
+                    <#assign r_border="r_border">
+                <#else>
+                    <#assign r_border="">
+                </#if>
+                <td class="b_border ${r_border}">${hour?string("00")}:00</td>
+                </#list>
+                #}
+                {% for x in range(0, 24) %}
+                {% set hour=(x+23)%24 %}
+                {% if x==6 or x==11 or x==16 or x==21 or x==23 %}
+                {% set r_border="r_border" %}
+                {% else %}{% set r_border="" %}{% endif %}
+                <td class="b_border ${r_border}">{{"%02d"|format(x)}}:00</td>
+                {% endfor %}
+                
+                <td class="b_border">总计</td>
+            </tr>
+
+            {% if 0==x %}{% set event_catagory=bg_event %}
+            {% elseif 1==x %}{% set event_catagory=carb_event %}
+            {% elseif 2==x %}{% set event_catagory=bolus_event %}
+            {% elseif 3==x %}{% set event_catagory=exercise_event %}{% endif %}
+            
+            {% set num=event_catagory|length %}
+            
+            {#<#list 0..(num-1) as day>#}
+            {% for day in range(0, num) %}
+            {% set day_event=event_catagory[day] %}
+            <tr>
+                <!-- 最后一行不用下边框 -->
+                
+                {% if day==num-1 %}{% set b_border="" %}
+                {% else %}{% set b_border="b_border" %}{% endif %}
+                
+                <!-- 隔行使用阴影效果 -->
+                {% if day%2 == 0 %}{% set bg_lg="bg_lg" %}
+                {% else %}{% set bg_lg="" %}{% endif %}
+                
+                <td class="r_border ${b_border}">
+                <p class="tbl_cell_para">${day_event.day}</p>
+                <p class="tbl_cell_para">${day_event.wday}</p>
+                </td>
+
+                   
+                {% if "no_data" in day_event.keys() %}
+                     <td class="${bg_lg}" colspan="25">无数据</td>
+                {% else %}
+                	 {% for x in range(0,24) %}
+                    {% set hour = (x+23)%24 %}
+                    {% set key="hour"+hour %}
+                    {% set keyList=day_event.keys() %}
+                    
+                    {% if  key in keyList %}
+                        {% set value=day_event[key] %}
+                    {% else %}
+                        {% set value="" %}
+                    {% endif %}
+                    <td class="${bg_lg}">${value}</td>
+                    {% endlist %}
+
+                    <td class="${bg_lg}">${day_event.total}</td>
+                {% endif %}
+                
+            </tr>
+            
+            {% endfor %}   
+            
+        </table>
+    </div>
+    
+    {% if x==1 or x==0 or x==2 %}
+    	{% include "report/pdf_report_header_tpl.html" %}
+    {% endif %}
+{% endfor %}
+
+{#<#include "./pdf_report_header_tpl.html">#}
+{% include 'report/pdf_report_header_tpl.html' %}
+
+<!-- 统计分析表格 -->
+<p>统计分析</p>
+
+<div class="mt_report_statistics_tbl">        
+    <table cellspacing="0">
+		<tr>
+        	<td rowspan="2" class="b_border r_border">统计</td>
+            <td colspan="5" class="b_border r_border ta_c">睡眠</td>
+            <td colspan="5" class="b_border r_border ta_c">早餐</td>
+            <td colspan="5" class="b_border r_border ta_c">中餐</td>
+            <td colspan="5" class="b_border r_border ta_c">晚餐</td>
+            <td colspan="5" class="b_border r_border ta_c">夜间</td>
+            <td colspan="5" class="b_border ta_c">全天</td>
+        </tr>
+        <tr>
+        {#<#list 0..5 as x>#}
+        {% for x in range(0, 6) %}
+        	<td class="b_border r_border"><p>平</p><p>均</p><p>值</p></td>
+            <td class="b_border r_border"><p>标</p><p>准</p><p>差</p></td>
+            <td class="b_border r_border"><p>最</p><p>大</p><p>值</p></td>
+            <td class="b_border r_border"><p>最</p><p>小</p><p>值</p></td>
+            
+            {% if x==5 %}{% set r_border="" %}
+            {% else %}{% set r_border="r_border" %}
+            {% endif %}
+            <td class="b_border ${r_border}"><p>次</p><p>数</p></td>
+        {% endfor %}
+        </tr>
+        
+        {#<#list 0..3 as x>#}
+        {% for x in range(0,4) %}
+        <tr>
+        	{% if x==3 %}{% set b_border="" %}
+            {% else %}{% set b_border="b_border" %}
+            {% endif %}
+            
+            {% if x%2==0 %}{% set bg_lg="bg_lg" %}
+            {% else %}{% set bg_lg="" %}
+            {% endif %}
+            
+            {#
+            <#switch x>
+            <#case 0>
+                <#assign catagory="指尖血">
+                <#break>
+            <#case 1>
+                <#assign catagory="食物">
+                <#break>
+            <#case 2>
+                <#assign catagory="大剂量">
+                <#break>
+            <#case 3>
+                <#assign catagory="运动">
+                <#break>
+            <#default>
+                <#assign catagory="">
+                <#break>
+            </#switch>
+    		#}
+    		{% if x==0 %}{% set catagory="指尖血" %}
+    		{% elif x==1 %}{% set catagory="食物" %}
+    		{% elif x==2 %}{% set catagory="大剂量" %}
+    		{% elif x==3 %}{% set catagory="运动" %}
+    		{% else %}{% set catagory="" %}
+    		{% endif %}
+        	<td class="r_border ${b_border}">${catagory}</td>
+
+            {% if 0==x %}{% set event_catagory_stat=bg_event_stat %}
+            {% elseif 1==x %}{% set event_catagory_stat=carb_event_stat %}
+            {% elseif 2==x %}{% set event_catagory_stat=bolus_event_stat %}
+            {% elseif 3==x %}{% set event_catagory_stat=exercise_event_stat %}{% endif %}
+            
+            {#<#list 0..29 as y>#}
+            {% for y in range(0,30) %}
+            <td class="${bg_lg}">${event_catagory_stat[y/5][y%5]}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+</div>
+</body>
+</html>
