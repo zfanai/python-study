@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#encoding:utf8
 
 from socket import *
 from time import ctime
@@ -11,8 +12,8 @@ ADDR = (HOST, PORT)
 udpSerSock = socket(AF_INET, SOCK_DGRAM)
 udpSerSock.bind(ADDR)
 
-# UDPм╗пе╡╩╩А╦З©м╩╖╤к╫╗а╒а╛╫сё╛кЫрт©ирт╫сйэ╤Ю╦Ж©м╩╖╤к╣дпео╒║ё
-# сппео╒ю╢╫сйэё╛оЮ╣╠сзн╒пеё╛╤лпе║ё
+# UDPИ─ Д©║Д╦█Д╪ Х╥÷Е╝╒Ф┬╥Г╚╞Е╩╨Г╚▀Х©·Ф▌╔О╪▄Ф┴─Д╩╔Е▐╞Д╩╔Ф▌╔Е▐≈Е╓ Д╦╙Е╝╒Ф┬╥Г╚╞Г └Д©║Ф│╞Ц─┌
+# Ф°┴Д©║Ф│╞Ф²╔Ф▌╔Е▐≈О╪▄Г⌡╦Е╫⌠Д╨▌Е╬╝Д©║О╪▄Г÷╜Д©║Ц─┌
 while True:
     print 'waiting for message...'
     data, addr = udpSerSock.recvfrom(BUFSIZ)

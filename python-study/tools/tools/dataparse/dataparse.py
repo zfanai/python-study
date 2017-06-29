@@ -55,5 +55,39 @@ def func1(filename):
     #str_sec=map(lambda x:'%02x'% ord(x), sec)
     #print 'sec[0]:', basic_data[0:4], sensor_rtn[0:4], pump_rtn[0:4],pump_misc[0:4]
 
+def func2():
+    a='0b000001 10023883 7d060002 b5725106 01d33de1 01033133 99002000 003e4491 058305c3 2ae50100 00000002 004c0000 00000001 03004c00 883ae101 14000500 00000000 00000000 042f0000 00597251 06240019 0005291a 000144e8 03930300 00006800 10000000 00d3e708 08b47600 10000000 00370000 00'
+    b=a.strip().replace(' ','')
+    print 'b:', b
+    def hex2bin(x):
+        r=[]
+        n=len(x)
+        for i in xrange(n/2):
+           r.append(int(x[i*2:(i+1)*2], 16))
+        return r
+    c=hex2bin(b)
+    print 'c:', c[0:3]
+    d=c[3:]
+    print 'd:',d[0:3]
+    
+    def split_data(d):
+        pos=0
+        a=[]
+        while pos<len(d):
+            s=d[pos+1]
+            a.append(d[pos:pos+s+2])
+            pos += 2+s
+        return a
+    e=split_data(d)
+    print 'e:', e
+    f=e[-1]
+    print 'f:', f, len(f)
+    g=' '.join(map(lambda x:'%02X'%x, f))
+    print 'g:', g
+    print 'g.1:', f[5:5+34]
+    print 'g.2:', f[39:]
+    
+    
 if __name__=='__main__':
-    func1(sys.argv[1])
+    #func1(sys.argv[1])
+    func2()

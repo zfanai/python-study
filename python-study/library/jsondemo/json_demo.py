@@ -1,4 +1,4 @@
-#encoding:gbk
+#encoding:utf8
 
 import json
 
@@ -19,6 +19,17 @@ def fun1():
     
     dict_obj={"bg":8.3}
     debug.trace([ 'dict_obj:', dict_obj])
+    
+    # 
+    person={
+        'name':'joe',
+        'age':12,
+        'height':175
+    }
+    print 'person json dumps:'
+    print json.dumps(person)
+    print json.dumps(person, indent=2)
+    
     
     #return
 
