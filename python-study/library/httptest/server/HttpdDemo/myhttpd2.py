@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#encoding:gbk
+#encoding:utf8
 
 from os import curdir, sep
 from BaseHTTPServer import \
@@ -9,11 +9,11 @@ from SocketServer import ThreadingMixIn
 import math
 
 """
-¶àÏß³ÌµÄHTTP·þÎñÆ÷£¬Èç¹û¿Í»§¶ËAÏò·þÎñÆ÷·¢ËÍÁËÒ»¸öÇëÇó£¬¶øÕâ¸öÇëÇóµÄ´¦ÀíÊ±¼äºÜ³¤£¬·þÎñ¶Ë»¹Ã»ÓÐ·µ»ØÏìÓ¦£¬
-ÕâÊÇ¿Í»§¶ËBÒ²Ïò·þÎñÆ÷·¢ËÍÁËÒ»¸öÇëÇó£¬·þÎñÆ÷ÊÇ¿ÉÒÔÁ¢Âí´¦ÀíÕâ¸öÇëÇóµÄ¡£
-ÏÖÔÚµÄÒÉÎÊÊÇ£¬ÔÚ·þÎñÆ÷»¹Ã»ÓÐ·µ»ØAµÄÏìÓ¦µÄÊ±ºò£¬ÊÇ·ñÊÇËµ·þÎñÆ÷ºÍA»¹±£³ÖTCPÁ¬½Ó£¬¶øBÔÚÕâ¸öÊ±ºòÀ´ÇëÇó·þÎñÆ÷µÄ´¦Àí£¬
-·þÎñÆ÷ÓÖ»áÓëB½¨Á¢TCPÁ¬½ÓÂð¡£·þÎñÆ÷¿ÉÒÔÍ¬Ê±ÓëÁ½¸ö¿Í»§¶Ë±£³ÖTCPÁ¬½ÓÂð£¬·þÎñÆ÷ÊÇÊ¹ÓÃµÄÍ¬Ò»¸ö¶Ë¿ÚÂð¡£ÒòÎª¿Í»§¶Ë
-¶¼ÊÇÏòÍ¬Ò»¸ö·þÎñÆ÷¶Ë¿Ú·¢ËÍÇëÇó
+å¤šçº¿ç¨‹çš„HTTPæœåŠ¡å™¨ï¼Œå¦‚æžœå®¢æˆ·ç«¯Aå‘æœåŠ¡å™¨å‘é€äº†ä¸€ä¸ªè¯·æ±‚ï¼Œè€Œè¿™ä¸ªè¯·æ±‚çš„å¤„ç†æ—¶é—´å¾ˆé•¿ï¼ŒæœåŠ¡ç«¯è¿˜æ²¡æœ‰è¿”å›žå“åº”ï¼Œ
+è¿™æ˜¯å®¢æˆ·ç«¯Bä¹Ÿå‘æœåŠ¡å™¨å‘é€äº†ä¸€ä¸ªè¯·æ±‚ï¼ŒæœåŠ¡å™¨æ˜¯å¯ä»¥ç«‹é©¬å¤„ç†è¿™ä¸ªè¯·æ±‚çš„ã€‚
+çŽ°åœ¨çš„ç–‘é—®æ˜¯ï¼Œåœ¨æœåŠ¡å™¨è¿˜æ²¡æœ‰è¿”å›žAçš„å“åº”çš„æ—¶å€™ï¼Œæ˜¯å¦æ˜¯è¯´æœåŠ¡å™¨å’ŒAè¿˜ä¿æŒTCPè¿žæŽ¥ï¼Œè€ŒBåœ¨è¿™ä¸ªæ—¶å€™æ¥è¯·æ±‚æœåŠ¡å™¨çš„å¤„ç†ï¼Œ
+æœåŠ¡å™¨åˆä¼šä¸ŽBå»ºç«‹TCPè¿žæŽ¥å—ã€‚æœåŠ¡å™¨å¯ä»¥åŒæ—¶ä¸Žä¸¤ä¸ªå®¢æˆ·ç«¯ä¿æŒTCPè¿žæŽ¥å—ï¼ŒæœåŠ¡å™¨æ˜¯ä½¿ç”¨çš„åŒä¸€ä¸ªç«¯å£å—ã€‚å› ä¸ºå®¢æˆ·ç«¯
+éƒ½æ˜¯å‘åŒä¸€ä¸ªæœåŠ¡å™¨ç«¯å£å‘é€è¯·æ±‚
 """
 class MyHandler(BaseHTTPRequestHandler):
 
@@ -59,8 +59,8 @@ class MyHandler(BaseHTTPRequestHandler):
             
             #self.look_inside()
             
-            # ÔÚ·µ»Ø½á¹ûÖ®Ç°£¬Ôö¼ÓÒ»Ð©´¦ÀíÑÓÊ±£¬ ÓÃÀ´Óë¶àÏß³ÌµÄHTTPServer
-            # °æ±¾½øÐÐ±È½Ï
+            # åœ¨è¿”å›žç»“æžœä¹‹å‰ï¼Œå¢žåŠ ä¸€äº›å¤„ç†å»¶æ—¶ï¼Œ ç”¨æ¥ä¸Žå¤šçº¿ç¨‹çš„HTTPServer
+            # ç‰ˆæœ¬è¿›è¡Œæ¯”è¾ƒ
             if self.path=="/index.html":
                 #self.delay()
                 pass
@@ -71,7 +71,7 @@ class MyHandler(BaseHTTPRequestHandler):
         except IOError:
             self.send_error(404,'File Not Found: %s' % self.path)
 
-# ¶àÏß³Ì
+# å¤šçº¿ç¨‹
 class ThreadingServer(ThreadingMixIn, HTTPServer):
     pass
     

@@ -1,10 +1,11 @@
 #!/usr/bin/env python
+#encoding:utf8
 
 import thread
 from time import sleep, ctime
 
 """
-Ϊ�˽�����߳��˳������̻߳�û�н����������ͨ���߳�����ͬ����
+为了解决主线程退出，子线程还没有结束的情况，通过线程锁来同步。
 """
 
 loops = [4, 2, 6, 3]

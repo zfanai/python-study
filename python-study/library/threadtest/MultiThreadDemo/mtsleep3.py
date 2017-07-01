@@ -1,10 +1,11 @@
 #!/usr/bin/env python
+#encoding:utf8
 
 import threading
 from time import sleep, ctime
 
 """
-通过threading模块的start，join函数来完成同步，推荐使用这种方式
+閫氳繃threading妯″潡鐨剆tart锛宩oin鍑芥暟鏉ュ畬鎴愬悓姝ワ紝鎺ㄨ崘浣跨敤杩欑鏂瑰紡
 """
 loops = [ 4, 2 ]
 

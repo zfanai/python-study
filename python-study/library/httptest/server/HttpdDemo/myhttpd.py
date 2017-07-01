@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-#encoding:gbk
-
+#encoding:utf8
+import json
 from os import curdir, sep
 from BaseHTTPServer import \
     BaseHTTPRequestHandler, HTTPServer
@@ -29,19 +29,28 @@ class MyHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type','text/html')
             self.end_headers()
             
-            # 在返回结果之前，增加一些处理延时， 用来与多线程的HTTPServer
-            # 版本进行比较
+            # 鍦ㄨ繑鍥炵粨鏋滀箣鍓嶏紝澧炲姞涓�浜涘鐞嗗欢鏃讹紝 鐢ㄦ潵涓庡绾跨▼鐨凥TTPServer
+            # 鐗堟湰杩涜姣旇緝
             #self.delay()
             
-            # 返回结果
+            # 杩斿洖缁撴灉
             self.wfile.write(f.read())
             f.close()
         except IOError:
             self.send_error(404,'File Not Found: %s' % self.path)
+    def do_POST(self):
+        #for k in dir(self):print 'k:', k
+        #print 'request:', self.request
+        print 'body:', self.rfile.read(int(self.headers.getheader('content-length', 0)))
+        #print 'request lines:', self.raw_requestline
+        self.send_response(200)
+        self.send_header('Content-type', 'text/json')
+        self.end_headers()
+        self.wfile.write(json.dumps({'res':'OK'}, ensure_ascii=False))
 
 def main():
     try:
-        server = HTTPServer(('', 8100), MyHandler)
+        server = HTTPServer(('', 5000), MyHandler)
         print 'Welcome to the machine...'
         print 'Press ^C once or twice to quit'
         server.serve_forever()

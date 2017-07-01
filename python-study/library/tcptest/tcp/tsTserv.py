@@ -1,13 +1,14 @@
 #!/usr/bin/env python
-#encoding:gbk
+#encoding:utf8
 
 from socket import *
 from time import ctime
 import threading
 
 HOST = ''
-PORT = 21567
-BUFSIZ = 1024
+#PORT = 21567 
+PORT = 5000
+BUFSIZ = 2048
 ADDR = (HOST, PORT)
 
 tcpSerSock = socket(AF_INET, SOCK_STREAM)
@@ -18,8 +19,8 @@ tcpSerSock.listen(5)
 
 def test_func1():
     pass
-    # ×èÈûÊ½µÄÁ¬½Ó·½Ê½£¬ÓëÒ»¸ö¿Í»§¶ËÁ¬½ÓÖ®ºó£¬ÆäËû¿Í»§¶ËÁ¬½Ó²»ÁË
-    # ÎŞÏßÑ­»·µÄ·½Ê½ÁË
+    # é˜»å¡å¼çš„è¿æ¥æ–¹å¼ï¼Œä¸ä¸€ä¸ªå®¢æˆ·ç«¯è¿æ¥ä¹‹åï¼Œå…¶ä»–å®¢æˆ·ç«¯è¿æ¥ä¸äº†
+    # æ— çº¿å¾ªç¯çš„æ–¹å¼äº†
     while True:
         print 'waiting for connection...'
         tcpCliSock, addr = tcpSerSock.accept()
@@ -27,18 +28,19 @@ def test_func1():
     
         while True:
             data = tcpCliSock.recv(BUFSIZ)
+            print data
             if not data:
                 break
-            tcpCliSock.send('[%s] %s' % (
-                ctime(), data))
+            #tcpCliSock.send('[%s] %s' % (
+            #    ctime(), data))
         
         tcpCliSock.close()
     
-    # ¹Ø±ÕÁË·şÎñÆ÷µÄ¶Ë¿Ú
+    # å…³é—­äº†æœåŠ¡å™¨çš„ç«¯å£
     tcpSerSock.close()    
 
 """
-ÏÂÃæÕâ¸öº¯ÊıËµÃ÷ÁË£¬Í¬Ò»¸ö·şÎñ¶Ësocket£¬È·Êµ¿ÉÒÔaccept¶à´ÎÀ´Óë²»Í¬µÄ¿Í»§¶Ë½¨Á¢TCPÁ¬½Ó¡£
+ä¸‹é¢è¿™ä¸ªå‡½æ•°è¯´æ˜äº†ï¼ŒåŒä¸€ä¸ªæœåŠ¡ç«¯socketï¼Œç¡®å®å¯ä»¥acceptå¤šæ¬¡æ¥ä¸ä¸åŒçš„å®¢æˆ·ç«¯å»ºç«‹TCPè¿æ¥ã€‚
 """
 def test_func2():
     pass

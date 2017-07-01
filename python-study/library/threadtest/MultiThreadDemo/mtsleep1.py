@@ -1,11 +1,12 @@
 #!/usr/bin/env python
+#encoding:utf8
 
 import thread
 from time import sleep, ctime
 
 """
-������򵥵�ʹ�÷�ʽ��һ�����⣬�����߳��������߳���ɺ���˳��ˣ��������̻߳�û�н�����
-���߳����оͻᱨ�������������߳�����������sleepָ������֤���߳����н�����
+这种最简单的使用方式有一个问题，当主线程启动子线程完成后就退出了，但是子线程还没有结束，
+子线程运行就会报错。所以在主线程里面增加了sleep指令来保证子线程运行结束。
 """
 
 def loop0():
