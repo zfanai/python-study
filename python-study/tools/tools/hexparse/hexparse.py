@@ -335,7 +335,9 @@ def modify_lang(hex_file):
                 ['IT', 4],
                 ['ES', 5],
                 ['DE', 6],
-                ['TR', 7],
+                ['PT', 7], # ÆÏÌÑÑÀ
+                ['SV', 8], # Èðµä
+                ['TR', 9],
             ]
     print 'lang:1:', parser.read_data(lang_addr, 2)
     print 'lang:1:', parser.read_data(lang_addr-2, 2)
@@ -402,7 +404,9 @@ def gen_version():
                 ['IT', 4],
                 ['ES', 5],
                 ['DE', 6],
-                ['TR', 7],
+                ['PT', 7],
+                ['SE', 8],
+                ['TR', 9],
             ]
     if trace_enable=='no' and purpose=='product':    
         for item in lang_desc:

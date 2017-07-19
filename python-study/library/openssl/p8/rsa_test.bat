@@ -1,0 +1,1 @@
+openssl rsa -in per.pem -outform der -out key.der   # der格式就是二进制格式， pem格式就是base64编码格式。

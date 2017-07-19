@@ -1,0 +1,1 @@
+openssl dgst -sha256 -sign "%1" "%2"

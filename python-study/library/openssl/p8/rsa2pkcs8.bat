@@ -1,0 +1,1 @@
+openssl pkcs8 -topk8 -inform PEM -in per.pem -outform PEM -nocrypt -out 11.p8

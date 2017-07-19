@@ -1,6 +1,6 @@
-:: Ë½Ô¿
-:: -des3 2048, Ë½Ô¿»¹¿ÉÒÔÓÃ¿ÚÁîÀ´±£»¤¡£ 
+:: ç§é’¥
+:: -des3 2048, ç§é’¥è¿˜å¯ä»¥ç”¨å£ä»¤æ¥ä¿æŠ¤ã€‚ 
 openssl genrsa -out ./myPrivateKey.pem -passout pass:"860102"
-:: ÓÃË½Ô¿Éú³É¹«Ô¿
+:: ç”¨ç§é’¥ç”Ÿæˆå…¬é’¥
 :: -config openssl.cnf
 openssl rsa -pubout -in ./myPrivateKey.pem -passin pass:"860102" -out ./myPublicKey.pem
