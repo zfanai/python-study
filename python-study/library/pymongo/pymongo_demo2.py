@@ -7,16 +7,22 @@ import datetime
 
 def get_db():
     # 建立连接
-    client = pymongo.MongoClient(host="localhost", port=27017)
-    db = client['example']
+    #client = pymongo.MongoClient(host="localhost", port=27017)
+    #db = client['example']
+    client = pymongo.MongoClient(host="192.168.40.202", port=27017)
+    db = client['onetrum']
     #或者 db = client.example
     return db
 
 
 def get_collection(db):
     # 选择集合（mongo中collection和database都是延时创建的）
-    coll = db['informations']
+    #coll = db['informations']
+    #print 'db.collection_names:', db.collection_names()
+
+    coll = db['user']
     print 'db.collection_names:', db.collection_names()
+    
     return coll
 
 
@@ -80,7 +86,7 @@ def clear_all_datas(db):
     #清空一个集合中的所有数据
     db["informations"].remove()
 
-if __name__ == '__main__':
+def func1():
     db = get_db()
     my_collection = get_collection(db)
     post = {"author": "Mike", "text": "My first blog post!", "tags": ["mongodb", "python", "pymongo"],
@@ -102,4 +108,14 @@ if __name__ == '__main__':
     get_one_doc(db)
     get_one_by_id(db)
     get_many_docs(db)
+
+def func2():
+    db = get_db()
+    user_colle = get_collection(db)
+    print user_colle.count()
+    print user_colle.find_one()
+
+if __name__ == '__main__':
     # clear_all_datas(db)
+    #func1()
+    func2()

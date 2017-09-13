@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*
 import datetime
 import time
+import calendar
 
 class Debug(object):
     def trace(self, obj):
@@ -128,6 +129,85 @@ def func6():
     #
     sec=time.mktime(d1.timetuple())  #+time.timezone
     debug.trace(["sec:", sec])    #1448490320
+
+
+# 测试夏令时。
+def func7():
+    def func7_1():
+        print 'timezone:', time.timezone
+        d=datetime.datetime.now()
+        print 'd:', d
+        print 't:', time.mktime(d.timetuple())
+        print d.timetuple()
+        print 't1:', time.localtime()
+        print time.mktime(time.localtime())
+        #print 'mt:', time.mktime((2017,10,29,2,0,0,))
+        print '========================='
+        t1=time.mktime((2017,10,29,2,0,0,6,302,0))
+        t2=time.mktime((2017,10,29,2,0,0,6,302,1))
+        print 't1,t2:', t1, t2
+    
+        d2=datetime.datetime(2017,3,26,2,12,0)
+        print 'd2:', d2, d2.timetuple()
+
+    #func7_1()
+    
+    def func7_2():
+        d = datetime.datetime.now()
+        tp=d.timetuple()      # 这样写其实就是丢失了夏令时的信息
+        print 'd:', d
+        print tp
+        print time.mktime(tp)
+    #func7_2()
+    
+    def func7_3():
+        tp=time.localtime()
+        t=time.mktime(tp)
+        #datetime.datetime.fromtimestamp()
+        print tp
+        print t
+    #func7_3()
+        
+    def func7_4():
+        tp1=(2017,3,26,1,59,0,6,85,0)
+        tp2=(2017,3,26,2,1,0,6,85,0)
+        tp3 = (2017, 3, 26, 3, 1, 0, 6, 85, 0)
+        print time.mktime(tp1), time.mktime(tp2), time.mktime(tp3)
+    #func7_4()
+    
+    def func7_5():
+        d1=datetime.datetime(2017,3,26,1)
+        d2 = datetime.datetime(2017, 3, 26, 3)
+        tp1=d1.timetuple()
+        tp2=d2.timetuple()
+        print tp1
+        print tp2
+        diff=d2-d1
+        print diff.days, diff.seconds
+        t1=time.mktime(tp1)       # 计算了夏令时的信息
+        t2=time.mktime(tp2)       # 计算了夏令时的信息
+        print t1
+        print t2
+        print t2-t1
+        
+    #func7_5()
+    def func7_6():
+        tp1=time.gmtime()
+        tp2=time.localtime()
+        print tp1
+        print tp2
+        t1=time.mktime(tp1)
+        t2=time.mktime(tp2)
+        print t1,t2
+        #t1 = time.gmtime(tp1)
+        #t2 = time.gmtime(tp2)
+        t1=calendar.timegm(tp1)
+        t2=calendar.timegm(tp2)
+        print t1, t2
+        print time.tzname[0], time.tzname[1] 
+        
+    func7_6()
+    
     
 if __name__ == '__main__':
     #func1()
@@ -136,6 +216,7 @@ if __name__ == '__main__':
     #func31()
     #func4()
     #func5()
-    func6()
+    #func6()
+    func7()
     
     

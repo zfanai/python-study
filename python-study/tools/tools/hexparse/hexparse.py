@@ -258,6 +258,7 @@ class HexParser(object):
         return bin_data
     
     def find_pattern(self, pattern):
+        rv=[]
         for i in xrange(len(self.bin_data)):
             block=self.bin_data[i]
             if 'flag' in block:continue
@@ -265,8 +266,9 @@ class HexParser(object):
                 sec=block['sec'][j]
                 #if re.search(pattern, sec['data']):
                 pos=''.join(map(lambda x:chr(x), sec['data'])).find(pattern)
-                if -1!=pos:return[i,j,sec['start_addr']+sec['offset']+pos,pos]
-        return None
+                if -1!=pos:
+                    rv.append([i,j,sec['start_addr']+sec['offset']+pos,pos]) 
+        return rv
     
     def set_addr_mask(self, mask):
         self.addr_mask=mask
@@ -301,7 +303,7 @@ class HexParser(object):
                     if rest_size>=size:
                         return sec['data'][pos:pos+size]
                     else:
-                        res=sec['data'][pos:pos+res_size]
+                        res=sec['data'][pos:pos+rest_size]
                         return res+self.read_data(end_addr, size-rest_size)
     def set_bin_data(self, bin_data):
         self.bin_data=bin_data
@@ -325,19 +327,22 @@ def modify_lang(hex_file):
     def_setting_addr=rv[2]-offset
     # 0x6F8是设置里面语言nLanguage的设置。
     lang_addr=def_setting_addr+0x6F8
+    glucose_unit_addr = def_setting_addr + 0x6F6
     #print 'offset:', hex(offset)
     # 0x6F8
+    # 1是mmol/L , 2是mg/dL
     lang_desc=[
-                ['GB', 0],
-                ['CN', 1],
-                ['HKF', 2],
-                ['FR', 3],
-                ['IT', 4],
-                ['ES', 5],
-                ['DE', 6],
-                ['PT', 7], # 葡萄牙
-                ['SV', 8], # 瑞典
-                ['TR', 9],
+                ['GB', 0, 1],
+                ['CN', 1, 1],
+                ['HKF', 2, 1],
+                ['FR', 3, 2],
+                ['IT', 4, 2],
+                ['ES', 5, 2],
+                ['DEW', 6, 2],  # 两个
+                ['DEE', 6, 1],  #两个
+                ['PT', 7, 2], # 葡萄牙
+                ['SV', 8, 1], # 瑞典
+                ['TR', 9, 2],
             ]
     print 'lang:1:', parser.read_data(lang_addr, 2)
     print 'lang:1:', parser.read_data(lang_addr-2, 2)
@@ -353,6 +358,7 @@ def modify_lang(hex_file):
     #return 
     for item in lang_desc:
         parser.modify_data(lang_addr, val2bytes(item[1], True, rqn=2))
+        parser.modify_data(glucose_unit_addr, val2bytes(item[2], True, rqn=2))
         #parser.set_addr_mask([])
         #p[0]='962022'
         p[1]='%s010024'%item[0]
@@ -390,27 +396,36 @@ def gen_version():
     rv=app_parser.find_pattern('GREEN')
     #print 'find_pattern:1:', rv[0], rv[1], hex(rv[2]), hex(rv[3])
     #offset=hex(rv[2]-int(sys.argv[2], 16))
+    print 'GREEN:', rv
+    rv=app_parser.find_pattern('HKF')
+    print 'HKF:', rv
+    
+    return 
     
     # 0x83E是设置里面用户名 GREEN 的偏移位置。
     offset=0x83E
     def_setting_addr=rv[2]-offset
     # 0x6F8是设置里面语言nLanguage的设置。
     lang_addr=def_setting_addr+0x6F8
+    glucose_unit_addr = def_setting_addr + 0x6F6
     lang_desc=[
-                ['GB', 0],
-                ['CN', 1],
-                ['HKF', 2],
-                ['FR', 3],
-                ['IT', 4],
-                ['ES', 5],
-                ['DE', 6],
-                ['PT', 7],
-                ['SE', 8],
-                ['TR', 9],
+        ['GB', 0, 1],
+        ['CN', 1, 1],
+        ['HKF', 2, 1],
+        ['FR', 3, 2],
+        ['IT', 4, 2],
+        ['ES', 5, 2],
+        ['DE', 6, 2],  # 两个, 西德
+        ['DD', 6, 1],  # 两个， 东德
+        ['PT', 7, 2],  # 葡萄牙
+        ['SE', 8, 1],  # 瑞典
+        ['TR', 9, 2],
             ]
     if trace_enable=='no' and purpose=='product':    
         for item in lang_desc:
             app_parser.modify_data(lang_addr, val2bytes(item[1], True, rqn=2))
+            app_parser.modify_data(glucose_unit_addr, val2bytes(item[2], True, rqn=2))
+            
             hex_path=os.path.join(version_path, '%s_%s%s.hex'%(app_sw_code, item[0], version_code))
             app_parser.make_hex(hex_path)
             
@@ -428,7 +443,8 @@ def gen_version():
             hex_path=os.path.join(version_path, '%s_%s%s.hex'%(whole_sw_code, item[0], version_code))
             merge_parser.make_hex(hex_path)
         # 不要生成测试过程的版本。
-        app_parser.modify_data(lang_addr, val2bytes(0, True, rqn=2))    
+        app_parser.modify_data(lang_addr, val2bytes(0, True, rqn=2))
+        app_parser.modify_data(glucose_unit_addr, val2bytes(1, True, rqn=2))
         app_parser.set_addr_mask([0x8100000])
         hex_path=os.path.join(version_path, '%s_%s%s_nolaunch.hex'%(app_sw_code, 'GB', version_code))
         app_parser.make_hex(hex_path)
