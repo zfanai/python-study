@@ -396,20 +396,31 @@ def gen_version():
     rv=app_parser.find_pattern('GREEN')
     #print 'find_pattern:1:', rv[0], rv[1], hex(rv[2]), hex(rv[3])
     #offset=hex(rv[2]-int(sys.argv[2], 16))
+    '''
     print 'GREEN:', rv
     rv=app_parser.find_pattern('HKF')
     print 'HKF:', rv
-    
+    rv=app_parser.read_data(rv[0][2], 40)
+    print 'read data:', rv
     return 
+    '''
+    zone_code_pos = app_parser.find_pattern('CTRYCODEPH')
+    print 'CTRYCODEPH:', zone_code_pos
+    zone_code_data = app_parser.read_data(zone_code_pos[0][2], 40)
+    print 'read data:', zone_code_data
+    zone_code_addr=zone_code_pos[0][2]
+    #return 
+    
     
     # 0x83E是设置里面用户名 GREEN 的偏移位置。
     offset=0x83E
-    def_setting_addr=rv[2]-offset
+    def_setting_addr=rv[0][2]-offset
     # 0x6F8是设置里面语言nLanguage的设置。
     lang_addr=def_setting_addr+0x6F8
     glucose_unit_addr = def_setting_addr + 0x6F6
     lang_desc=[
         ['GB', 0, 1],
+        ['IN', 0, 2],
         ['CN', 1, 1],
         ['HKF', 2, 1],
         ['FR', 3, 2],
@@ -418,11 +429,13 @@ def gen_version():
         ['DE', 6, 2],  # 两个, 西德
         ['DD', 6, 1],  # 两个， 东德
         ['PT', 7, 2],  # 葡萄牙
-        ['SE', 8, 1],  # 瑞典
-        ['TR', 9, 2],
+        ['NL', 8, 1],  # 荷兰
+        ['SE', 9, 1],  # 瑞典
+        ['TR', 10, 2],
             ]
     if trace_enable=='no' and purpose=='product':    
         for item in lang_desc:
+            app_parser.modify_data(zone_code_addr, map(lambda x: ord(x), item[0])+[0])
             app_parser.modify_data(lang_addr, val2bytes(item[1], True, rqn=2))
             app_parser.modify_data(glucose_unit_addr, val2bytes(item[2], True, rqn=2))
             
