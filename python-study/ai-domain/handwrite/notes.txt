@@ -1,0 +1,13 @@
+2017-10-21
+
+详解 MNIST 数据集
+http://blog.csdn.net/simple_the_best/article/details/75267863
+
+whl离线安装包
+http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy
+
+安装scipy时报错
+通过离线包的方式安装成功。
+
+
+http://blog.csdn.net/fuwenyan/article/details/53954615

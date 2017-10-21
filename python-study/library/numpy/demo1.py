@@ -33,6 +33,26 @@ def func1():
     print 'f18:', a1,a2, a1*a2
     print 'f19:', a1, a3, a1*a3
     print 'f20:', np.dot(a1, a3)
+
+def func2():
+    a=np.array([1,2,3])
+    b=np.array([[1,2,3]])
+    c=np.array([4,5,6])
+    d=b=np.array([[[1,2,3]]])
+    print 'f2:1:', a.T, a, a.shape
+    print 'f2:2:', b.T, b, b.shape
+    print 'f2:3:', d.T, d, d.shape
+   
+   
+def func3():
+    a=np.array([[1,2]])
+    #b=float(a)
+    #print b
+    a[0][0]=2.1
+    b=a.astype('float')
+    print b
     
 if __name__=="__main__":
-    func1()
+    #func1()
+    #func2()
+    func3()

@@ -1,0 +1,433 @@
+博客
+学院
+下载
+更多
+
+写博客
+发布Chat
+登录注册
+机器学习之深入理解神经网络理论基础、BP算法及其Python实现
+原创 2017年02月16日 09:25:11 标签：神经网络 /python /机器学习 /BP算法 /深度学习 2530
+　　人工神经网络（Artificial Neural Networks，ANN）系统是 20 世纪 40 年代后出现的。它是由众多的神经元可调的连接权值连接而成，具有大规模并行处理、分布式信 息存储、良好的自组织自学习能力等特点。BP（Back Propagation）算法又称为误差 反向传播算法，是人工神经网络中的一种监督式的学习算法。BP 神经网络算法在理 论上可以逼近任意函数，基本的结构由非线性变化单元组成，具有很强的非线性映射能力。而且网络的中间层数、各层的处理单元数及网络的学习系数等参数可根据具体情况设定，灵活性很大，在优化、信号处理与模式识别、智能控制、故障诊断等许 多领域都有着广泛的应用前景。
+
+神经元模型
+
+神经网络中最基本的成分是神经元模型。在这个模型中，神经元接收到来自n个其他神经元传递过来的输入信号，这些输入信号通过带权重的连接进行传递，神经元接收到的总数入值将与神经元的阈值进行比较，然后通过激活函数处理以产生神经元的输出。
+
+这里写图片描述
+理想中的激活函数是下图中（a）所表示的阶跃函数，它将输入值映射为输出值0或者1，然而，阶跃函数具有不连续性、不光滑等不太好的性质，因此实际常用Sigrnoid函数作为激活函数，典型的Sigrnoid函数是下图中（b）所示，它把可能在较大范围内变化的输入值挤压到（0,1）输出值范围内。
+
+这里写图片描述
+多层前向神经网络
+
+常见的神经网络层级结构是多层前向神经网络。
+
+多层前向神经网络由三部分组成：输出层、隐藏层、输出层，每层由单元组成；
+
+输入层由训练集的实例特征向量传入，经过连接结点的权重传入下一层，前一层的输出是下一层的输入；隐藏层的个数是任意的，输入层只有一层，输出层也只有一层；
+
+除去输入层之外，隐藏层和输出层的层数和为n，则该神经网络称为n层神经网络，如下图为2层的神经网络；
+
+这里写图片描述
+一层中加权求和，根据非线性方程进行转化输出；理论上，如果有足够多的隐藏层和足够大的训练集，可以模拟出任何方程；
+
+使用神经网络之前，必须要确定神经网络的层数，以及每层单元的个数；
+
+为了加速学习过程，特征向量在传入输入层前，通常需要标准化到0和1之间；
+
+离散型变量可以被编码成每一个输入单元对应一个特征值可能赋的值,比如：特征值A可能去三个值（a0,a1,a2），那么可以使用3个输入单元来代表A
+
+如果A=a0，则代表a0的单元值取1，其余取0； 
+如果A=a1，则代表a1的单元值取1，其余取0； 
+如果A=a2，则代表a2的单元值取1，其余取0；
+
+这里写图片描述
+神经网络既解决分类（classification）问题，也可以解决回归（regression）问题。对于分类问题，如果是两类，则可以用一个输出单元（0和1）分别表示两类；如果多余两类，则每一个类别用一个输出单元表示，所以输出层的单元数量通常等一类别的数量。
+
+没有明确的规则来设计最佳个数的隐藏层，一般根据实验测试误差和准确率来改进实验。
+
+误差逆传播算法（BP算法）
+
+通过迭代来处理训练集中的实例；
+
+对比经过神经网络后预测值与真实值之间的差；
+
+反方向（从输出层=>隐藏层=>输入层）来最小化误差，来更新每个连接的权重；
+
+算法详细介绍：
+
+输入：数据集、学习率、一个多层神经网络构架；
+
+输出：一个训练好的神经网络；
+
+初始化权重和偏向：随机初始化在-1到1之间（或者其他），每个单元有一个偏向；对于每一个训练实例X，执行以下步骤：
+
+1、由输入层向前传送：
+
+结合神经网络示意图进行分析：
+
+这里写图片描述
+由输入层到隐藏层： 
+
+Oj=∑iwijxi+θj
+
+由隐藏层到输出层： 
+Ok=∑jwjkOj+θk
+
+两个公式进行总结，可以得到： 
+Ij=∑iwijOi+θj
+
+Ij为当前层单元值，Oi为上一层的单元值，wij为两层之间，连接两个单元值的权重值，θj为每一层的偏向值。我们要对每一层的输出进行非线性的转换，示意图如下：
+这里写图片描述
+当前层输出为Ij，f为非线性转化函数，又称为激活函数，定义如下： 
+
+f(x)=11+e?x
+
+即每一层的输出为： 
+Oj=11+e?Ij
+这样就可以通过输入值正向得到每一层的输出值。 
+2、根据误差反向传送 对于输出层：其中Tk是真实值，Ok是预测值: 
+
+Errk=Ok(1?Ok)(Tk?Ok)
+
+对于隐藏层： 
+Errj=Oj(1?Oj)∑kErrkwjk
+
+权重更新：其中l为学习率: 
+Δwij=(l)ErrjOi
+
+wij=wij+Δwij
+
+偏向更新： 
+Δθj=(l)Errj
+
+θj=θj+Δθj
+3、终止条件
+
+① 偏重的更新低于某个阈值； 
+②预测的错误率低于某个阈值； 
+③达到预设一定的循环次数；
+
+算法举例：
+
+这里写图片描述
+这里写图片描述
+BP神经网络的python实现
+
+需要先导入numpy模块
+
+import numpy as np
+1
+定义非线性转化函数，由于还需要用到给函数的导数形式，因此一起定义
+
+def tanh(x):
+    return np.tanh(x)
+def tanh_deriv(x):
+    return 1.0 - np.tanh(x)*np.tanh(x)
+def logistic(x):
+    return 1/(1 + np.exp(-x))
+def logistic_derivative(x):
+    return logistic(x)*(1-logistic(x))
+1
+2
+3
+4
+5
+6
+7
+8
+设计BP神经网络的形式（几层，每层多少单元个数），用到了面向对象，主要是选择哪种非线性函数，以及初始化权重。layers是一个list，里面包含每一层的单元个数。
+
+class NeuralNetwork:
+    def __init__(self, layers, activation='tanh'):
+        """
+        :param layers: A list containing the number of units in each layer.
+        Should be at least two values
+        :param activation: The activation function to be used. Can be
+        "logistic" or "tanh"
+        """
+        if activation == 'logistic':
+            self.activation = logistic
+            self.activation_deriv = logistic_derivative
+        elif activation == 'tanh':
+            self.activation = tanh
+            self.activation_deriv = tanh_deriv
+
+        self.weights = []
+        for i in range(1, len(layers) - 1):
+            self.weights.append((2*np.random.random((layers[i - 1] + 1, layers[i] + 1))-1)*0.25)
+            self.weights.append((2*np.random.random((layers[i] + 1, layers[i + 1]))-1)*0.25)
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+实现算法
+
+ def fit(self, X, y, learning_rate=0.2, epochs=10000):
+        X = np.atleast_2d(X)
+        temp = np.ones([X.shape[0], X.shape[1]+1])
+        temp[:, 0:-1] = X
+        X = temp
+        y = np.array(y)
+
+        for k in range(epochs):
+            i = np.random.randint(X.shape[0])
+            a = [X[i]]
+
+            for l in range(len(self.weights)):
+                a.append(self.activation(np.dot(a[l], self.weights[l])))
+            error = y[i] - a[-1]
+            deltas = [error * self.activation_deriv(a[-1])]
+
+            for l in range(len(a) - 2, 0, -1):
+                deltas.append(deltas[-1].dot(self.weights[l].T)*self.activation_deriv(a[l]))
+            deltas.reverse()
+
+            for i in range(len(self.weights)):
+                layer = np.atleast_2d(a[i])
+                delta = np.atleast_2d(deltas[i])
+                self.weights[i] += learning_rate * layer.T.dot(delta)
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+实现预测
+
+def predict(self, x):
+        x = np.array(x)
+        temp = np.ones(x.shape[0]+1)
+        temp[0:-1] = x
+        a = temp
+        for l in range(0, len(self.weights)):
+            a = self.activation(np.dot(a, self.weights[l]))
+        return a
+1
+2
+3
+4
+5
+6
+7
+8
+我们给出一组数进行预测，我们上面的程序文件保存名称为BP
+
+from BP import NeuralNetwork
+import numpy as np
+
+nn = NeuralNetwork([2,2,1], 'tanh')
+x = np.array([[0,0], [0,1], [1,0], [1,1]])
+y = np.array([1,0,0,1])
+nn.fit(x,y,0.1,10000)
+for i in [[0,0], [0,1], [1,0], [1,1]]:
+    print(i, nn.predict(i))
+1
+2
+3
+4
+5
+6
+7
+8
+9
+
+结果如下：
+
+([0, 0], array([ 0.99738862]))
+([0, 1], array([ 0.00091329]))
+([1, 0], array([ 0.00086846]))
+([1, 1], array([ 0.99751259]))
+1
+2
+3
+4
+参考：神经网络理论基础
+
+相关博客：
+
+1、机器学习系列之机器学习之决策树（Decision Tree）及其Python代码实现
+
+2、机器学习系列之机器学习之Validation（验证，模型选择）
+
+3、机器学习系列之机器学习之Logistic回归(逻辑蒂斯回归）
+
+4、机器学习系列之机器学习之拉格朗日乘数法
+
+5、机器学习系列之机器学习之深入理解SVM
+
+6、机器学习系列之机器学习之深入理解K-means、与KNN算法区别及其代码实现
+
+具体更多资源可前往机器学习专题
+
+版权声明：本文为博主原创文章，未经博主允许不得转载。
+本文已收录于以下专栏：机器学习
+目前您尚未登录，请 登录 或 注册 后进行评论
+相关文章推荐
+Android设计模式学习之观察者模式
+
+观察者模式在实际项目中使用的也是非常频繁的，它最常用的地方是GUI系统、订阅——发布系统等。因为这个模式的一个重要作用就是解耦，使得它们之间的依赖性更小，甚至做到毫无依赖。以GUI系统来说，应用的UI...
+u012124438u0121244382017-02-17 00:256632
+关注CSDN程序人生公众号，轻松获得下载积分
+
+关注公众号 在公众号里回复“”秘密“”两个字 返回 http://task.csdn.net/m/task/home?task_id=398 领取奖励 提示：根据公众号里的自动回复，完成...
+baiyuzhong2012baiyuzhong20122016-11-24 16:29152724
+ 
+耿直程序员，你真的了解面试官的套路吗？
+
+王建国刚毕业就拿到月薪20K的offer，靠的是什么？老王与老周实力相当，为什么跳槽后薪资相差甚远？
+属性动画----把图片渐渐变小不见（主函数MainActivity 页面）（XML布局）（本布局和渐变布局一样）
+
+LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schema...
+fengdongzhixiafengdongzhixia2017-09-01 14:374
+JavaEE 6及以上版本的web.xml问题？
+
+JavaEE 6及以上版本的web.xml问题？MyEclipse JavaEE 6版本开始web.xml突然消失不见？没这回事，只是不太必须而已，有需要的项目可以自行进行添加或在创建项目的时候点击n...
+QQB67G8COMQQB67G8COM2017-09-05 15:171740
+Android 图片毛玻璃的实现方法
+
+注：本文的高斯模糊只能显示，如果想要保存模糊后的图片，请参考另一篇文章：http://blog.csdn.net/fan7983377/article/details/51568059 效果...
+fan7983377fan79833772016-05-30 13:401862
+目标检测和跟踪小结
+
+一、目标检测目标检测即为从序列图像中将变化区域从背景图像中提取出来。运动目标检测的算法依照目标与摄像机之间的关系可以分为静态背景下运动检测和动态背景下运动检测。1.静态背景 背景差分法 帧间差分法 光...
+lxy_2011lxy_20112015-03-08 13:092646
+
+大规模人工神经网络理论基础
+
+2010-04-29 17:554.25MB
+下载
+Stanford机器学习---第五周.BP神经网络算法
+
+第五周  BP神经网络算法Back propagation algorithm 关键词             代价函数J(Θ)、反向传播、梯度检验、随机初始化、自动驾驶 重要的话       ...
+u012717411u0127174112016-01-21 17:502112
+
+第五章：神经网络理论基础
+
+2011-08-03 15:111.59MB
+下载
+
+大规模人工神经网络理论基础.pdf
+
+2012-05-25 12:094.25MB
+下载
+机器学习总结（七）：基本神经网络、BP算法、常用激活函数对比
+
+1.   神经网络 （1）为什么要用神经网络？ 对于非线性分类问题，如果用多元线性回归进行分类，需要构造许多高次项，导致特征特多学习参数过多，从而复杂度太高。 （2）常用的激活函数及其优...
+cppjava_cppjava_2017-03-31 09:452449
+
+大规模人工神经网络理论基础
+
+2010-08-04 15:284.25MB
+下载
+
+大规模人工神经网络理论基础
+
+2014-06-01 09:384.25MB
+下载
+斯坦福机器学习-week5 学习笔记(1)——神经网络训练BP算法与Gradient checking
+
+一.神经网络的cost function     对于神经网络，可以用下图表示一个神经网络     因此，对于神经网络来说，cost function J(θ)的定义如下：...
+shengno1shengno12014-03-30 14:377237
+机器学习--BP神经网络的C++实现
+
+激活函数:Sigmoid 使用的是周志华老师的《机器学习》一书上的更新公式。 #include #include #include #include using namespace std...
+chaoshengmingyuechaoshengmingyue2016-06-06 23:55330
+6.2神经网络算法实现--python机器学习
+
+参考彭亮老师的视频教程：转载请注明出处及彭亮老师原创 视频教程： http://pan.baidu.com/s/1kVNe5EJ 1. 关于非线性转化方程(non-linear t...
+qq_16365849qq_163658492016-08-17 09:13989
+ 
+qinjianhuang
+
+＋关注
+原创
+93
+ 
+粉丝
+297
+ 
+喜欢
+0
+ 
+码云
+0
+他的最新文章更多文章
+普通学渣的春招，秋招历程以及实习心路
+Shell常见命令实践
+JSP中servlet中的路径配置问题
+《实战Java高并发程序设计》读书笔记
+
+博主专栏
+ 15
+面试算法题目集锦
+8333
+ 7
+Java面试题总结
+65840
+ 8
+机器学习
+24033
+在线课程
+
+用户画像系统应用与技术解析
+用户画像系统应用与技术解析
+讲师：汪剑
+2017 求职面试集训营之VIP服务版
+2017 求职面试集训营之VIP服务版
+讲师：刘道宽
+
+热门文章
+
+各大公司Java后端开发面试题总结
+31104
+Vue2.0中v-for迭代语法变化（key、index）
+14609
+历年阿里面试题汇总（2017年不断更新中）
+11360
+2017年小米春招内推面试面经
+9471
+2017年阿里内推一面面经（不断更新）
+7967
+
+0
+ 
+ 
+ 
+内容举报
+返回顶部
+
