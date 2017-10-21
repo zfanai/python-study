@@ -29,6 +29,5 @@ def func2():
     debug.trace(['sd:', sd1, sd2, sd2/sd1])
     debug.trace(['var:', var1, var2, var2/var1])
     
-    
 if __name__=='__main__':
     func2()

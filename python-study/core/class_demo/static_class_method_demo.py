@@ -50,8 +50,39 @@ def test2():
     t=TestStaticMethod()
     TestStaticMethod.foo2(t)
     
+class Dog(object):
+    def f():
+        print 'dda'
+        pass
+        
+    @staticmethod
+    def f3():
+        print 'f3'
+        
+    def f2(self):
+        print 'dfa'
+        
+def func1():
+    d=Dog()
+    d.f2()
+    #Dog.f()   #调用会出错
+    print hasattr(Dog, 'f')
+    print hasattr(d, 'f')
+    
+    #f=getattr(d, 'f')
+    #f()   # 这样调用也会保存
+    
+    #Dog.f3(2)   # 不能带参数
+    
+    print dir(Dog)
+    print dir(d)
+    print Dog.__dict__
+    print d.__dict__
+    
     
 if __name__ == "__main__":
     print "start ..."
     #test()
-    test2()
+    #test2()
+    func1()
+    

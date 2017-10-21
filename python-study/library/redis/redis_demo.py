@@ -12,6 +12,8 @@ def func1():
     r.set('guo', 'shuai')
     v=r.get('guo')
     debug.trace(v)
+    v = r.get('user_type_613')
+    print v
     
 if __name__=='__main__':
     func1()

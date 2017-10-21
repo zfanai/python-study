@@ -82,12 +82,12 @@ def func3():
 def func4():
     d=func3()
     debug.trace(['func4 start'])
-    #for item in d:debug.trace(['d:', item, item.a])    
+    for item in d:debug.trace(['d:', item, item.a])    
 
 def func5():
     def func5_2():
         #for i in xrange(3):yield i*2
-        return i
+        return 2
     # 
     def func5_1():
         debug.trace(['func5_1 start'])
@@ -99,15 +99,24 @@ def func5():
             a += 1
     d=func5_1()
     for item in d:debug.trace(['d:', item])    
-      
+
+# yield其实很简单      
 def func6():
     def func6_1():
         for i in xrange(5):
-            yield i
+            a=yield i
+            print 'yr:', a
     g=func6_1()
     print next(g)
+    print '=='
+    print g.send('ad')   # 在调用next之后可以调用。
+    return 
     print next(g)
+    print g.next()
+    print g.send('ad')
     print list(g)   # 关于迭代的用法。
  
 if __name__ == '__main__':
+    #func4()
+    #func5()
     func6()
