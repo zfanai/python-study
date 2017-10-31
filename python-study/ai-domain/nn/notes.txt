@@ -1,4 +1,0 @@
-2017-10-21
-
-为什么用tanh作为神经网络的激活函数
-http://blog.csdn.net/suixinsuiyuan33/article/details/69062894?locationNum=4&fps=1
