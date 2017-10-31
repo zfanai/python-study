@@ -30,11 +30,23 @@ def environpath(name):
 def pathexist():
     tmp=os.path.exists('123.*')
     debug.trace(['tmp:', tmp])
-#
-if __name__=='__main__':
+
+def func1():
     if len(sys.argv)<2:
         debug.trace(["args wrong!"])
         sys.exit(1)
     # 
     name=sys.argv[1]
     environpath(name)
+
+def func2():
+    path=os.environ['PATH']
+    #for k,v in path_env:
+    #    print 
+    path = path.split(';')
+    for p in path:
+        print p
+
+#
+if __name__=='__main__':
+    func2()

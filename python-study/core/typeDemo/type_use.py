@@ -48,13 +48,15 @@ def func1():
     class Taidi(Dog):
         pass
         
-
+# type可以作为元类的基类来使用的。
+# AnimalMeta 是type的子类， 也可以通过 AnimalMeta（）调用来创建一个类。
 def func2():
     # 
     class AnimalMeta(type):
         def __new__(cls, name, bases, attrs):
             debug.trace('AnimalMeta,__new__')
             return type.__new__(cls, name, bases, attrs)
+    
     def with_metaclass(meta, *bases):
         """Create a base class with a metaclass."""
         # This requires a bit of explanation: the basic idea is to make a dummy
@@ -75,7 +77,19 @@ def func2():
     d=Dog('kkk')
     print d
         
+def func3():
+    class AnimalMeta(type):
+        # __new__会构造 AnimalMeta 这个元类的实例， 元类的实例就是类
+        def __new__(cls, name, bases, attrs):
+            debug.trace('AnimalMeta,__new__')
+            return type.__new__(cls, name, bases, attrs)
     
+    def run(self):
+        print 'run'
+    dog_cls=AnimalMeta('Dog', (object,), {'a':1, 'run':run})
+    d=dog_cls()
+    d.run()
     
 if __name__=='__main__':
-    func2()
+    #func2()
+    func3()

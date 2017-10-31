@@ -1,5 +1,5 @@
 ::python cleanpyc.py C:\Users\zhoufan\Projects\Python\Flask\JunePythonChina
-python cleanpyc.py C:\Users\zhoufan\Projects\Python\TrumCloud\app
+::python cleanpyc.py C:\Users\zhoufan\Projects\Python\TrumCloud\app
 ::python cleanpyc.py C:\Users\zhoufan\Projects\TrumCloud\Product
 ::python cleanpyc.py C:\Users\zhoufan\Projects\Python\Flask\sdgblog
 ::python cleanpyc.py C:\Users\zhoufan\Projects\Python\VirtualEnv\Django
@@ -23,4 +23,5 @@ python cleanpyc.py C:\Users\zhoufan\Projects\Python\TrumCloud\app
 :: Python cleanpyc.py C:\Users\zhoufan\Programs\VirtualEnv\Flask
 :: Python cleanpyc.py C:\Users\zhoufan\Programs\VirtualEnv\FlaskDebug
 :: Python cleanpyc.py C:\Users\zhoufan\Projects\VIM
-Python cleanpyc.py C:\Users\zhoufan\Programs\VirtualEnv\python27
+:: Python cleanpyc.py C:\Users\zhoufan\Programs\VirtualEnv\python27
+Python cleanpyc.py C:\Users\zhoufan\Anaconda2\Lib\site-packages\theano

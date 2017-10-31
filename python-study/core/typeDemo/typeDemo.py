@@ -37,6 +37,8 @@ def func2():
         pass
     d=Dog()
     debug.trace(['d:', d, type(d), Dog, dir(d)])
+
+
     
 if __name__ == "__main__":
     debug.trace(["main:start:"])

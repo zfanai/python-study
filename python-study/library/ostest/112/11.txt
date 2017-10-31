@@ -1,0 +1,1 @@
+%GNUstep%;C:\Ruby22-x64\bin;%APPDATA%\Python\Scripts;%JAVA_HOME%\bin;%ANT_HOME%\bin;%MYSQL_HOME%\bin;%HOME%\Programs\MyTools;%GROOVY_HOME%\bin;%GRADLE_HOME%\bin;%GOROOT%\bin;%HOME%\DLL;%ERL_HOME%\bin;C:\Users\zhoufan\AppData\Roaming\npm;%WEBPACK_HOME%

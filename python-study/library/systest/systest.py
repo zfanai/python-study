@@ -22,8 +22,26 @@ def func3():
 def func4():
     debug.trace(['attr of sys:', dir(sys)])
     
+def func5():
+    def inner_func1():
+        print sys.exc_info()   # 当前处理的异常信息。
+        #print sys.e
+        print sys.exc_type
+        #print sys.exc_value
+        print 'inner_func1'
+    def inner_func2():
+        inner_func1()
+    def inner_func3():
+        inner_func2()
+    def inner_func4():
+        inner_func3()
+    def inner_func5():
+        inner_func4()
+    inner_func5()
+    
 #
 if __name__=='__main__':
     #func1()
     #func2()
-    func4()
+    #func4()
+    func5()
