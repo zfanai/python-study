@@ -24,113 +24,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="network.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/src/network.py">
+      <file leaf-file-name="hexparse.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/tools/tools/hexparse/hexparse.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="13" column="0" lean-forward="false" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
-              <folding>
-                <element signature="e#372#385#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="network2.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/src/network2.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="225">
-              <caret line="15" column="0" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
-              <folding>
-                <element signature="e#486#497#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="network3.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/src/network3.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="600">
-              <caret line="50" column="30" lean-forward="false" selection-start-line="50" selection-start-column="30" selection-end-line="50" selection-end-column="30" />
-              <folding>
-                <element signature="e#1269#1283#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="mnist_svm.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/src/mnist_svm.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="135">
-              <caret line="9" column="0" lean-forward="false" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
-              <folding>
-                <element signature="e#165#184#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="conv.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/src/conv.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4320">
-              <caret line="290" column="38" lean-forward="false" selection-start-line="290" selection-start-column="38" selection-end-line="290" selection-end-column="38" />
-              <folding>
-                <element signature="e#363#394#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DateTimeDemo.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/library/datetimedemo/DateTimeDemo.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="795">
-              <caret line="55" column="16" lean-forward="false" selection-start-line="55" selection-start-column="16" selection-end-line="55" selection-end-column="16" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="coroutine.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/framework/tornado/practise/coroutine.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="450">
-              <caret line="31" column="24" lean-forward="false" selection-start-line="31" selection-start-column="24" selection-end-line="31" selection-end-column="24" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="httpclient.py" pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/Programs/VirtualEnv/python27/Lib/site-packages/tornado/httpclient.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3450">
-              <caret line="240" column="0" lean-forward="false" selection-start-line="240" selection-start-column="0" selection-end-line="240" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="sel_demo.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/library/scrapy/sel_demo.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="390">
-              <caret line="26" column="14" lean-forward="true" selection-start-line="26" selection-start-column="14" selection-end-line="26" selection-end-column="14" />
-              <folding>
-                <element signature="e#16#52#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="backprop_magnitude_nabla.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/fig/backprop_magnitude_nabla.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="540">
-              <caret line="36" column="0" lean-forward="false" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
+            <state relative-caret-position="86">
+              <caret line="423" column="21" lean-forward="true" selection-start-line="423" selection-start-column="21" selection-end-line="423" selection-end-column="21" />
               <folding />
             </state>
           </provider>
@@ -260,8 +158,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="Scratches" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -298,7 +196,11 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="library" />
+              <option name="myItemId" value="tools" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tools" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -312,11 +214,15 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="library" />
+              <option name="myItemId" value="tools" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="scrapy" />
+              <option name="myItemId" value="tools" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hexparse" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -325,7 +231,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../TrumCloud" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/.." />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="js-jscs-nodeInterpreter" value="C:\Program Files\nodejs\node.exe" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
@@ -593,9 +499,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2185501" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22068231" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -634,34 +540,7 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$USER_HOME$/Programs/VirtualEnv/python27/Lib/site-packages/tornado/stack_context.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2565">
-          <caret line="176" column="8" lean-forward="false" selection-start-line="176" selection-start-column="8" selection-end-line="176" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Programs/VirtualEnv/python27/Lib/site-packages/tornado/concurrent.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4650">
-          <caret line="320" column="25" lean-forward="false" selection-start-line="320" selection-start-column="25" selection-end-line="320" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Programs/VirtualEnv/python27/Lib/site-packages/tornado/ioloop.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5730">
-          <caret line="403" column="8" lean-forward="false" selection-start-line="403" selection-start-column="8" selection-end-line="403" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/framework/tornado/practise/notes.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="0" lean-forward="false" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/framework/tornado/practise/notes.txt" />
     <entry file="file://$USER_HOME$/Programs/VirtualEnv/python27/Lib/site-packages/tornado/gen.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="14925">
@@ -669,55 +548,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/framework/tornado/practise/coroutine2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1845">
-          <caret line="124" column="13" lean-forward="false" selection-start-line="124" selection-start-column="13" selection-end-line="124" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/framework/tornado/practise/runcor.bat">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="19" lean-forward="false" selection-start-line="0" selection-start-column="19" selection-end-line="0" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/demo.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="550">
-          <caret line="50" column="0" lean-forward="false" selection-start-line="50" selection-start-column="0" selection-end-line="50" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/handwrite.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="430">
-          <caret line="153" column="21" lean-forward="false" selection-start-line="153" selection-start-column="21" selection-end-line="153" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/requirements.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/fig/generate_gradient.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="28" column="33" lean-forward="false" selection-start-line="28" selection-start-column="33" selection-end-line="28" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/fig/mnist.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="21" column="58" lean-forward="false" selection-start-line="21" selection-start-column="58" selection-end-line="21" selection-end-column="58" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/framework/tornado/practise/coroutine2.py" />
+    <entry file="file://$PROJECT_DIR$/framework/tornado/practise/runcor.bat" />
+    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/demo.py" />
+    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/handwrite.py" />
+    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/requirements.txt" />
+    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/fig/generate_gradient.py" />
+    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/fig/mnist.py" />
     <entry file="file://$PROJECT_DIR$/library/ostest/attr.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -746,13 +583,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ai-domain/nn/notes.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/ai-domain/nn/notes.txt" />
     <entry file="file://$USER_HOME$/Programs/VirtualEnv/python27/Lib/site-packages/tornado/util.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-1187">
@@ -803,34 +634,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/src/mnist_average_darkness.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="21" column="0" lean-forward="false" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ai-domain/notes.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="21" column="0" lean-forward="false" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ai-domain/theano/first.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="690">
-          <caret line="46" column="18" lean-forward="false" selection-start-line="46" selection-start-column="18" selection-end-line="46" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ai-domain/theano/lr.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="29" column="6" lean-forward="false" selection-start-line="29" selection-start-column="6" selection-end-line="29" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/src/mnist_average_darkness.py" />
+    <entry file="file://$PROJECT_DIR$/ai-domain/notes.txt" />
+    <entry file="file://$PROJECT_DIR$/ai-domain/theano/first.py" />
+    <entry file="file://$PROJECT_DIR$/ai-domain/theano/lr.py" />
     <entry file="file://$PROJECT_DIR$/library/ostest/ostest.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="705">
@@ -838,141 +645,23 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/notes.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="465">
-          <caret line="31" column="0" lean-forward="false" selection-start-line="31" selection-start-column="0" selection-end-line="31" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ai-domain/tensorflow/first.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-330">
-          <caret line="11" column="0" lean-forward="false" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/README.md">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ai-domain/tensorflow/tensorflow-master/tensorflow/c/c_test_util.cc">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-495">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ai-domain/tensorflow/tensorflow-master/tensorflow/c/eager/BUILD">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ai-domain/tensorflow/tensorflow-master/tensorflow/examples/tutorials/mnist/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="16" column="0" lean-forward="true" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ai-domain/tensorflow/tensorflow-master/tensorflow/examples/tutorials/mnist/fully_connected_feed.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="73">
-          <caret line="115" column="4" lean-forward="false" selection-start-line="115" selection-start-column="4" selection-end-line="115" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/handwrite2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="675">
-          <caret line="45" column="8" lean-forward="false" selection-start-line="45" selection-start-column="8" selection-end-line="45" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/src/demo.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="21" column="0" lean-forward="true" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/src/expand_mnist.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="22" column="0" lean-forward="false" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/src/mnist_loader.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" column="0" lean-forward="false" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/src/mnist_svm.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" column="0" lean-forward="false" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
-          <folding>
-            <element signature="e#165#184#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/src/network.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="13" column="0" lean-forward="false" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
-          <folding>
-            <element signature="e#372#385#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/src/network2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="15" column="0" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
-          <folding>
-            <element signature="e#486#497#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/src/network3.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="600">
-          <caret line="50" column="30" lean-forward="false" selection-start-line="50" selection-start-column="30" selection-end-line="50" selection-end-column="30" />
-          <folding>
-            <element signature="e#1269#1283#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/fig/backprop_magnitude_nabla.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="540">
-          <caret line="36" column="0" lean-forward="false" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/src/conv.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4320">
-          <caret line="290" column="38" lean-forward="false" selection-start-line="290" selection-start-column="38" selection-end-line="290" selection-end-column="38" />
-          <folding>
-            <element signature="e#363#394#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/notes.txt" />
+    <entry file="file://$PROJECT_DIR$/ai-domain/tensorflow/first.py" />
+    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/README.md" />
+    <entry file="file://$PROJECT_DIR$/ai-domain/tensorflow/tensorflow-master/tensorflow/c/c_test_util.cc" />
+    <entry file="file://$PROJECT_DIR$/ai-domain/tensorflow/tensorflow-master/tensorflow/c/eager/BUILD" />
+    <entry file="file://$PROJECT_DIR$/ai-domain/tensorflow/tensorflow-master/tensorflow/examples/tutorials/mnist/__init__.py" />
+    <entry file="file://$PROJECT_DIR$/ai-domain/tensorflow/tensorflow-master/tensorflow/examples/tutorials/mnist/fully_connected_feed.py" />
+    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/handwrite2.py" />
+    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/src/demo.py" />
+    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/src/expand_mnist.py" />
+    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/src/mnist_loader.py" />
+    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/src/mnist_svm.py" />
+    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/src/network.py" />
+    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/src/network2.py" />
+    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/src/network3.py" />
+    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/fig/backprop_magnitude_nabla.py" />
+    <entry file="file://$PROJECT_DIR$/ai-domain/handwrite/neural-networks-and-deep-learning-master/src/conv.py" />
     <entry file="file://$PROJECT_DIR$/library/datetimedemo/DateTimeDemo.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="795">
@@ -981,29 +670,37 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/framework/tornado/practise/coroutine.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
-          <caret line="31" column="24" lean-forward="false" selection-start-line="31" selection-start-column="24" selection-end-line="31" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/framework/tornado/practise/coroutine.py" />
+    <entry file="file://$PROJECT_DIR$/library/scrapy/sel_demo.py" />
     <entry file="file://$USER_HOME$/Programs/VirtualEnv/python27/Lib/site-packages/tornado/httpclient.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3450">
+        <state relative-caret-position="865">
           <caret line="240" column="0" lean-forward="false" selection-start-line="240" selection-start-column="0" selection-end-line="240" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/library/scrapy/sel_demo.py">
+    <entry file="file://$PROJECT_DIR$/pythonic/import_compat.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="26" column="14" lean-forward="true" selection-start-line="26" selection-start-column="14" selection-end-line="26" selection-end-column="14" />
-          <folding>
-            <element signature="e#16#52#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pythonic/grace_code.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tools/tools/hexparse/hexparse.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="86">
+          <caret line="423" column="21" lean-forward="true" selection-start-line="423" selection-start-column="21" selection-end-line="423" selection-end-column="21" />
+          <folding />
         </state>
       </provider>
     </entry>
