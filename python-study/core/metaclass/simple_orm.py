@@ -23,7 +23,7 @@ class IntegerField(Field):
 class ModelMetaclass(type):
 
     def __new__(cls, name, bases, attrs):
-        print 'ModelMetaclass:name:', name, bases
+        print 'ModelMetaclass:name:', name, bases #, attrs
         if name=='Model':
             return type.__new__(cls, name, bases, attrs)
         print('Found model: %s' % name)
@@ -48,9 +48,11 @@ class ModelMetaclass(type):
 # 默认情况下， 用class声明一个类，就是用type类型类来创建一个类， 但是如果指定了__metaclass__属性， 可以指定创建这个类的类型类
 # 这个类型类的__new__函数返回的就是这个类。
 class Model(dict):
-    __metaclass__ = ModelMetaclass
+#class Model(object):
+    x__metaclass__ = ModelMetaclass
 
     def __init__(self, **kw):
+        print 'kw:', kw
         super(Model, self).__init__(**kw)
 
     def __getattr__(self, key):
@@ -85,8 +87,47 @@ class User(Model):
     email = StringField('email')
     password = StringField('password')
 
-u = User(id=12345, name='Michael', email='test@orm.org', password='my-pwd', l=4)
-# 
-#print User.id
-print u.id
-u.save()
+print '======================='
+
+
+'''
+因为User是字典的子类， 实例化时候，传递的参数会以字典的形式保存起来。
+而在定义表的时候， 会把什么的属性当成映射信息保存起来。
+'''
+
+def func0():
+    # 也就是说User类， 表面上定义了id属性， 属性类型也是一份类， 然后实例化类的时候传了id参数， 但是这个id的值不是传给了定义的id属性。
+    # 实例有id属性， 类保存了类和相应属性的映射关系。
+    u = User(id=12345, name='Michael', email='test@orm.org', password='my-pwd', l=4)
+    print u.id
+    #print 'mappings:', u.__mappings__['id']
+    
+    # 
+    ##print User.id
+    #print u.id
+    #u.save()
+    #u=User()
+    #u.id=1234
+
+def func1():
+    pass
+    print type(dict), dict
+    class Dog(dict):
+        a=2
+        def __init__(self, **kw):
+            #self.a=a
+            super(Dog,self).__init__(**kw)
+            
+    d=Dog(a=3)
+    print d['a'], d.a
+
+# d['color'] 和 d.color访问的目标是不一样的。
+def func2():
+    class Dog(object):
+        def __getitem__(self, name):
+            print 'name:', name
+    d=Dog()
+    print d['color']
+
+if __name__=='__main__':
+    func2()

@@ -173,14 +173,38 @@ def func5():
     #object.__setattribute__(d, 'xx', 1)   # object 是没有__setattribute__属性的
     object.__setattr__(d, 'xx', 2)
     print 'd.xx:', d.xx
+    d.aa=23
     v=object.__getattribute__(d, 'aa')    #属性异常
     print 'v:1:', v
+
+'''
+__getattribute__ 这个钩子的优先级更高， 
+如果这个函数里面抛出一个异常， 那么__getattr__这个钩子就会执行
+'''
+def func6():
+    class Dog(object):
+        def __getattr__(self, name):
+            print 'ga:', name
+            #return self.x    # 无线递归
+            object.__getattribute__(self, name)  # 这个不会递归
+            #getattr(self, name)   # 效果相当于 self.[name] 
+            # getattr和点操作符是一样的， 只不过getattr可以使用属性名变量。
+            #return self.__dict__[name]  # 无线递归
+        
+        def __getattribute__(self, name):
+            print 'gab:', name
+            raise AttributeError
+    d=Dog()
+    print d.a
+    
+
     
 if __name__ == "__main__":
     debug.trace(["main:start:"])
     #func1()
-    func2()
+    #func2()
     #func3()
     #func4()
     #func5()
+    func6()
     

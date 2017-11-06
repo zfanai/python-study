@@ -54,7 +54,7 @@ def func2():
     # 
     class AnimalMeta(type):
         def __new__(cls, name, bases, attrs):
-            debug.trace('AnimalMeta,__new__')
+            debug.trace('AnimalMeta,__new__:', cls)
             return type.__new__(cls, name, bases, attrs)
     
     def with_metaclass(meta, *bases):
@@ -64,18 +64,22 @@ def func2():
         # the actual metaclass.
         class metaclass(meta):
             def __new__(cls, name, this_bases, d):
-                debug.trace('metaclass,__new__')
+                debug.trace('metaclass,__new__:', cls)
                 return meta(name, bases, d)
         # type是一个类型, __new__是一个实例方法， 其实应该说是Python针对不同的方法会绑定不同的对象。
         # 普通的实例方法绑定实例对象，类方法绑定类型对象（类）。    
-        return type.__new__(metaclass, 'temporary_class', (), {})
+        return type.__new__(metaclass, 'temporary_class', (), {})   # 某种观点的回调注册
+        #return metaclass('temporary_class', (), {})
+    #
     AnimalCls=with_metaclass(AnimalMeta)
-    debug.trace('AnimalCls:', AnimalCls)
-    class Dog(AnimalCls):
-        def __init__(self, name):
-            self.name=name
-    d=Dog('kkk')
-    print d
+    debug.trace('AnimalCls2:', AnimalCls)
+    
+    # 声明类的时候才会去创建类
+    #class Dog(AnimalCls):
+    #    def __init__(self, name):
+    #        self.name=name
+    #d=Dog('kkk')
+    #print d
         
 def func3():
     class AnimalMeta(type):
@@ -90,6 +94,33 @@ def func3():
     d=dog_cls()
     d.run()
     
+    
+def func4():
+    #class A(object):
+    class A(type):
+        def __new__(cls, name, bases, attrs):
+            print '__new__:', name
+            return type.__new__(cls, name, bases, attrs)
+    
+    #cls=type.__new__(A, 'Model', (), {})  # 默认object , 创建A的对象， 创建A的对象并不会调用A的__new__
+    #cls = type('Model', (), {})
+    cls = A('Model', (), {})
+
+    print isinstance(cls, A)
+    print 'cls:',  cls, type(cls)
+    
+    class Dog(cls):
+        pass
+    
+    # cls是一个类， Dog也是一个类， cls是通过它的元类实例化的方式创建的。
+    # Dog是通过声明的方式创建的， 但是也会调用它的元类的__new__函数。
+    
+    #print cls, cls.__bases__
+    #c=cls()
+    #print c
+    
+    
 if __name__=='__main__':
     #func2()
-    func3()
+    #func3()
+    func4()

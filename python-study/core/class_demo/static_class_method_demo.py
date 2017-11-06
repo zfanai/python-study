@@ -51,6 +51,7 @@ def test2():
     TestStaticMethod.foo2(t)
     
 class Dog(object):
+    # 下面这样写，可以定义，但是无法调用， 除非修饰成静态函数。
     def f():
         print 'dda'
         pass
@@ -70,7 +71,7 @@ def func1():
     print hasattr(d, 'f')
     
     #f=getattr(d, 'f')
-    #f()   # 这样调用也会保存
+    #f()   # 这样调用也会报错
     
     #Dog.f3(2)   # 不能带参数
     

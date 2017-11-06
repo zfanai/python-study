@@ -52,6 +52,11 @@ def test_func2():
 # 的内部机制。所以如果在__slot__里面增加了__dict__属性后，实例就可以增加属性了。但是，这样
 # 定义了__slots__属性并且包含了__dict__变量，和不定义__slots__属性有什么区别呢。定义了__slots__
 # 属性的变量多了__slots__属性，但是少了__weakref__属性。
+'''
+__dict__是类的默认内置属性，每一个对象实例化时都分配一个字典，类增加属性时都向字典里面
+增加值 ---- 这句话是不对的。 (类增加属性时，只是类增加了属性，实例可以访问到这个属性是由于属性访问机制决定的)
+
+'''
 class Base3(object):
     __slots__=('__sdf', 'y', '_y', '_x')   # 抑制了__dict__属性, 没有下划线的属性就是只读的属性。
     #__slots__=('__sdf', 'y', "__dict__")   # 定义了__dict__属性就可以使用随意绑定属性了
@@ -90,6 +95,7 @@ def test_func3():
     # 变量是只读的属性(如果定义了__slots__)，不能赋值。
     b._x=2  #
     debug.trace(["b._x:", b._x])
+    #b.a=123
     
     #b.y=3
     #debug.trace(["b.y:", b.y])   
@@ -160,8 +166,8 @@ def func6():
 if __name__ == "__main__":
     #test_func1()
     #test_func2()
-    #test_func3()
+    test_func3()
     #test_func4()
     #test_func5()
-    func6()
+    #func6()
     

@@ -54,19 +54,20 @@ def func1():
 def func2():
     # 因为这是一个旧式类， 所以写了__getattr__之后就出现了很多错误。
     # 只有在新式类里面描述符特性才会起作用。且只有对象作为一个其他类的属性出现时，才会使用描述符特性
-    class Dog(object):
-    #class Dog():
+    #class Dog(object):
+    class Dog():
         def __get__(self, ins, o):
             print 'sss'
             #return self
             return 45
         # 定义了这个属性之后， print h.d就会报错。
         def __getattr__(self, name):  
-            print("__getattr__() is called ")  
+            print("__getattr__() is called ", name) 
             #return name + " from getattr"  
     d=Dog()
+    #print d
     # 在这里就会报错
-    print 'd:1:', d #type(d)
+    print 'd:1:', d   #type(d)
     #
     class House(object):
         d=Dog()
@@ -76,10 +77,18 @@ def func2():
     #h.d2=Dog()   #这个不算描述符。描述符必须是类的属性.
     House.d2=Dog()  #这是是描述符。
     print 'h.d2:', h.d2
+
+def func3():
+    def Dog():
+        def __getattr__(self, name):  
+            return 1
+    d=Dog()
+    print d
     
     
 # 类属性如果实现了__get__函数，在访问该属性时，会调用该属性的__get__方法。
 if __name__ == '__main__':  
-    func2()
+    #func2()
+    func3()
     
     

@@ -10,7 +10,7 @@ class Rabbit1(object):
         self._name = name
     @classmethod
     def newClass(cls):
-        return 'abc',cls,Rabbit('')
+        return 'abc',cls,Rabbit1('')
     
     # 如果只有property修饰的话，这个属性只有只读属性。
     @property
@@ -22,7 +22,7 @@ class Rabbit2(object):
         self._name = name
     @classmethod
     def newClass(cls):
-        return 'abc',cls,Rabbit('')
+        return 'abc',cls,Rabbit2('')
     
     @property
     def name(self):

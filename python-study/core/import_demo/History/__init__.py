@@ -4,3 +4,5 @@
 # 在用from pkg import *导入时就会报错
 
 __all__ = ["history_attr1", "history_attr2"]
+
+name='history'

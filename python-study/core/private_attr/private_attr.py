@@ -1,10 +1,10 @@
-#encoding:gbk
+#encoding:utf8
 
 """
-1. _xx��ʽ�ı������ܵ���, from m1 import *  Ĭ���ǲ�����ģ����û����ȷָ��__all__�����Ļ���
-2. __xx��ʽ�ı���ϵͳ�����һ��ǰ׺_cls(�ⲿ���ʵ�ʱ��)
-3. __xx__��ʽ�ı�����Ȼ���Խ��飬���Ǳ�̹淶��Ӧ��������������Ϊϵͳ��һ���������������
-�����ģ��������������
+1. _xx形式的变量不能导入, from m1 import *  默认是不导入的，如果没有明确指定__all__变量的话。
+2. __xx形式的变量系统会加上一个前缀_cls(外部访问的时候)
+3. __xx__形式的变量虽然可以建议，但是编程规范不应该这样命名，因为系统的一个特殊变量是这样
+命名的，容易引起混淆。
 """
 
 from m1 import *
@@ -34,8 +34,12 @@ def func1():
     #debug.trace(['NAME:', _NAME])
     debug.trace(['car:', car])
     
+def func2():
+    from m2 import *
+    print a
+
 if __name__ == '__main__':
-    func1()
+    func2()
     
 
 

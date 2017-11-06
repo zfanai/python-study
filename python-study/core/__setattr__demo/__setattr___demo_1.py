@@ -65,11 +65,15 @@ def func4():
     a=A()
     # 这个地方肯定是内部特殊处理， __dict__是特殊属性，虽然给它
     # 不能给__dict__属性设置非字典类型的值。
-    a.__dict__=2
+    a.__dict__=2    # __dict__会字串化
     #a.y=4
     #print 'a.y:', a.y
     a.x=2
     print a.__dict__
+    a.__dict__['ss']=123
+    print dir(a), type(a.__dict__), a.__dict__
+    print type(a.__dict__), type(A.__dict__)
+    A.__dict__=2   # 而修改类的__dict__是不运行的。所以类和实例还是有区别的。
     
 if __name__=="__main__":
     #test_func1()

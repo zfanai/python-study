@@ -37,6 +37,15 @@ def func3():
     
     #print _height
     #_height=4    #出错
+    m=__import__('History')
+    print m.name
+    
+    import importlib
+    try:
+        m1=importlib.import_module('Phonex')
+        print 'm1:', m1.abc
+    except ImportError as e:
+        print e
 
 if __name__ == '__main__':
     #func1();

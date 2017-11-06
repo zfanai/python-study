@@ -72,9 +72,39 @@ def func4():
     class Dog(object):
         def run(self):pass
     print 'Dog.__dict__:', Dog.__dict__    
+
+def func5():
+    class Dog(object):
+        pass
+        #__dict__={'a':123}   # 如果程序定义了__dict__属性， 就会破坏Python内部的OOP机制， 因为其实Python默认的
+        # __dict__属性不是一个字段， 而是一个dictproxy对象， 如果这里定义成了字典对象， 那么Python提供的OOP机制就受到了破坏。
+        
+    #Dog.__dict__={'a':123}  # 这个属性不可写
+    d=Dog()
+    # d有a属性， 但是不可访问。
+    print 'f5.1:', d, dir(d), d.__dict__
+    #print 'f5.2:', getattr(d, 'a')
+    d.__dict__['b']=123
+    print 'f5.3:', d.__dict__['b'], dir(d) , d.b         #, d.a, 
+    print type(Dog.__dict__).__module__
+
+def func6():
+    import sys
+    import __builtin__
     
+    a=sys.modules
+    print a
+    for k,v in a.items():
+        print k
+    #print dir(__builtin__)
+    print '============================'
+    for k in dir(__builtin__):
+        print k
+    #from __builtin__ import dictproxy
+    print 'dictproxy' in dir(__builtin__)
     
 if __name__ == "__main__":
     #test_func1()
-    func4()
-    
+    #func4()
+    #func5()
+    func6()

@@ -1,42 +1,42 @@
-ÃæÊÔÎÊµ½µÄ¡£´ÓÃ»ÌýËµ¹ýÕâ¸ö¶«Î÷¡£½ñÌì×Ü½áÒ»ÏÂ¡£
+é¢è¯•é—®åˆ°çš„ã€‚ä»Žæ²¡å¬è¯´è¿‡è¿™ä¸ªä¸œè¥¿ã€‚ä»Šå¤©æ€»ç»“ä¸€ä¸‹ã€‚
 
 ---------------------------------
 
-ÔÚPythonÖÐ£¬·ÃÎÊÒ»¸öÊôÐÔµÄÓÅÏÈ¼¶Ë³Ðò°´ÕÕÈçÏÂË³Ðò:
-1.ÀàÊôÐÔ
-2.Êý¾ÝÃèÊö·û
-3.ÊµÀýÊôÐÔ
-4.·ÇÊý¾ÝÃèÊö·û
-5.__getattr__()·½·¨¡£Õâ¸ö·½·¨µÄÍêÕû¶¨ÒåÈçÏÂËùÊ¾:
+åœ¨Pythonä¸­ï¼Œè®¿é—®ä¸€ä¸ªå±žæ€§çš„ä¼˜å…ˆçº§é¡ºåºæŒ‰ç…§å¦‚ä¸‹é¡ºåº:
+1.ç±»å±žæ€§
+2.æ•°æ®æè¿°ç¬¦
+3.å®žä¾‹å±žæ€§
+4.éžæ•°æ®æè¿°ç¬¦
+5.__getattr__()æ–¹æ³•ã€‚è¿™ä¸ªæ–¹æ³•çš„å®Œæ•´å®šä¹‰å¦‚ä¸‹æ‰€ç¤º:
 
 [python] view plain copy
-def __getattr__(self,attr) :#attrÊÇselfµÄÒ»¸öÊôÐÔÃû  
+def __getattr__(self,attr) :#attræ˜¯selfçš„ä¸€ä¸ªå±žæ€§å  
      pass;  
-ÏÈÀ´²ûÊöÏÂÊ²Ã´½ÐÊý¾ÝÃèÊö·û¡£
+å…ˆæ¥é˜è¿°ä¸‹ä»€ä¹ˆå«æ•°æ®æè¿°ç¬¦ã€‚
 
-Êý¾ÝÃèÊö·ûÊÇÖ¸ÊµÏÖÁË__get__,__set__,__del__·½·¨µÄÀàÊôÐÔ(ÓÉÓÚPythonÖÐ£¬Ò»ÇÐ½ÔÊÇ¶ÔÏó£¬ËùÒÔÄã²»·Á°ÑËùÓÐµÄÊôÐÔÒ²¿´³ÉÊÇ¶ÔÏó)
+æ•°æ®æè¿°ç¬¦æ˜¯æŒ‡å®žçŽ°äº†__get__,__set__,__del__æ–¹æ³•çš„ç±»å±žæ€§(ç”±äºŽPythonä¸­ï¼Œä¸€åˆ‡çš†æ˜¯å¯¹è±¡ï¼Œæ‰€ä»¥ä½ ä¸å¦¨æŠŠæ‰€æœ‰çš„å±žæ€§ä¹Ÿçœ‹æˆæ˜¯å¯¹è±¡)
 
-PS:¸öÈË¾õµÃÕâÀï×îºÃ°ÑÊý¾ÝÃèÊö·ûµÈÐ§ÓÚ¶¨ÒåÁË__get__,__set__,__del__Èý¸ö·½·¨µÄ½Ó¿Ú¡£
+PS:ä¸ªäººè§‰å¾—è¿™é‡Œæœ€å¥½æŠŠæ•°æ®æè¿°ç¬¦ç­‰æ•ˆäºŽå®šä¹‰äº†__get__,__set__,__del__ä¸‰ä¸ªæ–¹æ³•çš„æŽ¥å£ã€‚
 
-²ûÊöÏÂÕâÈý¸ö·½·¨:
+é˜è¿°ä¸‹è¿™ä¸‰ä¸ªæ–¹æ³•:
 
-__get__µÄ±ê×¼¶¨ÒåÊÇ__get__(self,obj,type=None)£¬Ëü·Ç³£½Ó½üÓÚJavaBeanµÄget
+__get__çš„æ ‡å‡†å®šä¹‰æ˜¯__get__(self,obj,type=None)ï¼Œå®ƒéžå¸¸æŽ¥è¿‘äºŽJavaBeançš„get
 
-µÚÒ»¸öº¯ÊýÊÇµ÷ÓÃËüµÄÊµÀý£¬objÊÇÖ¸È¥·ÃÎÊÊôÐÔËùÔÚµÄ·½·¨£¬×îºóÒ»¸ötypeÊÇÒ»¸ö¿ÉÑ¡²ÎÊý£¬Í¨³£ÎªNone(Õâ¸öÓÐ´ýÓÚ½øÒ»²½µÄÑÐ¾¿)
+ç¬¬ä¸€ä¸ªå‡½æ•°æ˜¯è°ƒç”¨å®ƒçš„å®žä¾‹ï¼Œobjæ˜¯æŒ‡åŽ»è®¿é—®å±žæ€§æ‰€åœ¨çš„æ–¹æ³•ï¼Œæœ€åŽä¸€ä¸ªtypeæ˜¯ä¸€ä¸ªå¯é€‰å‚æ•°ï¼Œé€šå¸¸ä¸ºNone(è¿™ä¸ªæœ‰å¾…äºŽè¿›ä¸€æ­¥çš„ç ”ç©¶)
 
-ÀýÈç¸ø¶¨ÀàXºÍÊµÀýx£¬µ÷ÓÃx.foo£¬µÈÐ§ÓÚµ÷ÓÃ:
+ä¾‹å¦‚ç»™å®šç±»Xå’Œå®žä¾‹xï¼Œè°ƒç”¨x.fooï¼Œç­‰æ•ˆäºŽè°ƒç”¨:
 
 type(x).__dict__["foo"].__get__(x,type(x))
-µ÷ÓÃX.foo£¬µÈÐ§ÓÚµ÷ÓÃ:
+è°ƒç”¨X.fooï¼Œç­‰æ•ˆäºŽè°ƒç”¨:
 
 type(x).__dict__["foo"].__get__(None,type(x))
-µÚ¶þ¸öº¯Êý__set__µÄ±ê×¼¶¨ÒåÊÇ__set__(self,obj,val)£¬Ëü·Ç³£½Ó½üÓÚJavaBeanµÄset·½·¨£¬ÆäÖÐ×îºóÒ»¸ö²ÎÊýÊÇÒª¸³ÓèµÄÖµ
+ç¬¬äºŒä¸ªå‡½æ•°__set__çš„æ ‡å‡†å®šä¹‰æ˜¯__set__(self,obj,val)ï¼Œå®ƒéžå¸¸æŽ¥è¿‘äºŽJavaBeançš„setæ–¹æ³•ï¼Œå…¶ä¸­æœ€åŽä¸€ä¸ªå‚æ•°æ˜¯è¦èµ‹äºˆçš„å€¼
 
-µÚÈý¸öº¯Êý__del__µÄ±ê×¼¶¨ÒåÊÇ__del__(self,obj)£¬Ëü·Ç³£½Ó½üJavaÖÐObjectµÄFinailize()·½·¨£¬Ö¸PythonÔÚ»ØÊÕÕâ¸öÀ¬»ø¶ÔÏóÊ±Ëùµ÷ÓÃµ½µÄÎö¹¹º¯Êý£¬Ö»ÊÇÕâ¸öº¯ÊýÓÀÔ¶²»»áÅ×³öÒì³£¡£ÒòÎªÕâ¸ö¶ÔÏóÒÑ¾­Ã»ÓÐÒýÓÃÖ¸ÏòËü£¬Å×³öÒì³£Ã»ÓÐÈÎºÎÒâÒå¡£
+ç¬¬ä¸‰ä¸ªå‡½æ•°__del__çš„æ ‡å‡†å®šä¹‰æ˜¯__del__(self,obj)ï¼Œå®ƒéžå¸¸æŽ¥è¿‘Javaä¸­Objectçš„Finailize()æ–¹æ³•ï¼ŒæŒ‡Pythonåœ¨å›žæ”¶è¿™ä¸ªåžƒåœ¾å¯¹è±¡æ—¶æ‰€è°ƒç”¨åˆ°çš„æžæž„å‡½æ•°ï¼Œåªæ˜¯è¿™ä¸ªå‡½æ•°æ°¸è¿œä¸ä¼šæŠ›å‡ºå¼‚å¸¸ã€‚å› ä¸ºè¿™ä¸ªå¯¹è±¡å·²ç»æ²¡æœ‰å¼•ç”¨æŒ‡å‘å®ƒï¼ŒæŠ›å‡ºå¼‚å¸¸æ²¡æœ‰ä»»ä½•æ„ä¹‰ã€‚
 
-½ÓÏÂÀ´£¬ÎÒÃÇÀ´Ò»Ò»±È½ÏÕâÐ©ÓÅÏÈ¼¶.
+æŽ¥ä¸‹æ¥ï¼Œæˆ‘ä»¬æ¥ä¸€ä¸€æ¯”è¾ƒè¿™äº›ä¼˜å…ˆçº§.
 
-Ê×ÏÈÀ´¿´ÀàÊôÐÔ
+é¦–å…ˆæ¥çœ‹ç±»å±žæ€§
 
 [python] view plain copy
 # -*- coding:utf-8 -*-  
@@ -54,18 +54,18 @@ print a.foo
 a.foo=4  
 print a.foo  
 print A.foo  
-ÉÏÃæÕâ¶Î´úÂëµÄÊä³öÈçÏÂ£º
+ä¸Šé¢è¿™æ®µä»£ç çš„è¾“å‡ºå¦‚ä¸‹ï¼š
 
 3
 3
 4
 3
 
-´ÓÊä³ö¿ÉÒÔ¿´µ½£¬µ±ÎÒÃÇ¸øa.foo¸³ÖµµÄÊ±ºò£¬ÆäÊµÓëÀàÊµÀýµÄÄÇ¸öfooÊÇÃ»ÓÐ¹ØÏµµÄ¡£a.foo=4 Õâ¾ä»°¸øa¶ÔÏóÔö¼ÓÁËÒ»¸öÊôÐÔ½Ðfoo¡£ÆäÖµÊÇ4¡£
+ä»Žè¾“å‡ºå¯ä»¥çœ‹åˆ°ï¼Œå½“æˆ‘ä»¬ç»™a.fooèµ‹å€¼çš„æ—¶å€™ï¼Œå…¶å®žä¸Žç±»å®žä¾‹çš„é‚£ä¸ªfooæ˜¯æ²¡æœ‰å…³ç³»çš„ã€‚a.foo=4 è¿™å¥è¯ç»™aå¯¹è±¡å¢žåŠ äº†ä¸€ä¸ªå±žæ€§å«fooã€‚å…¶å€¼æ˜¯4ã€‚
 
-×îºóÁ½¸öÓï¾äÃ÷È·µÄ±íÃ÷ÁË£¬ÎÒÃÇÊä³öa.fooºÍA.fooµÄÖµ£¬ËûÃÇÊÇ²»Í¬µÄ¡£
+æœ€åŽä¸¤ä¸ªè¯­å¥æ˜Žç¡®çš„è¡¨æ˜Žäº†ï¼Œæˆ‘ä»¬è¾“å‡ºa.fooå’ŒA.fooçš„å€¼ï¼Œä»–ä»¬æ˜¯ä¸åŒçš„ã€‚
 
-µ«ÊÇÎªÊ²Ã´a=A()Óï¾äºóÃæµÄprint a.fooÊä³öÁË3ÄØ£¿ÕâÊÇÒòÎª¸ù¾ÝËÑË÷Ë³ÐòÕÒµ½ÁËÀàÊôÐÔ¡£µ±ÎÒÃÇÖ´ÐÐa.foo=4µÄÊ±ºò£¬ÎÒÃÇÈÃa¶ÔÏóµÄfooÊôÐÔÖ¸ÏòÁË4Õâ¸ö¶ÔÏó¡£µ«ÊÇ²¢Ã»ÓÐ¸Ä±äÀàÊôÐÔfooµÄÖµ¡£ËùÒÔ×îºóÎÒÃÇprint A.fooµÄÊ±ºò£¬ÓÖÊä³öÁË3¡£
+ä½†æ˜¯ä¸ºä»€ä¹ˆa=A()è¯­å¥åŽé¢çš„print a.fooè¾“å‡ºäº†3å‘¢ï¼Ÿè¿™æ˜¯å› ä¸ºæ ¹æ®æœç´¢é¡ºåºæ‰¾åˆ°äº†ç±»å±žæ€§ã€‚å½“æˆ‘ä»¬æ‰§è¡Œa.foo=4çš„æ—¶å€™ï¼Œæˆ‘ä»¬è®©aå¯¹è±¡çš„fooå±žæ€§æŒ‡å‘äº†4è¿™ä¸ªå¯¹è±¡ã€‚ä½†æ˜¯å¹¶æ²¡æœ‰æ”¹å˜ç±»å±žæ€§fooçš„å€¼ã€‚æ‰€ä»¥æœ€åŽæˆ‘ä»¬print A.fooçš„æ—¶å€™ï¼Œåˆè¾“å‡ºäº†3ã€‚
 
 [python] view plain copy
 # -*- coding:utf-8 -*-  
@@ -82,11 +82,11 @@ a.foo=4
 print a.foo  
 del a.foo  
 print a.foo  
-ÉÏÃæµÄ´úÂë£¬ÎÒ¸øa.foo¸³ÖµÎª4£¬ÔÚÊä³öÒ»´ÎÖ®ºó¾ÍdelÁË¡£Á½´ÎÊä³ö£¬µÚÒ»´ÎÊä³öµÄÊÇa¶ÔÏóµÄÊôÐÔ¡£µÚ¶þ´ÎÊÇÀàÊôÐÔ¡£²»ÊÇËµÀàÊôÐÔµÄÓÅÏÈ¼¶±ÈÊµÀýÊôÐÔµÄ¸ßÂð¡£ÎªÉ¶µÚÒ»´ÎÊä³öµÄÊÇ4¶ø²»ÊÇ3ÄØ£¿»¹ÊÇÉÏÃæ½âÊÍµÄÔ­Òò¡£ÒòÎªa.fooÓëÀàÊôÐÔµÄfooÖ»ÊÇÖØÃû¶øÒÑ¡£ÎÒÃÇprint a.fooµÄÊ±ºò£¬aµÄfooÖ¸ÏòµÄÊÇ4£¬ËùÒÔÊä³öÁË4¡£
+ä¸Šé¢çš„ä»£ç ï¼Œæˆ‘ç»™a.fooèµ‹å€¼ä¸º4ï¼Œåœ¨è¾“å‡ºä¸€æ¬¡ä¹‹åŽå°±deläº†ã€‚ä¸¤æ¬¡è¾“å‡ºï¼Œç¬¬ä¸€æ¬¡è¾“å‡ºçš„æ˜¯aå¯¹è±¡çš„å±žæ€§ã€‚ç¬¬äºŒæ¬¡æ˜¯ç±»å±žæ€§ã€‚ä¸æ˜¯è¯´ç±»å±žæ€§çš„ä¼˜å…ˆçº§æ¯”å®žä¾‹å±žæ€§çš„é«˜å—ã€‚ä¸ºå•¥ç¬¬ä¸€æ¬¡è¾“å‡ºçš„æ˜¯4è€Œä¸æ˜¯3å‘¢ï¼Ÿè¿˜æ˜¯ä¸Šé¢è§£é‡Šçš„åŽŸå› ã€‚å› ä¸ºa.fooä¸Žç±»å±žæ€§çš„fooåªæ˜¯é‡åè€Œå·²ã€‚æˆ‘ä»¬print a.fooçš„æ—¶å€™ï¼Œaçš„fooæŒ‡å‘çš„æ˜¯4ï¼Œæ‰€ä»¥è¾“å‡ºäº†4ã€‚
 
 ------------------------------------
 
-È»ºóÎÒÃÇÀ´¿´ÏÂÊý¾ÝÃèÊö·ûÕâÒ»È«ÐÂµÄÓïÑÔ¸ÅÄî¡£°´ÕÕÖ®Ç°µÄ¶¨Òå£¬Ò»¸öÊµÏÖÁË__get__,__set__,__del__µÄÀà¶¼Í³³ÆÎªÊý¾ÝÃèÊö·û¡£ÎÒÃÇÀ´¿´ÏÂÒ»¸ö¼òµ¥µÄÀý×Ó¡£
+ç„¶åŽæˆ‘ä»¬æ¥çœ‹ä¸‹æ•°æ®æè¿°ç¬¦è¿™ä¸€å…¨æ–°çš„è¯­è¨€æ¦‚å¿µã€‚æŒ‰ç…§ä¹‹å‰çš„å®šä¹‰ï¼Œä¸€ä¸ªå®žçŽ°äº†__get__,__set__,__del__çš„ç±»éƒ½ç»Ÿç§°ä¸ºæ•°æ®æè¿°ç¬¦ã€‚æˆ‘ä»¬æ¥çœ‹ä¸‹ä¸€ä¸ªç®€å•çš„ä¾‹å­ã€‚
 
 [python] view plain copy
 # -*- coding:utf-8 -*-  
@@ -116,14 +116,14 @@ a=A()
 print a.foo  
 a.foo=13  
 print a.foo  
-ÉÏÃæÀý×ÓµÄÊä³ö½á¹ûÈçÏÂ£º
+ä¸Šé¢ä¾‹å­çš„è¾“å‡ºç»“æžœå¦‚ä¸‹ï¼š
 
 [plain] view plain copy
 {'__dict__': <attribute '__dict__' of 'A' objects>, '__module__': '__main__', 'foo': <__main__.simpleDescriptor object at 0x005511B0>, '__weakref__': <attribute '__weakref__' of 'A' objects>, '__doc__': None}  
 None  
 None  
 None  
-´ÓÊä³ö½á¹û¿´³ö£¬printÓï¾ä´òÓ¡³öÀ´µÄ¶¼ÊÇNone¡£ÕâËµÃ÷a.foo¶¼Ã»ÓÐ±»¸³ÖµÄÚÈÝ¡£ÕâÊÇÒòÎª__get__º¯ÊýµÄº¯ÊýÌåÊ²Ã´¹¤×÷¶¼Ã»ÓÐ×ö¡£Ö±½ÓÊÇpass¡£´ËÊ±£¬ÏëÒª·ÃÎÊfoo£¬Ã¿´Î¶¼Ã»ÓÐ·µ»ØÄÚÈÝ£¬ËùÒÔÊä³öµÄÄÚÈÝ¾ÍÊÇNoneÁË¡£
+ä»Žè¾“å‡ºç»“æžœçœ‹å‡ºï¼Œprintè¯­å¥æ‰“å°å‡ºæ¥çš„éƒ½æ˜¯Noneã€‚è¿™è¯´æ˜Ža.fooéƒ½æ²¡æœ‰è¢«èµ‹å€¼å†…å®¹ã€‚è¿™æ˜¯å› ä¸º__get__å‡½æ•°çš„å‡½æ•°ä½“ä»€ä¹ˆå·¥ä½œéƒ½æ²¡æœ‰åšã€‚ç›´æŽ¥æ˜¯passã€‚æ­¤æ—¶ï¼Œæƒ³è¦è®¿é—®fooï¼Œæ¯æ¬¡éƒ½æ²¡æœ‰è¿”å›žå†…å®¹ï¼Œæ‰€ä»¥è¾“å‡ºçš„å†…å®¹å°±æ˜¯Noneäº†ã€‚
 
 [python] view plain copy
 # -*- coding:utf-8 -*-  
@@ -153,14 +153,14 @@ a=A()
 print a.foo  
 a.foo=13  
 print a.foo  
-°Ñ__get__º¯ÊýÊµÏÖÒÔÏÂ£¬¾Í¿ÉÒÔµÃµ½ÈçÏÂÊä³ö½á¹û£º
+æŠŠ__get__å‡½æ•°å®žçŽ°ä»¥ä¸‹ï¼Œå°±å¯ä»¥å¾—åˆ°å¦‚ä¸‹è¾“å‡ºç»“æžœï¼š
 
 [plain] view plain copy
 {'__dict__': <attribute '__dict__' of 'A' objects>, '__module__': '__main__', 'foo': <__main__.simpleDescriptor object at 0x00671190>, '__weakref__': <attribute '__weakref__' of 'A' objects>, '__doc__': None}  
 hi there  
 hi there  
 hi there  
-ÎªÁË¼ÓÉî¶ÔÊý¾ÝÃèÊö·ûµÄÀí½â£¬¿´ÈçÏÂÀý×Ó£º
+ä¸ºäº†åŠ æ·±å¯¹æ•°æ®æè¿°ç¬¦çš„ç†è§£ï¼Œçœ‹å¦‚ä¸‹ä¾‹å­ï¼š
 
 [python] view plain copy
 # -*- coding:utf-8 -*-  
@@ -185,21 +185,21 @@ class A(object):
 a = A();  
 a.foo = 13;  
 print a.foo;  
-ÉÏÃæ´úÂëµÄÊä³öÊÇ
+ä¸Šé¢ä»£ç çš„è¾“å‡ºæ˜¯
 
 16
 
 6
 
-µÚÒ»¸ö16ÎªÎÒÃÇÔÚ¶Ôa.foo¸³ÖµµÄÊ±ºò£¬ÈËÎªµÄ½«13¼ÓÉÏ3ºó×÷ÎªfooµÄÖµ£¬µÚ¶þ¸ö6ÊÇÎÒÃÇÔÚ·µ»Øa.fooÖ®Ç°ÈËÎªµÄ½«Ëü¼õÈ¥ÁË10¡£
+ç¬¬ä¸€ä¸ª16ä¸ºæˆ‘ä»¬åœ¨å¯¹a.fooèµ‹å€¼çš„æ—¶å€™ï¼Œäººä¸ºçš„å°†13åŠ ä¸Š3åŽä½œä¸ºfooçš„å€¼ï¼Œç¬¬äºŒä¸ª6æ˜¯æˆ‘ä»¬åœ¨è¿”å›ža.fooä¹‹å‰äººä¸ºçš„å°†å®ƒå‡åŽ»äº†10ã€‚
 
-ËùÒÔÎÒÃÇ¿ÉÒÔ²Â²â£¬³£¹æµÄPythonÀàÔÚ¶¨Òåget,set·½·¨µÄÊ±ºò£¬Èç¹ûÎÞÌØÊâÐèÇó£¬Ö±½Ó¸ø¶ÔÓ¦µÄÊôÐÔ¸³Öµ»òÖ±½Ó·µ»Ø¸ÃÊôÐÔÖµ¡£Èç¹û×Ô¼º¶¨ÒåÀà£¬²¢ÇÒ¼Ì³ÐobjectÀàµÄ»°£¬Õâ¼¸¸ö·½·¨¶¼²»ÓÃ¶¨Òå¡£
+æ‰€ä»¥æˆ‘ä»¬å¯ä»¥çŒœæµ‹ï¼Œå¸¸è§„çš„Pythonç±»åœ¨å®šä¹‰get,setæ–¹æ³•çš„æ—¶å€™ï¼Œå¦‚æžœæ— ç‰¹æ®Šéœ€æ±‚ï¼Œç›´æŽ¥ç»™å¯¹åº”çš„å±žæ€§èµ‹å€¼æˆ–ç›´æŽ¥è¿”å›žè¯¥å±žæ€§å€¼ã€‚å¦‚æžœè‡ªå·±å®šä¹‰ç±»ï¼Œå¹¶ä¸”ç»§æ‰¿objectç±»çš„è¯ï¼Œè¿™å‡ ä¸ªæ–¹æ³•éƒ½ä¸ç”¨å®šä¹‰ã€‚
 
 -----------------
 
-ÔÚÕâÀï¿´Ò»¸öÌâÍâ»°¡£
+åœ¨è¿™é‡Œçœ‹ä¸€ä¸ªé¢˜å¤–è¯ã€‚
 
-¿´´úÂë
+çœ‹ä»£ç 
 
 [python] view plain copy
 # -*- coding:utf-8 -*-  
@@ -226,11 +226,11 @@ class A(object):
 a = A();  
 a.foo = "13";  
 print a.foo;  
-ÉÏÃæ´úÂëÔÚ__set__ º¯ÊýÖÐ¼ì²éÁË²ÎÊýval£¬Èç¹ûvalÊÇstrÀàÐÍµÄ£¬ÄÇÃ´Òª±¨´í¡£Õâ¾ÍÊµÏÖÁËÎÒÃÇÉÏÒ»ÆªÎÄÕÂÖÐÒªÊµÏÖµÄ£¬ÔÚ¸øÊôÐÔ¸³ÖµµÄÊ±ºò×öÀàÐÍ¼ì²éµÄ¹¦ÄÜ¡£
+ä¸Šé¢ä»£ç åœ¨__set__ å‡½æ•°ä¸­æ£€æŸ¥äº†å‚æ•°valï¼Œå¦‚æžœvalæ˜¯strç±»åž‹çš„ï¼Œé‚£ä¹ˆè¦æŠ¥é”™ã€‚è¿™å°±å®žçŽ°äº†æˆ‘ä»¬ä¸Šä¸€ç¯‡æ–‡ç« ä¸­è¦å®žçŽ°çš„ï¼Œåœ¨ç»™å±žæ€§èµ‹å€¼çš„æ—¶å€™åšç±»åž‹æ£€æŸ¥çš„åŠŸèƒ½ã€‚
 
 -----------------------------------------------
 
-ÏÂÃæÎÒÃÇÀ´¿´ÏÂÊµÀýÊôÐÔºÍ·ÇÊý¾ÝÃèÊö·û¡£
+ä¸‹é¢æˆ‘ä»¬æ¥çœ‹ä¸‹å®žä¾‹å±žæ€§å’Œéžæ•°æ®æè¿°ç¬¦ã€‚
 
 [python] view plain copy
 # -*- coding:utf-8 -*-  
@@ -247,35 +247,35 @@ print b.__dict__
 b.bar = 13  
 print b.__dict__  
 print b.bar  
-ÉÏÃæ´úÂëÊä³ö½á¹ûÈçÏÂ£º
+ä¸Šé¢ä»£ç è¾“å‡ºç»“æžœå¦‚ä¸‹ï¼š
 
  {}
 {'bar': 13}
 13
 
-ÄÇÃ´Ê²Ã´ÊÇ·ÇÊý¾ÝÃèÊö·ûÄØ£¿
+é‚£ä¹ˆä»€ä¹ˆæ˜¯éžæ•°æ®æè¿°ç¬¦å‘¢ï¼Ÿ
 
-¼òµ¥µÄËµ£¬¾ÍÊÇÃ»ÓÐÊµÏÖget,set,delÈý¸ö·½·¨µÄËùÓÐÀà¡£
+ç®€å•çš„è¯´ï¼Œå°±æ˜¯æ²¡æœ‰å®žçŽ°get,set,delä¸‰ä¸ªæ–¹æ³•çš„æ‰€æœ‰ç±»ã€‚
 
-ÈÃÎÒÃÇÈÎÒâ¿´Ò»¸öº¯ÊýµÄÃèÊö£º
+è®©æˆ‘ä»¬ä»»æ„çœ‹ä¸€ä¸ªå‡½æ•°çš„æè¿°ï¼š
 
 def call():
 
     pass
 
-Ö´ÐÐprint dir(call)»áµÃµ½ÈçÏÂ½á¹û£º
+æ‰§è¡Œprint dir(call)ä¼šå¾—åˆ°å¦‚ä¸‹ç»“æžœï¼š
 
 [plain] view plain copy
 ['__call__', '__class__', '__closure__', '__code__', '__defaults__', '__delattr__', '__dict__', '__doc__', '__format__', '__get__', '__getattribute__', '__globals__', '__hash__', '__init__', '__module__', '__name__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', 'func_closure', 'func_code', 'func_defaults', 'func_dict', 'func_doc', 'func_globals', 'func_name']  
-ÏÈ¿´ÏÂdirµÄ°ïÖú¡£
+å…ˆçœ‹ä¸‹dirçš„å¸®åŠ©ã€‚
 
 
 
-dirÁÐ³ö¸ø¶¨¶ÔÏóµÄÊôÐÔ»òÕßÊÇ´ÓÕâ¸ö¶ÔÏóÄÜ¹»´ïµ½µÄ¶ÔÏó¡£
+diråˆ—å‡ºç»™å®šå¯¹è±¡çš„å±žæ€§æˆ–è€…æ˜¯ä»Žè¿™ä¸ªå¯¹è±¡èƒ½å¤Ÿè¾¾åˆ°çš„å¯¹è±¡ã€‚
 
-»Øµ½print dir(call)·½·¨µÄÊä³ö£¬¿´µ½£¬call·½·¨£¬ÓÐÊä³öµÄÄÇÃ´¶à¸öÊôÐÔ¡£ÆäÖÐ¾Í°üº¬ÁË__get__º¯Êý¡£µ«ÊÇÈ´Ã»ÓÐ__set__ºÍ__del__º¯Êý¡£ËùÒÔËùÓÐµÄÀà³ÉÔ±º¯Êý¶¼ÊÇ·ÇÊý¾ÝÃèÊö·û¡£
+å›žåˆ°print dir(call)æ–¹æ³•çš„è¾“å‡ºï¼Œçœ‹åˆ°ï¼Œcallæ–¹æ³•ï¼Œæœ‰è¾“å‡ºçš„é‚£ä¹ˆå¤šä¸ªå±žæ€§ã€‚å…¶ä¸­å°±åŒ…å«äº†__get__å‡½æ•°ã€‚ä½†æ˜¯å´æ²¡æœ‰__set__å’Œ__del__å‡½æ•°ã€‚æ‰€ä»¥æ‰€æœ‰çš„ç±»æˆå‘˜å‡½æ•°éƒ½æ˜¯éžæ•°æ®æè¿°ç¬¦ã€‚
 
-¿´Ò»¸öÊµÀýÊý¾ÝÑÚ¸Ç·ÇÊý¾ÝÃèÊö·ûµÄÀý×Ó£º
+çœ‹ä¸€ä¸ªå®žä¾‹æ•°æ®æŽ©ç›–éžæ•°æ®æè¿°ç¬¦çš„ä¾‹å­ï¼š
 
 [python] view plain copy
 ''''' 
@@ -294,14 +294,14 @@ d=D()
 print d.foo  
 d.foo=15  
 print d.foo  
-¿´Êä³ö£º
+çœ‹è¾“å‡ºï¼š
 
 ('get', <__main__.simpleDescriptor object at 0x02141190>, <__main__.D object at 0x025CAF50>, <class '__main__.D'>)
 15
 
-¿É¼û£¬ÊµÀýÊý¾ÝÑÚ¸ÇÁË·ÇÊý¾ÝÃèÊö·û¡£
+å¯è§ï¼Œå®žä¾‹æ•°æ®æŽ©ç›–äº†éžæ•°æ®æè¿°ç¬¦ã€‚
 
-Èç¹û¸Ä³ÉÊý¾ÝÃèÊö·û£¬ÄÇÃ´¾Í²»»á±»¸²¸ÇÁË¡£¿´ÏÂÃæ£º
+å¦‚æžœæ”¹æˆæ•°æ®æè¿°ç¬¦ï¼Œé‚£ä¹ˆå°±ä¸ä¼šè¢«è¦†ç›–äº†ã€‚çœ‹ä¸‹é¢ï¼š
 
 [python] view plain copy
 ''''' 
@@ -324,17 +324,17 @@ d=D()
 print d.foo  
 d.foo=15  
 print d.foo  
-´úÂëµÄÊä³öÈçÏÂ£º
+ä»£ç çš„è¾“å‡ºå¦‚ä¸‹ï¼š
 
 [plain] view plain copy
 ('get', <__main__.simpleDescriptor object at 0x01DD1190>, <__main__.D object at 0x0257AF50>, <class '__main__.D'>)  
 ('get', <__main__.simpleDescriptor object at 0x01DD1190>, <__main__.D object at 0x0257AF50>, <class '__main__.D'>)  
 
-ÓÉÓÚÊÇÊý¾ÝÃèÊö·û£¬__set __º¯ÊýÌåÊÇpass£¬ËùÒÔÁ½´ÎÊä³ö¶¼ÊÇÍ¬ÑùµÄÄÚÈÝ¡£
+ç”±äºŽæ˜¯æ•°æ®æè¿°ç¬¦ï¼Œ__set __å‡½æ•°ä½“æ˜¯passï¼Œæ‰€ä»¥ä¸¤æ¬¡è¾“å‡ºéƒ½æ˜¯åŒæ ·çš„å†…å®¹ã€‚
 
-×îºó¿´ÏÂ__getatrr__·½·¨¡£ËüµÄ±ê×¼¶¨ÒåÊÇ:__getattr__(self,attr)£¬ÆäÖÐattrÊÇÊôÐÔÃû
+æœ€åŽçœ‹ä¸‹__getatrr__æ–¹æ³•ã€‚å®ƒçš„æ ‡å‡†å®šä¹‰æ˜¯:__getattr__(self,attr)ï¼Œå…¶ä¸­attræ˜¯å±žæ€§å
 
-ÈÃÎÒÃÇÀ´¿´Ò»¸ö¼òµ¥µÄÀý×Ó£º
+è®©æˆ‘ä»¬æ¥çœ‹ä¸€ä¸ªç®€å•çš„ä¾‹å­ï¼š
 
 [plain] view plain copy
 '''  
@@ -351,16 +351,16 @@ d=D()
 print d.foo,type(d.foo)  
 d.foo=15  
 print d.foo  
-´úÂëÊä³ö£º
+ä»£ç è¾“å‡ºï¼š
 
 foo <type 'str'>
 15
 
-ÓÉÓÚd¶ÔÏóÖÐ¸ù±¾Ã»ÓÐfooÕâ¸öÊôÐÔ£¬ËùÒÔpython×îºóÇóÖúÓÚ__getattr__º¯Êý¡£È»ºó´òÓ¡³ö__getattr__º¯ÊýµÄ·µ»ØÖµ¡£
+ç”±äºŽdå¯¹è±¡ä¸­æ ¹æœ¬æ²¡æœ‰fooè¿™ä¸ªå±žæ€§ï¼Œæ‰€ä»¥pythonæœ€åŽæ±‚åŠ©äºŽ__getattr__å‡½æ•°ã€‚ç„¶åŽæ‰“å°å‡º__getattr__å‡½æ•°çš„è¿”å›žå€¼ã€‚
 
-×¢Òâ£ºÕâÀï²»ÒªÈÏÎªµÄÔì³ÉÎÞÏÞµÝ¹é
+æ³¨æ„ï¼šè¿™é‡Œä¸è¦è®¤ä¸ºçš„é€ æˆæ— é™é€’å½’
 
-´úÂëÈçÏÂ£º
+ä»£ç å¦‚ä¸‹ï¼š
 
 [python] view plain copy
 ''''' 
@@ -377,7 +377,7 @@ d=D()
 print d.foo  
 d.foo=15  
 print d.foo  
-Õâ¶Î´úÂë£¬ »áÔì³ÉÈçÏÂ´íÎó£º
+è¿™æ®µä»£ç ï¼Œ ä¼šé€ æˆå¦‚ä¸‹é”™è¯¯ï¼š
 
 Exception RuntimeError: 'maximum recursion depth exceeded while calling a Python object'in <type 'exceptions.AttributeError'> ignored
 Traceback (most recent call last):
@@ -396,4 +396,4 @@ Traceback (most recent call last):
     return self.attr
 AttributeError: 'D' object has no attribute 'attr'
 
-Ôì³ÉÁË³¬¹ý×î´óµÝ¹éÉî¶ÈÎÊÌâ
+é€ æˆäº†è¶…è¿‡æœ€å¤§é€’å½’æ·±åº¦é—®é¢˜

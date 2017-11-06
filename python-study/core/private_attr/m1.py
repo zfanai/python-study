@@ -1,6 +1,6 @@
-#encoding:gbk
+#encoding:utf8
 
-# ¶¨ÒåÁË__all__Ò²¾ÍÊÇ¶¨ÒåÁËÕâ¸öÄ£¿éÍ¨¹ýfrom m import * ÐÎÊ½ÄÜ¹»µ¼ÈëµÄÊôÐÔ
+# å®šä¹‰äº†__all__ä¹Ÿå°±æ˜¯å®šä¹‰äº†è¿™ä¸ªæ¨¡å—é€šè¿‡from m import * å½¢å¼èƒ½å¤Ÿå¯¼å…¥çš„å±žæ€§
 #__all__=['_VER']
 _VER=0.2
 VER=0.3
